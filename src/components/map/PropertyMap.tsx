@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useEffect, useState, useRef } from 'react';
 import { Property } from '../../types/property';
 import { formatCurrency, formatArea } from '../../lib/formatters';
 
@@ -20,12 +19,17 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [mapTile, setMapTile] = useState<'streets' | 'satellite'>('streets');
+  const leafletRef = useRef<any>(null);
 
   useEffect(() => {
     setIsMounted(true);
+    // Load Leaflet safely only on client mount
+    if (typeof window !== 'undefined') {
+      leafletRef.current = require('leaflet');
+    }
   }, []);
 
-  if (!isMounted) {
+  if (!isMounted || !leafletRef.current) {
     return (
       <div 
         style={{ height }}
@@ -36,11 +40,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     );
   }
 
-  // Import Leaflet dynamically on client
-  const L = require('leaflet');
-  require('leaflet/dist/leaflet.css');
-
-  // Center around Urabá & Darién (approx 7.9° N, -76.7° W)
+  const L = leafletRef.current;
   const defaultCenter: [number, number] = [7.9351, -76.7289];
 
   return (
@@ -66,7 +66,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
       </div>
 
       {/* Leaflet Map Container */}
-      <div id="darien-map-container" className="w-full h-full">
+      <div className="w-full h-full">
         <LeafletMapInner 
           L={L} 
           properties={properties} 
@@ -87,11 +87,11 @@ const LeafletMapInner: React.FC<{
   mapTile: 'streets' | 'satellite';
   onSelectProperty?: (id: string) => void;
 }> = ({ L, properties, defaultCenter, mapTile, onSelectProperty }) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const mapInstanceRef = React.useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !L) return;
 
     // Create map if not created
     if (!mapInstanceRef.current) {
@@ -121,7 +121,7 @@ const LeafletMapInner: React.FC<{
       }).addTo(map);
     } else {
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
         maxZoom: 18
       }).addTo(map);
     }
@@ -186,9 +186,6 @@ const LeafletMapInner: React.FC<{
       }
     });
 
-    return () => {
-      // Keep map reference
-    };
   }, [L, properties, defaultCenter, mapTile, onSelectProperty]);
 
   return <div ref={containerRef} className="w-full h-full" />;

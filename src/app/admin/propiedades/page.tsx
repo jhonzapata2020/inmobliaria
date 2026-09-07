@@ -10,12 +10,10 @@ import {
   Copy, 
   Trash2, 
   Eye, 
-  CheckCircle2, 
   AlertTriangle, 
-  Lock,
+  ShieldCheck,
   MapPin,
-  Ruler,
-  FileSpreadsheet
+  Ruler
 } from 'lucide-react';
 import { INITIAL_PROPERTIES } from '../../../data/mockProperties';
 import { Property } from '../../../types/property';
@@ -71,64 +69,61 @@ export default function AdminPropiedadesPage() {
     const matchesSearch = 
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.municipality.toLowerCase().includes(searchQuery.toLowerCase());
+      p.municipality.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.matriculaInmobiliaria.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = assetTypeFilter ? p.assetType === assetTypeFilter : true;
     return matchesSearch && matchesType;
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="space-y-6 text-[#1C1917]">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
+      {/* Header Corporativo Sobrio */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#E5E7EB] pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-teal-400">
-            <Lock className="w-3.5 h-3.5" />
-            <span>Panel Administrativo Interno</span>
-          </div>
-          <h1 className="font-serif text-2xl sm:text-4xl font-bold text-white mt-1">
-            Gestión de Inventario de Propiedades (CRUD)
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
+            Gestión de Inventario & Portafolio de Predios
           </h1>
-          <p className="text-xs text-slate-400 font-mono mt-1">
+          <p className="text-xs text-stone-500 font-mono mt-1">
             {properties.length} registros en base de datos local demostrativa.
           </p>
         </div>
 
         <button
           onClick={handleCreateNew}
-          className="px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2"
+          className="px-4.5 py-2.5 bg-[#1E3A2F] hover:bg-[#152921] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 transition-all"
         >
-          <Plus className="w-4 h-4" /> Crear Nueva Propiedad
+          <Plus className="w-4 h-4 text-emerald-300" /> Registrar Nuevo Predio
         </button>
       </div>
 
-      {/* Demo Notice Bar */}
-      <div className="bg-amber-950/70 border border-amber-800/40 p-4 rounded-xl text-xs text-amber-200 flex items-center gap-3 font-mono">
-        <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+      {/* Banner de Aviso Demostrativo Sutil */}
+      <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 flex items-center gap-3 font-mono">
+        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
         <span>
           <strong>Nota de Demostración:</strong> Los datos mostrados son demostrativos y deben ser reemplazados por información validada antes de cualquier uso comercial o jurídico.
         </span>
       </div>
 
-      {/* Controls Bar */}
-      <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Control Bar & Search (Paleta Clara) */}
+      <div className="p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por código, título o municipio..."
+            placeholder="Buscar por Matrícula, Código, Nombre o Municipio..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+            className="w-full bg-white border border-stone-300 rounded-xl pl-9 pr-3 py-2 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-[#1E3A2F] shadow-2xs font-mono"
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto text-xs">
-          <label className="text-slate-400 font-mono">Tipo de Activo:</label>
+        <div className="flex items-center gap-3 w-full md:w-auto text-xs font-mono">
+          <label className="text-stone-500 font-bold">Tipo de Activo:</label>
           <select
             value={assetTypeFilter}
             onChange={(e) => setAssetTypeFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none"
+            className="bg-white border border-stone-300 rounded-xl px-3 py-2 text-stone-900 font-semibold focus:outline-none focus:border-[#1E3A2F]"
           >
             <option value="">Todos ({properties.length})</option>
             <option value="Finca">Fincas</option>
@@ -142,82 +137,82 @@ export default function AdminPropiedadesPage() {
         </div>
       </div>
 
-      {/* Properties Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl overflow-x-auto">
+      {/* Properties Table (Paleta Clara Sobria) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-xs overflow-x-auto">
         <table className="w-full text-left text-xs font-mono">
-          <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase text-[10px] tracking-wider">
+          <thead className="bg-[#F5F5F4] text-stone-600 uppercase text-xs font-semibold tracking-wider border-b border-[#E5E7EB]">
             <tr>
-              <th className="p-4">Código / Título</th>
-              <th className="p-4">Tipo & Modalidad</th>
-              <th className="p-4">Ubicación</th>
+              <th className="p-4">Código / Matrícula</th>
+              <th className="p-4">Nombre del Predio</th>
+              <th className="p-4">Municipio</th>
               <th className="p-4">Área Total</th>
               <th className="p-4">Valor Comercial</th>
-              <th className="p-4">Estado Jurídico</th>
+              <th className="p-4">Estado Legal</th>
               <th className="p-4 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-[#E5E7EB]">
             {filteredProperties.map((prop) => {
-              const legalBadge = getLegalStatusBadge(prop.legalStatus);
               return (
-                <tr key={prop.id} className="hover:bg-slate-850/60 transition-colors">
+                <tr key={prop.id} className="hover:bg-[#F8F7F4]/80 transition-colors">
                   <td className="p-4 space-y-1">
-                    <span className="font-bold text-emerald-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800 inline-block">
+                    <span className="font-bold text-[#1E3A2F] bg-[#1E3A2F]/10 px-2 py-0.5 rounded border border-[#1E3A2F]/20 inline-block text-[11px]">
                       {prop.code}
                     </span>
-                    <h4 className="font-bold text-white text-sm font-sans truncate max-w-xs">{prop.title}</h4>
+                    <div className="text-[11px] text-stone-500 font-mono">{prop.matriculaInmobiliaria}</div>
                   </td>
 
                   <td className="p-4 font-sans">
-                    <span className="font-bold text-slate-200 block">{prop.assetType}</span>
-                    <span className="text-[11px] text-slate-400">{prop.modality}</span>
+                    <h4 className="font-bold text-stone-900 text-sm">{prop.title}</h4>
+                    <span className="text-[11px] text-stone-500 font-mono">{prop.assetType} • {prop.modality}</span>
                   </td>
 
-                  <td className="p-4 text-slate-300 font-sans">
-                    {prop.municipality}, {prop.department}
+                  <td className="p-4 text-stone-700 font-sans">
+                    <span className="font-semibold">{prop.municipality}</span>, {prop.department}
                   </td>
 
-                  <td className="p-4 text-slate-200 font-bold">
+                  <td className="p-4 text-stone-900 font-bold">
                     {formatArea(prop.areaTotalHa, prop.areaTotalM2)}
                   </td>
 
-                  <td className="p-4 font-bold text-emerald-400">
+                  <td className="p-4 font-bold text-[#1E3A2F]">
                     {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                    {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/m`}
+                    {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/mes`}
                     {prop.modality === 'Custodia' && 'Regulada SAE'}
+                    {prop.modality === 'Inversión' && formatCurrency(prop.price)}
                   </td>
 
                   <td className="p-4">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${legalBadge.bgClass} ${legalBadge.textClass} ${legalBadge.borderClass}`}>
-                      {legalBadge.label}
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-[#F8F7F4] text-[#1E3A2F] border border-[#E5E7EB] inline-block">
+                      {prop.legalStatus}
                     </span>
                   </td>
 
                   <td className="p-4 text-right space-x-2">
                     <Link
                       href={`/propiedades/${prop.id}`}
-                      className="p-2 text-slate-400 hover:text-white inline-block"
-                      title="Ver Vista Pública"
+                      className="p-2 text-stone-500 hover:text-stone-900 hover:bg-[#F8F7F4] rounded-lg inline-block transition-colors"
+                      title="Ver Ficha 360°"
                     >
                       <Eye className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => handleEdit(prop)}
-                      className="p-2 text-slate-400 hover:text-emerald-400 inline-block"
-                      title="Editar Propiedad"
+                      className="p-2 text-[#1E3A2F] hover:bg-[#1E3A2F]/10 rounded-lg inline-block font-bold transition-colors"
+                      title="Editar Registro"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDuplicate(prop)}
-                      className="p-2 text-slate-400 hover:text-teal-400 inline-block"
+                      className="p-2 text-stone-500 hover:text-[#1E3A2F] hover:bg-[#F8F7F4] rounded-lg inline-block transition-colors"
                       title="Duplicar Registro"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(prop.id)}
-                      className="p-2 text-slate-400 hover:text-rose-400 inline-block"
+                      className="p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg inline-block transition-colors"
                       title="Eliminar Registro"
                     >
                       <Trash2 className="w-4 h-4" />

@@ -35,7 +35,7 @@ export default function PropertyDetailPage() {
   const router = useRouter();
   const propertyId = params?.id as string;
 
-  const property = INITIAL_PROPERTIES.find((p) => p.id === propertyId) || INITIAL_PROPERTIES[0];
+  const property = INITIAL_PROPERTIES.find((p) => p.id === propertyId);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
@@ -50,6 +50,19 @@ export default function PropertyDetailPage() {
   const { addToDossier, isInDossier, removeFromDossier } = useDossier();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { addToCompare, isInCompare } = useCompare();
+
+  if (!property) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center space-y-5">
+        <p className="text-xs font-mono uppercase tracking-wider text-amber-400">Activo no encontrado</p>
+        <h1 className="font-serif text-3xl font-bold text-white">Esta propiedad ya no está disponible</h1>
+        <p className="text-sm text-slate-400">El enlace puede estar desactualizado. Regresa al catálogo para consultar las oportunidades activas.</p>
+        <Link href="/propiedades" className="inline-flex items-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-500">
+          Volver al catálogo
+        </Link>
+      </div>
+    );
+  }
 
   const inDossier = isInDossier(property.id);
   const favorite = isFavorite(property.id);

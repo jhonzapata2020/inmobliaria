@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Phone, Mail, MapPin, CheckCircle2, Building2, Send, ShieldCheck } from 'lucide-react';
 
 export default function ContactoPage() {
@@ -12,6 +12,11 @@ export default function ContactoPage() {
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('');
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const requestedType = new URLSearchParams(window.location.search).get('type');
+    if (requestedType === 'sae') setInterestType('Custodia SAE');
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

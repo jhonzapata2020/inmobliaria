@@ -58,6 +58,9 @@ function PropiedadesCatalogContent() {
   // Filter & Sort Logic
   const filteredProperties = useMemo(() => {
     return INITIAL_PROPERTIES.filter((p) => {
+      const effectiveAreaHa = p.areaTotalHa ?? ((p.areaTotalM2 ?? 0) / 10000);
+      const effectivePrice = p.price ?? p.estimatedValue ?? p.monthlyRent ?? 0;
+
       // Favorite filter
       if (showOnlyFavorites && !favoriteIds.includes(p.id)) return false;
 
@@ -68,7 +71,8 @@ function PropiedadesCatalogContent() {
         const matchCode = p.code.toLowerCase().includes(q);
         const matchMun = p.municipality.toLowerCase().includes(q);
         const matchDesc = p.shortDescription.toLowerCase().includes(q);
-        if (!matchTitle && !matchCode && !matchMun && !matchDesc) return false;
+        const matchUse = p.potentialUses.some((use) => use.toLowerCase().includes(q));
+        if (!matchTitle && !matchCode && !matchMun && !matchDesc && !matchUse) return false;
       }
 
       // Modality
@@ -80,17 +84,40 @@ function PropiedadesCatalogContent() {
       // Municipality
       if (filters.municipality && p.municipality !== filters.municipality) return false;
 
+      // Department
+      if (filters.department && p.department !== filters.department) return false;
+
       // Legal status
       if (filters.legalStatus && p.legalStatus !== filters.legalStatus) return false;
+
+      // Availability and potential use
+      if (filters.availability && p.availability !== filters.availability) return false;
+      if (filters.potentialUse && !p.potentialUses.includes(filters.potentialUse as Property['potentialUses'][number])) return false;
+
+      // Numeric filters. Area is interpreted in hectares; square-meter assets are converted.
+      const minPrice = Number(filters.minPrice);
+      const maxPrice = Number(filters.maxPrice);
+      const minArea = Number(filters.minArea);
+      const maxArea = Number(filters.maxArea);
+      if (filters.minPrice && Number.isFinite(minPrice) && effectivePrice < minPrice) return false;
+      if (filters.maxPrice && Number.isFinite(maxPrice) && effectivePrice > maxPrice) return false;
+      if (filters.minArea && Number.isFinite(minArea) && effectiveAreaHa < minArea) return false;
+      if (filters.maxArea && Number.isFinite(maxArea) && effectiveAreaHa > maxArea) return false;
 
       // Investment flag
       if (filters.isInvestmentOpportunity && !p.isInvestmentOpportunity) return false;
 
       return true;
     }).sort((a, b) => {
-      if (filters.sortBy === 'price-asc') return (a.price || a.monthlyRent || 0) - (b.price || b.monthlyRent || 0);
-      if (filters.sortBy === 'price-desc') return (b.price || b.monthlyRent || 0) - (a.price || a.monthlyRent || 0);
-      if (filters.sortBy === 'area-desc') return (b.areaTotalHa || b.areaTotalM2 || 0) - (a.areaTotalHa || a.areaTotalM2 || 0);
+      const priceA = a.price ?? a.estimatedValue ?? a.monthlyRent ?? 0;
+      const priceB = b.price ?? b.estimatedValue ?? b.monthlyRent ?? 0;
+      if (filters.sortBy === 'price-asc') return priceA - priceB;
+      if (filters.sortBy === 'price-desc') return priceB - priceA;
+      if (filters.sortBy === 'area-desc') {
+        const areaA = a.areaTotalHa ?? ((a.areaTotalM2 ?? 0) / 10000);
+        const areaB = b.areaTotalHa ?? ((b.areaTotalM2 ?? 0) / 10000);
+        return areaB - areaA;
+      }
       if (filters.sortBy === 'featured') return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
     });

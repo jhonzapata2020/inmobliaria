@@ -171,7 +171,7 @@ export default function HomePage() {
                   Hablar con un Asesor
                 </Link>
                 <button
-                  onClick={handleSearchSubmit}
+                  type="submit"
                   className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
                 >
                   <span>Explorar Oportunidades</span>

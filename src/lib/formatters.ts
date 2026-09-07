@@ -3,12 +3,12 @@ import { LegalStatus, Modality } from '../types/property';
 export function formatCurrency(amount?: number): string {
   if (amount === undefined || amount === null) return 'Bajo solicitud';
   if (amount >= 1000000000) {
-    const billones = amount / 1000000000;
-    return `$${billones.toFixed(billones % 1 === 0 ? 0 : 2)}.000M COP`;
+    const millones = amount / 1000000;
+    return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} Millones COP`;
   }
   if (amount >= 1000000) {
     const millones = amount / 1000000;
-    return `$${millones.toFixed(millones % 1 === 0 ? 0 : 1)} Millones COP`;
+    return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} Millones COP`;
   }
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',

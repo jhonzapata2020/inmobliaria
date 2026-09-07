@@ -159,7 +159,13 @@ const LeafletMapInner: React.FC<{
           icon: createCustomIcon(prop.code, prop.modality)
         }).addTo(map);
 
-        const priceText = prop.modality === 'Venta' ? formatCurrency(prop.price) : `${formatCurrency(prop.monthlyRent)}/m`;
+        const priceText = prop.modality === 'Venta'
+          ? formatCurrency(prop.price)
+          : prop.modality === 'Arriendo'
+            ? `${formatCurrency(prop.monthlyRent)}/mes`
+            : prop.modality === 'Inversión'
+              ? formatCurrency(prop.price || prop.estimatedValue)
+              : 'Regulada SAE';
         const areaText = formatArea(prop.areaTotalHa, prop.areaTotalM2);
 
         const popupContent = `

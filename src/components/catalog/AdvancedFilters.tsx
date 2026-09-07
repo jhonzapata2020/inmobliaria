@@ -46,8 +46,11 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     filters.municipality,
     filters.minPrice,
     filters.maxPrice,
+    filters.minArea,
+    filters.maxArea,
     filters.legalStatus,
     filters.potentialUse,
+    filters.availability,
     filters.isInvestmentOpportunity ? 'Inversión' : ''
   ].filter(Boolean).length;
 
@@ -207,6 +210,56 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <option value="area-desc">Mayor Área Total</option>
           </select>
         </div>
+
+        <div>
+          <label className="block text-slate-400 mb-1 font-mono">Precio mínimo (COP)</label>
+          <input
+            type="number"
+            min="0"
+            value={filters.minPrice}
+            onChange={(e) => updateField('minPrice', e.target.value)}
+            placeholder="Sin mínimo"
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-slate-400 mb-1 font-mono">Precio máximo (COP)</label>
+          <input
+            type="number"
+            min="0"
+            value={filters.maxPrice}
+            onChange={(e) => updateField('maxPrice', e.target.value)}
+            placeholder="Sin máximo"
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-slate-400 mb-1 font-mono">Área mínima (Ha)</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={filters.minArea}
+            onChange={(e) => updateField('minArea', e.target.value)}
+            placeholder="Sin mínimo"
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-slate-400 mb-1 font-mono">Área máxima (Ha)</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={filters.maxArea}
+            onChange={(e) => updateField('maxArea', e.target.value)}
+            placeholder="Sin máximo"
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
       </div>
 
       {/* Active Filter Chips */}
@@ -297,6 +350,72 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   <option value="Chigorodó">Chigorodó</option>
                   <option value="Acandí">Acandí</option>
                   <option value="Unguía">Unguía</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-mono">Precio mínimo</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={filters.minPrice}
+                    onChange={(e) => updateField('minPrice', e.target.value)}
+                    placeholder="COP"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 mb-1 font-mono">Precio máximo</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={filters.maxPrice}
+                    onChange={(e) => updateField('maxPrice', e.target.value)}
+                    placeholder="COP"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-mono">Área mínima (Ha)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={filters.minArea}
+                    onChange={(e) => updateField('minArea', e.target.value)}
+                    placeholder="Ha"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 mb-1 font-mono">Área máxima (Ha)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={filters.maxArea}
+                    onChange={(e) => updateField('maxArea', e.target.value)}
+                    placeholder="Ha"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-mono">Estado jurídico</label>
+                <select
+                  value={filters.legalStatus}
+                  onChange={(e) => updateField('legalStatus', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white"
+                >
+                  <option value="">Cualquier estado</option>
+                  <option value="Saneado">Saneado 100%</option>
+                  <option value="En estudio jurídico">En estudio jurídico</option>
+                  <option value="Activo especial SAE">Activo Especial SAE</option>
                 </select>
               </div>
             </div>

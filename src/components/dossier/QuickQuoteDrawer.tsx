@@ -147,11 +147,12 @@ export const QuickQuoteDrawer: React.FC = () => {
           {/* Consolidated Quick Calculations & Footer */}
           {selectedProperties.length > 0 && (
             <div className="p-4 bg-slate-950 border-t border-slate-800 space-y-4">
-              <div className="p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2 text-xs">
+                  <div className="p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>Área Consolidada:</span>
-                  <span className="font-mono font-semibold text-slate-200">
-                    {summary.totalAreaHa > 0 ? `${summary.totalAreaHa} Hectáreas` : `${summary.totalAreaM2.toLocaleString('es-CO')} m²`}
+                  <span className="font-mono font-semibold text-slate-200 text-right">
+                    {summary.totalAreaHa > 0 && <span className="block">{summary.totalAreaHa.toLocaleString('es-CO')} Ha</span>}
+                    {summary.totalAreaM2 > 0 && <span className="block text-slate-400">{summary.totalAreaM2.toLocaleString('es-CO')} m²</span>}
                   </span>
                 </div>
                 {summary.hasSale && (

@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
             <span>Urabá • Darién • Antioquia • Chocó — Custodia SAE & Inversión Territorial</span>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono">
-            <a href="tel:+573110009988" className="hover:text-emerald-400 flex items-center gap-1 transition-colors">
+            <a href="tel:+5748289000" className="hover:text-emerald-400 flex items-center gap-1 transition-colors">
               <PhoneCall className="w-3 h-3 text-teal-400" />
               +57 (4) 828-9000
             </a>

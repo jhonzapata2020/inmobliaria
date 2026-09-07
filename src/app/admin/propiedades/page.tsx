@@ -28,14 +28,17 @@ export default function AdminPropiedadesPage() {
   const [assetTypeFilter, setAssetTypeFilter] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [formInstance, setFormInstance] = useState(0);
 
   const handleCreateNew = () => {
     setEditingProperty(null);
+    setFormInstance((current) => current + 1);
     setModalOpen(true);
   };
 
   const handleEdit = (prop: Property) => {
     setEditingProperty(prop);
+    setFormInstance((current) => current + 1);
     setModalOpen(true);
   };
 
@@ -229,6 +232,7 @@ export default function AdminPropiedadesPage() {
 
       {/* Property Creation/Edit Wizard Modal */}
       <PropertyFormModal
+        key={`${formInstance}-${editingProperty?.id ?? 'new'}`}
         propertyToEdit={editingProperty}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

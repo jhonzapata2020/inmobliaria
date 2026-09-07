@@ -216,8 +216,9 @@ export const ExecutiveDossierModal: React.FC = () => {
                 <div className="text-xs text-slate-400 font-medium mt-1">Activos Seleccionados</div>
               </div>
               <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800">
-                <div className="text-2xl font-bold font-mono text-teal-300">
-                  {summary.totalAreaHa > 0 ? `${summary.totalAreaHa} Ha` : `${summary.totalAreaM2.toLocaleString('es-CO')} m²`}
+                <div className="text-lg font-bold font-mono text-teal-300">
+                  {summary.totalAreaHa > 0 && <span className="block">{summary.totalAreaHa.toLocaleString('es-CO')} Ha</span>}
+                  {summary.totalAreaM2 > 0 && <span className="block text-sm text-slate-400">{summary.totalAreaM2.toLocaleString('es-CO')} m²</span>}
                 </div>
                 <div className="text-xs text-slate-400 font-medium mt-1">Área Consolidada</div>
               </div>

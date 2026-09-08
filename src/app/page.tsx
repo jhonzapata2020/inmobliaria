@@ -301,7 +301,7 @@ export default function HomePage() {
 
                   <div className="absolute bottom-3 left-3 z-10">
                     <span className="text-[10px] sm:text-xs font-mono font-bold text-white bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/20">
-                      DAR-FIN-001
+                      DAR-SAE-001 • ID SAE: 528835
                     </span>
                   </div>
                 </div>
@@ -311,13 +311,13 @@ export default function HomePage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <span className="text-[11px] font-mono text-[#1E3A2F] font-bold uppercase tracking-wider">
-                        Finca Agroganadera & Bananera
+                        Finca Ganadera & Agroforestal • SAE
                       </span>
                       <h3 className="font-serif text-lg sm:text-xl font-bold text-[#242321] mt-0.5">
-                        Hacienda El Porvenir
+                        Hacienda El Reposo N° 1
                       </h3>
                       <p className="text-xs text-[#6B6A63] mt-0.5 line-clamp-1">
-                        140 Hectáreas planas con riego propio y frente costero.
+                        90.2 Hectáreas con fuentes hídricas permanentes y pastos mejorados.
                       </p>
                     </div>
                   </div>
@@ -326,12 +326,12 @@ export default function HomePage() {
                     <div>
                       <span className="text-[10px] text-[#6B6A63] font-mono block leading-none">Valor Comercial:</span>
                       <span className="font-serif font-bold text-[#1E3A2F] text-base sm:text-lg">
-                        $4.200.000.000 COP
+                        $2.250.000.000 COP
                       </span>
                     </div>
 
                     <Link
-                      href="/propiedades/DAR-FIN-001"
+                      href="/propiedades/DAR-SAE-001"
                       className="px-3.5 py-2 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
                     >
                       <span>+ Ver Dossier</span>

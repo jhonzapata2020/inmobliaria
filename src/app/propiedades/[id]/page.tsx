@@ -28,7 +28,9 @@ export default function PropertyDetailPage() {
   const router = useRouter();
   const propertyId = params?.id as string;
 
-  const property = INITIAL_PROPERTIES.find((p) => p.id === propertyId);
+  const property = INITIAL_PROPERTIES.find(
+    (p) => p.id === propertyId || p.code === propertyId || p.slug === propertyId || p.saeIdActivo === propertyId
+  );
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
@@ -239,13 +241,24 @@ export default function PropertyDetailPage() {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                {property.saeIdActivo && (
+                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-200 space-y-1 shadow-sm sm:col-span-2 flex items-center justify-between">
+                    <div>
+                      <span className="text-[#6D4C7D] block font-mono font-semibold uppercase tracking-wider text-[11px]">ID Activo SAE (Base de Datos Oficial)</span>
+                      <span className="font-mono font-bold text-xl text-purple-900">{property.saeIdActivo}</span>
+                    </div>
+                    <span className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full border border-purple-200">
+                      Custodia SAE
+                    </span>
+                  </div>
+                )}
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
-                  <span className="text-[#6B6A63] block font-mono">Matrícula Inmobiliaria:</span>
-                  <span className="font-mono font-bold text-[#1E3A2F]">{property.matriculaInmobiliaria}</span>
+                  <span className="text-[#6B6A63] block font-mono">Folio de Matrícula Inmobiliaria:</span>
+                  <span className="font-mono font-bold text-base text-[#1E3A2F]">{property.folioMatricula || property.matriculaInmobiliaria}</span>
                 </div>
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block font-mono">Cédula Catastral:</span>
-                  <span className="font-mono font-bold text-[#0F766E]">{property.cedulaCatastral}</span>
+                  <span className="font-mono font-bold text-[#0F766E] break-all">{property.cedulaCatastral}</span>
                 </div>
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block">Altitud sobre el nivel del mar:</span>

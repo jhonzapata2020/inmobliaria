@@ -1,4 +1,4 @@
-export type Modality = 'Venta' | 'Arriendo' | 'Custodia' | 'Inversión';
+export type Modality = 'Venta' | 'Arriendo' | 'Custodia' | 'Inversión' | 'Custodia SAE';
 
 export type AssetType = 
   | 'Finca'
@@ -17,50 +17,50 @@ export type LegalStatus =
   | 'En proceso de saneamiento'
   | 'Con documentación parcial'
   | 'Activo especial SAE'
-  | 'Información disponible bajo solicitud';
+  | 'Información disponible bajo solicitud'
+  | string;
 
 export type AvailabilityStatus = 'Disponible' | 'En negociación' | 'Reservado' | 'Adjudicado';
-
-export type PotentialUse = 
-  | 'Agropecuario'
-  | 'Ganadero'
-  | 'Industrial'
-  | 'Comercial'
-  | 'Residencial'
-  | 'Logístico'
-  | 'Turístico'
-  | 'Oficina'
-  | 'Inversión';
-
-export interface PropertyFeature {
-  id: string;
-  name: string;
-  category: 'Acceso' | 'Servicios' | 'Geografía' | 'Infraestructura' | 'Jurídico';
-}
 
 export interface Property {
   id: string;
   code: string;
+  slug?: string;
   title: string;
   shortDescription: string;
   description: string;
   opportunityAnalysis: string;
   assetType: AssetType;
   modality: Modality;
+  
+  // Real SAE Database Metadata
+  isSae?: boolean;
+  saeIdActivo?: string;
+  folioMatricula?: string;
+
   price?: number; // COP for sale
+  priceTotal?: number; // Alias for price
   monthlyRent?: number; // COP for rent
-  estimatedValue?: number; // COP for custody / investment evaluation
+  rentMonthly?: number; // Alias for monthlyRent
+  estimatedValue?: number; // COP for custody evaluation
+  
+  totalArea?: number;
+  areaUnit?: string;
   areaTotalHa?: number; // Hectares if rural
   areaTotalM2?: number; // Square meters
   builtAreaM2?: number; // Built area
+  builtArea?: number;
   
   // Location
   department: string;
   municipality: string;
   sectorVereda?: string;
+  vereda?: string;
+  address?: string;
   latitude: number;
   longitude: number;
   altitudeMsl?: number;
+  coordinates?: { lat: number; lng: number };
   
   // Specs & Tech info
   matriculaInmobiliaria: string;
@@ -70,7 +70,7 @@ export interface Property {
   waterSources: string;
   publicServices: string[];
   currentUse: string;
-  potentialUses: PotentialUse[];
+  potentialUses: string[];
   existingInfrastructure: string[];
   environmentalNotes: string;
   
@@ -82,6 +82,7 @@ export interface Property {
   
   // Media & Metadata
   images: string[];
+  featuredImage?: string;
   videoUrl?: string;
   virtualTourUrl?: string;
   documentsAvailable: { name: string; type: string; size: string }[];
@@ -94,19 +95,31 @@ export interface Property {
   updatedDate: string;
 }
 
+export type PotentialUse =
+  | 'Ganadería'
+  | 'Agroforestal'
+  | 'Cacao / Palma'
+  | 'Logístico / Industrial'
+  | 'Comercial'
+  | 'Residencial'
+  | 'Conservación / Ecoturismo'
+  | string;
+
 export interface PropertyFilterState {
   searchQuery: string;
   modality: string;
   assetType: string;
-  department: string;
+  department?: string;
   municipality: string;
-  minPrice: string;
-  maxPrice: string;
-  minArea: string;
-  maxArea: string;
-  legalStatus: string;
-  potentialUse: string;
-  availability: string;
-  isInvestmentOpportunity: boolean;
-  sortBy: 'recent' | 'price-asc' | 'price-desc' | 'area-desc' | 'featured';
+  minPrice?: number | string;
+  maxPrice?: number | string;
+  minArea?: number | string;
+  maxArea?: number | string;
+  minAreaHa?: number | string;
+  maxAreaHa?: number | string;
+  legalStatus?: string;
+  potentialUse?: string;
+  availability?: string;
+  isInvestmentOpportunity?: boolean;
+  sortBy?: 'recent' | 'price-asc' | 'price-desc' | 'area-desc' | 'featured' | string;
 }

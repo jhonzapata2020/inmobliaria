@@ -45,10 +45,10 @@ function PropiedadesCatalogContent() {
     if (filters.assetType) params.set('assetType', filters.assetType);
     if (filters.municipality) params.set('municipality', filters.municipality);
     if (filters.department) params.set('department', filters.department);
-    if (filters.minPrice) params.set('minPrice', filters.minPrice);
-    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
-    if (filters.minArea) params.set('minArea', filters.minArea);
-    if (filters.maxArea) params.set('maxArea', filters.maxArea);
+    if (filters.minPrice) params.set('minPrice', String(filters.minPrice));
+    if (filters.maxPrice) params.set('maxPrice', String(filters.maxPrice));
+    if (filters.minArea) params.set('minArea', String(filters.minArea));
+    if (filters.maxArea) params.set('maxArea', String(filters.maxArea));
     if (filters.legalStatus) params.set('legalStatus', filters.legalStatus);
     if (filters.isInvestmentOpportunity) params.set('isInvestmentOpportunity', 'true');
     if (showOnlyFavorites) params.set('favorites', 'true');

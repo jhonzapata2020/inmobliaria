@@ -26,24 +26,24 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E5E1D8] shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
         
-        {/* Brand Logo - Editorial & Sobrio */}
-        <Link href="/" className="flex items-center gap-3 group shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-[#1E3A2F] text-white flex items-center justify-center shadow-xs group-hover:bg-[#152921] transition-colors">
-            <Building2 className="w-5 h-5 text-emerald-300" />
+        {/* Brand Logo - Responsive & Anti-overlap */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 flex-1 sm:flex-initial">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#1E3A2F] text-white flex items-center justify-center shadow-xs group-hover:bg-[#152921] transition-colors shrink-0">
+            <Building2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-emerald-300" />
           </div>
-          <div>
-            <div className="font-serif text-base font-bold tracking-tight text-[#242321]">
+          <div className="min-w-0 flex-1">
+            <div className="font-serif text-xs sm:text-base font-bold tracking-tight text-[#242321] leading-tight truncate max-w-[150px] xs:max-w-[190px] sm:max-w-none">
               ACTIVOS & INVERSIONES
             </div>
-            <div className="text-[10px] font-mono tracking-wider uppercase text-[#1E3A2F] font-bold">
+            <div className="text-[10px] font-mono tracking-wider uppercase text-[#1E3A2F] font-bold hidden sm:block">
               DARIEN S.A.S.
             </div>
           </div>
         </Link>
 
-        {/* Central Navigation Links - Una Sola Línea Unificada */}
+        {/* Central Navigation Links */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
           <Link
             href="/propiedades"
@@ -90,56 +90,51 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Right Actions: Portal Socios & Botón Principal Mi Dossier */}
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        {/* Right Actions Container: Portal Socios, Mi Dossier & Hamburger */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
-          {/* Portal Socios / Panel Interno Link */}
+          {/* Desktop Partner Access */}
           <Link
             href="/admin"
-            className="text-[#6B6A63] hover:text-[#1E3A2F] text-xs font-semibold flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[#F8F7F2] transition-colors"
+            className="hidden lg:flex text-[#6B6A63] hover:text-[#1E3A2F] text-xs font-semibold items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[#F8F7F2] transition-colors"
             title="Acceso Asesores & Panel Interno"
           >
             <Lock className="w-3.5 h-3.5 text-[#6B6A63]" />
             <span>Portal Socios</span>
           </Link>
 
-          <div className="h-5 w-px bg-[#E5E1D8]" />
+          <div className="hidden lg:block h-5 w-px bg-[#E5E1D8]" />
 
-          {/* Primary Action Button: Mi Dossier (#1E3A2F Forest Green) */}
+          {/* Primary Action Button: Mi Dossier */}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-semibold text-xs shadow-xs flex items-center gap-2.5 transition-all active:scale-[0.98]"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-300" />
-            <span>Mi Dossier</span>
-            <span className="bg-white/20 text-white font-mono font-bold text-xs px-2 py-0.5 rounded-full">
-              {summary.propertyCount}
-            </span>
-          </button>
-        </div>
-
-        {/* Mobile Navigation Toggle */}
-        <div className="flex md:hidden items-center gap-2">
-          <button
-            onClick={() => setIsDrawerOpen(true)}
-            className="p-2 rounded-xl bg-[#1E3A2F] text-white relative"
+            className="h-9 md:h-auto px-2.5 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-semibold text-xs shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] relative"
             title="Mi Dossier"
           >
-            <FileSpreadsheet className="w-5 h-5" />
-            {summary.propertyCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#23866D] text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center ring-2 ring-white">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-300 shrink-0" />
+            <span className="hidden md:inline">Mi Dossier</span>
+            
+            {/* Dossier property count badge */}
+            {summary.propertyCount > 0 ? (
+              <span className="md:static absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#23866D] md:bg-white/20 text-[10px] md:text-xs font-mono font-bold text-white px-1 ring-2 ring-white md:ring-0">
                 {summary.propertyCount}
+              </span>
+            ) : (
+              <span className="hidden md:inline bg-white/20 text-white font-mono font-bold text-xs px-2 py-0.5 rounded-full">
+                0
               </span>
             )}
           </button>
 
+          {/* Mobile Navigation Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl bg-[#F8F7F2] text-[#242321] hover:bg-[#E5E1D8]"
+            className="h-9 w-9 flex md:hidden items-center justify-center rounded-lg border border-[#E5E1D8] text-[#242321] hover:bg-[#F8F7F2] transition-colors shrink-0"
             aria-label="Menú principal"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
           </button>
+
         </div>
 
       </div>

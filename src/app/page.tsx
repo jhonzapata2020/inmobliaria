@@ -40,7 +40,13 @@ export default function HomePage() {
     router.push(`/propiedades?${params.toString()}`);
   };
 
-  const featuredProperties = INITIAL_PROPERTIES.filter((p) => p.isFeatured && p.id !== 'prop-001').slice(0, 6);
+  // Featured properties: Place prop-001 (Hero asset) further back in the catalog grid (position 4 instead of first)
+  const allFeatured = INITIAL_PROPERTIES.filter((p) => p.isFeatured);
+  const heroProp = allFeatured.find((p) => p.id === 'prop-001');
+  const otherFeatured = allFeatured.filter((p) => p.id !== 'prop-001');
+  const featuredProperties = heroProp
+    ? [...otherFeatured.slice(0, 3), heroProp, ...otherFeatured.slice(3)].slice(0, 6)
+    : allFeatured.slice(0, 6);
 
   return (
     <div className="space-y-20 pb-20 bg-[#F8F7F2]">
@@ -196,7 +202,7 @@ export default function HomePage() {
                 {/* Vibrant High-Quality Photo with Bounded Mobile Height */}
                 <div className="relative max-h-[260px] sm:max-h-[320px] h-60 sm:h-80 w-full overflow-hidden bg-[#F1EFE8]">
                   <img
-                    src="https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80"
+                    src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
                     alt="Hacienda El Porvenir - Necoclí"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />

@@ -119,10 +119,6 @@ export default function HomePage() {
   const [modality, setModality] = useState('');
   const [assetType, setAssetType] = useState('');
   const [municipality, setMunicipality] = useState('');
-
-  // Category Tab State
-  const [activeTab, setActiveTab] = useState<string>('todos');
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -134,24 +130,7 @@ export default function HomePage() {
     router.push(`/propiedades?${params.toString()}`);
   };
 
-  // Filter properties based on active tab
-  const getFilteredProperties = () => {
-    if (activeTab === 'Venta') {
-      return INITIAL_PROPERTIES.filter((p) => p.modality === 'Venta');
-    }
-    if (activeTab === 'Arriendo') {
-      return INITIAL_PROPERTIES.filter((p) => p.modality === 'Arriendo');
-    }
-    if (activeTab === 'Custodia') {
-      return INITIAL_PROPERTIES.filter((p) => p.modality === 'Custodia' || p.assetType === 'Activo Especial');
-    }
-    if (activeTab === 'Inversión') {
-      return INITIAL_PROPERTIES.filter((p) => p.isInvestmentOpportunity);
-    }
-    return INITIAL_PROPERTIES;
-  };
-
-  const filteredProperties = getFilteredProperties();
+  const filteredProperties = INITIAL_PROPERTIES;
 
   // Featured properties logic: hero property (prop-001) moved further back (position 4)
   const allFeatured = filteredProperties.filter((p) => p.isFeatured);
@@ -168,76 +147,7 @@ export default function HomePage() {
   return (
     <div className="space-y-16 pb-20 bg-[#F8F7F2]">
       
-      {/* 1. BARRA SUPERIOR DE MODALIDADES (ESTILO AIRBNB TABS) */}
-      <div className="sticky top-16 z-30 bg-[#F8F7F2]/95 backdrop-blur-md border-b border-[#E5E1D8] py-3 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-start sm:justify-center gap-6 sm:gap-10 overflow-x-auto scrollbar-none py-1 text-xs">
-            
-            <button
-              onClick={() => setActiveTab('todos')}
-              className={`flex items-center gap-2 pb-2.5 font-medium transition-all whitespace-nowrap border-b-2 ${
-                activeTab === 'todos'
-                  ? 'border-[#1E3A2F] text-[#242321] font-bold'
-                  : 'border-transparent text-[#6B6A63] hover:text-[#242321] hover:border-[#E5E1D8]'
-              }`}
-            >
-              <Grid className="w-4 h-4 text-[#1E3A2F]" />
-              <span>Todos los Activos</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('Venta')}
-              className={`flex items-center gap-2 pb-2.5 font-medium transition-all whitespace-nowrap border-b-2 ${
-                activeTab === 'Venta'
-                  ? 'border-[#1E3A2F] text-[#242321] font-bold'
-                  : 'border-transparent text-[#6B6A63] hover:text-[#242321] hover:border-[#E5E1D8]'
-              }`}
-            >
-              <Trees className="w-4 h-4 text-[#1E3A2F]" />
-              <span>Predios en Venta</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('Arriendo')}
-              className={`flex items-center gap-2 pb-2.5 font-medium transition-all whitespace-nowrap border-b-2 ${
-                activeTab === 'Arriendo'
-                  ? 'border-[#1E3A2F] text-[#242321] font-bold'
-                  : 'border-transparent text-[#6B6A63] hover:text-[#242321] hover:border-[#E5E1D8]'
-              }`}
-            >
-              <Warehouse className="w-4 h-4 text-[#0F766E]" />
-              <span>Arrendamiento Comercial/Rural</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('Custodia')}
-              className={`flex items-center gap-2 pb-2.5 font-medium transition-all whitespace-nowrap border-b-2 ${
-                activeTab === 'Custodia'
-                  ? 'border-[#6D4C7D] text-[#242321] font-bold'
-                  : 'border-transparent text-[#6B6A63] hover:text-[#242321] hover:border-[#E5E1D8]'
-              }`}
-            >
-              <Landmark className="w-4 h-4 text-[#6D4C7D]" />
-              <span>Custodia SAE</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('Inversión')}
-              className={`flex items-center gap-2 pb-2.5 font-medium transition-all whitespace-nowrap border-b-2 ${
-                activeTab === 'Inversión'
-                  ? 'border-[#C6A15B] text-[#242321] font-bold'
-                  : 'border-transparent text-[#6B6A63] hover:text-[#242321] hover:border-[#E5E1D8]'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4 text-[#C6A15B]" />
-              <span>Oportunidades de Inversión</span>
-            </button>
-
-          </div>
-        </div>
-      </div>
-
-      {/* 2. HERO PRINCIPAL ASIMÉTRICO (SPLIT LAYOUT 12-COLUMNS WITH AIRBNB PILL SEARCH BAR) */}
+      {/* HERO PRINCIPAL ASIMÉTRICO (SPLIT LAYOUT 12-COLUMNS WITH AIRBNB PILL SEARCH BAR) */}
       <section className="relative pt-6 sm:pt-8 pb-14 bg-[#F8F7F2] border-b border-[#E5E1D8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">

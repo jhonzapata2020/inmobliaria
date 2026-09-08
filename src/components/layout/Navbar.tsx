@@ -29,7 +29,7 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         {/* Brand Logo - Editorial & Sobrio */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group shrink-0">
           <div className="w-10 h-10 rounded-xl bg-[#1E3A2F] text-white flex items-center justify-center shadow-xs group-hover:bg-[#152921] transition-colors">
             <Building2 className="w-5 h-5 text-emerald-300" />
           </div>
@@ -43,7 +43,7 @@ export const Navbar: React.FC = () => {
           </div>
         </Link>
 
-        {/* Central Navigation Links */}
+        {/* Central Navigation Links - Una Sola Línea Unificada */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
           <Link
             href="/propiedades"
@@ -68,14 +68,14 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <Link
-            href="/mapa"
+            href="/nosotros"
             className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-              isActive('/mapa')
+              isActive('/nosotros') || isActive('/mapa')
                 ? 'text-[#1E3A2F] bg-[#F8F7F2] font-bold'
                 : 'text-[#6B6A63] hover:text-[#242321] hover:bg-[#F8F7F2]'
             }`}
           >
-            Territorio & Cobertura
+            Territorio Urabá
           </Link>
 
           <Link
@@ -90,8 +90,8 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Right Actions: Ghost Partner Link & Forest Green Primary Dossier CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Right Actions: Portal Socios & Botón Principal Mi Dossier */}
+        <div className="hidden md:flex items-center gap-3 shrink-0">
           
           {/* Portal Socios / Panel Interno Link */}
           <Link
@@ -105,7 +105,7 @@ export const Navbar: React.FC = () => {
 
           <div className="h-5 w-px bg-[#E5E1D8]" />
 
-          {/* Primary Action Button: Mi Dossier (#1E3A2F Deep Forest Green) */}
+          {/* Primary Action Button: Mi Dossier (#1E3A2F Forest Green) */}
           <button
             onClick={() => setIsDrawerOpen(true)}
             className="px-4 py-2.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-semibold text-xs shadow-xs flex items-center gap-2.5 transition-all active:scale-[0.98]"
@@ -123,6 +123,7 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => setIsDrawerOpen(true)}
             className="p-2 rounded-xl bg-[#1E3A2F] text-white relative"
+            title="Mi Dossier"
           >
             <FileSpreadsheet className="w-5 h-5" />
             {summary.propertyCount > 0 && (
@@ -135,6 +136,7 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-xl bg-[#F8F7F2] text-[#242321] hover:bg-[#E5E1D8]"
+            aria-label="Menú principal"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -161,11 +163,11 @@ export const Navbar: React.FC = () => {
               Custodia & Gestión SAE
             </Link>
             <Link
-              href="/mapa"
+              href="/nosotros"
               onClick={() => setMobileMenuOpen(false)}
               className="block px-3 py-2.5 rounded-lg text-[#242321] hover:bg-[#F8F7F2]"
             >
-              Territorio & Cobertura
+              Territorio Urabá
             </Link>
             <Link
               href="/contacto"

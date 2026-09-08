@@ -31,9 +31,9 @@ export const INITIAL_PROPERTIES: Property[] = [
     areaTotalM2: 902000,
     builtAreaM2: 280,
     builtArea: 280,
-    topography: 'Ondulada suave con pasturas mejoradas',
+    topography: 'Ondulada suave con división tradicional de potreros en franjas y corredores de bosque protector.',
     waterSources: 'Quebradas veredales y reservorios de agua',
-    accessRoads: 'Vía veredal afirmada en buen estado con acceso carreteable.',
+    accessRoads: 'Conectividad mediante carreteable veredal desde la vía principal de Necoclí.',
     publicServices: ['Energía eléctrica 110V/220V', 'Agua de pozo artesanal', 'Cobertura celular 4G LTE'],
     currentUse: 'Ganadería tradicional y conservación',
     potentialUses: ['Agropecuario', 'Ganadero', 'Inversión'],
@@ -48,12 +48,13 @@ export const INITIAL_PROPERTIES: Property[] = [
     price: 2250000000,
     images: [
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=1200&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop'
     ],
     featuredImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
-    coordinates: { lat: 8.4285, lng: -76.7842 },
-    latitude: 8.4285,
-    longitude: -76.7842,
+    coordinates: { lat: 8.5562, lng: -76.7118 },
+    latitude: 8.5562,
+    longitude: -76.7118,
     altitudeMsl: 18,
     documentsAvailable: [
       { name: 'Ficha Técnica SAE Id 528835', type: 'PDF', size: '1.4 MB' },

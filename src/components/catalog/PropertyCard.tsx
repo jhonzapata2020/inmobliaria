@@ -9,7 +9,6 @@ import {
   Check, 
   MapPin, 
   Ruler, 
-  Sparkles, 
   ChevronLeft, 
   ChevronRight,
   ShieldCheck,
@@ -56,23 +55,23 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   };
 
   return (
-    <div className="group bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-950/20 transition-all duration-200 flex flex-col justify-between">
+    <div className="group bg-white border border-[#E5E1D8] hover:border-[#1E3A2F]/40 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
       
       {/* Photo Container */}
-      <div className="relative h-56 w-full bg-slate-950 overflow-hidden">
+      <div className="relative h-56 w-full bg-[#F1EFE8] overflow-hidden">
         <img
           src={property.images[currentImageIndex] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
           alt={property.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start gap-2 z-10">
           <div className="flex flex-wrap gap-1.5 items-center">
-            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-md ${modalityBadge.bgClass} ${modalityBadge.textClass}`}>
+            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm ${modalityBadge.bgClass} ${modalityBadge.textClass}`}>
               {modalityBadge.label}
             </span>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border backdrop-blur-md ${legalBadge.bgClass} ${legalBadge.textClass} ${legalBadge.borderClass}`}>
@@ -83,10 +82,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           {/* Favorite Button */}
           <button
             onClick={() => toggleFavorite(property.id)}
-            className={`p-2 rounded-xl backdrop-blur-md transition-all ${
+            className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
               favorite 
-                ? 'bg-rose-500 text-white shadow-lg' 
-                : 'bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-900/90'
+                ? 'bg-rose-600 text-white' 
+                : 'bg-white/90 text-[#6B6A63] hover:text-[#242321] hover:bg-white'
             }`}
             title={favorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
           >
@@ -99,13 +98,13 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={prevImage}
-              className="p-1.5 rounded-full bg-slate-900/70 text-white hover:bg-slate-900 transition-colors"
+              className="p-1.5 rounded-full bg-white/80 text-[#242321] hover:bg-white transition-colors shadow-md"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={nextImage}
-              className="p-1.5 rounded-full bg-slate-900/70 text-white hover:bg-slate-900 transition-colors"
+              className="p-1.5 rounded-full bg-white/80 text-[#242321] hover:bg-white transition-colors shadow-md"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -119,7 +118,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               <span
                 key={i}
                 className={`w-1.5 h-1.5 rounded-full transition-all ${
-                  i === currentImageIndex ? 'bg-emerald-400 w-3' : 'bg-white/50'
+                  i === currentImageIndex ? 'bg-emerald-400 w-3' : 'bg-white/60'
                 }`}
               />
             ))}
@@ -128,7 +127,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
         {/* Code Badge */}
         <div className="absolute bottom-3 left-3 z-10">
-          <span className="text-[10px] font-mono font-bold text-slate-200 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded border border-slate-700/60">
+          <span className="text-[10px] font-mono font-bold text-white bg-black/70 backdrop-blur-md px-2 py-0.5 rounded border border-white/20">
             {property.code}
           </span>
         </div>
@@ -140,46 +139,46 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         <div className="space-y-2">
           {/* Asset Type & Location */}
           <div className="flex justify-between items-center text-xs">
-            <span className="font-mono text-emerald-400 font-semibold uppercase tracking-wider flex items-center gap-1">
-              <Building className="w-3.5 h-3.5" />
+            <span className="font-mono text-[#1E3A2F] font-bold uppercase tracking-wider flex items-center gap-1">
+              <Building className="w-3.5 h-3.5 text-[#23866D]" />
               {property.assetType}
             </span>
-            <span className="text-slate-400 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+            <span className="text-[#6B6A63] flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
               {property.municipality}, {property.department}
             </span>
           </div>
 
           {/* Title */}
-          <Link href={`/propiedades/${property.id}`} className="block group-hover:text-emerald-400 transition-colors">
-            <h3 className="font-serif text-base font-bold text-white line-clamp-1">
+          <Link href={`/propiedades/${property.id}`} className="block group-hover:text-[#1E3A2F] transition-colors">
+            <h3 className="font-serif text-base font-bold text-[#242321] line-clamp-1">
               {property.title}
             </h3>
           </Link>
 
           {/* Short Description */}
-          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-[#6B6A63] line-clamp-2 leading-relaxed">
             {property.shortDescription}
           </p>
         </div>
 
         {/* Specs Grid */}
-        <div className="pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs">
-          <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800 flex items-center gap-2">
-            <Ruler className="w-4 h-4 text-teal-400 shrink-0" />
+        <div className="pt-3 border-t border-[#E5E1D8] grid grid-cols-2 gap-2 text-xs">
+          <div className="bg-[#F8F7F2] p-2 rounded-xl border border-[#E5E1D8] flex items-center gap-2">
+            <Ruler className="w-4 h-4 text-[#0F766E] shrink-0" />
             <div>
-              <span className="text-[10px] text-slate-500 block leading-none">Área Total</span>
-              <span className="font-mono font-semibold text-slate-200 text-xs">
+              <span className="text-[10px] text-[#929087] block leading-none">Área Total</span>
+              <span className="font-mono font-bold text-[#242321] text-xs">
                 {formatArea(property.areaTotalHa, property.areaTotalM2)}
               </span>
             </div>
           </div>
 
-          <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="bg-[#F8F7F2] p-2 rounded-xl border border-[#E5E1D8] flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-[#23866D] shrink-0" />
             <div>
-              <span className="text-[10px] text-slate-500 block leading-none">Topografía</span>
-              <span className="font-semibold text-slate-200 text-xs truncate block max-w-[90px]">
+              <span className="text-[10px] text-[#929087] block leading-none">Topografía</span>
+              <span className="font-semibold text-[#242321] text-xs truncate block max-w-[90px]">
                 {property.topography}
               </span>
             </div>
@@ -187,10 +186,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         </div>
 
         {/* Price & Action Buttons */}
-        <div className="pt-3 border-t border-slate-800 space-y-3">
+        <div className="pt-3 border-t border-[#E5E1D8] space-y-3">
           <div className="flex justify-between items-baseline">
-            <span className="text-xs text-slate-400 font-mono">Valor Comercial:</span>
-            <span className="text-base font-serif font-bold text-emerald-400 font-mono">
+            <span className="text-xs text-[#6B6A63] font-mono">Valor Comercial:</span>
+            <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono">
               {property.modality === 'Venta' && formatCurrency(property.price)}
               {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRent)}/mes`}
               {property.modality === 'Custodia' && 'Regulada SAE'}
@@ -204,21 +203,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               onClick={() => (inCompare ? removeFromCompare(property.id) : addToCompare(property))}
               className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
                 inCompare
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-[#C6A15B]/20 text-[#C6A15B] border border-[#C6A15B]/50'
+                  : 'bg-[#F1EFE8] text-[#242321] hover:bg-[#E5E1D8]'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3.5 h-3.5 text-[#6B6A63]" />
               <span>{inCompare ? 'Comparando' : 'Comparar'}</span>
             </button>
 
             {/* Dossier Toggle */}
             <button
               onClick={() => (inDossier ? removeFromDossier(property.id) : addToDossier(property))}
-              className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-md ${
+              className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm ${
                 inDossier
-                  ? 'bg-emerald-500 text-slate-950 font-bold'
-                  : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white'
+                  ? 'bg-[#23866D] text-white font-bold'
+                  : 'bg-[#1E3A2F] hover:bg-[#152921] text-white'
               }`}
             >
               {inDossier ? (

@@ -1,35 +1,60 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+:root {
+  --bg-marfil: #F8F7F2;
+  --bg-white: #FFFFFF;
+  --bg-sand: #F1EFE8;
+  --bg-pale-green: #EEF4EF;
+  --text-charcoal: #242321;
+  --text-warm-gray: #6B6A63;
+  --text-stone: #929087;
+  --border-beige: #E5E1D8;
+
+  --brand-forest: #1E3A2F;
+  --brand-forest-dark: #152921;
+  --brand-salvia: #8FAE9D;
+  --brand-emerald: #23866D;
+  --brand-teal: #0F766E;
+  --brand-terracotta: #C9795B;
+  --brand-gold: #C6A15B;
+  --brand-sae: #6D4C7D;
+}
+
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    @apply bg-[#F8F7F2] text-[#242321] antialiased;
   }
 }
 
-/* Custom Leaflet Map Pin Styles */
+/* Leaflet Map Customizations */
 .custom-map-pin {
   background: transparent !important;
   border: none !important;
 }
 
-/* Custom Scrollbars */
+.leaflet-container {
+  background: #F1EFE8 !important;
+  font-family: inherit;
+}
+
+/* Custom Scrollbars for Editorial Palette */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #F1EFE8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #C6A15B;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #1E3A2F;
 }
 
 /* Print Styles for Executive Dossier */

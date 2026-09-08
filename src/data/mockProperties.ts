@@ -49,7 +49,7 @@ export const INITIAL_PROPERTIES: Property[] = [
     images: [
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop'
+      '/properties/satelite-aguas-claras.png'
     ],
     featuredImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
     coordinates: { lat: 8.5562, lng: -76.7118 },

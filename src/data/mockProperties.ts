@@ -299,9 +299,9 @@ export const INITIAL_PROPERTIES: Property[] = [
     commercialConditions: 'Negociación llave en mano incluyendo cultivos, maquinaria y marca productora.',
     isDemoData: true,
     images: [
-      'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80'
     ],
     documentsAvailable: [
       { name: 'Histórico de Producción y Cajas / Ha', type: 'PDF', size: '1.8 MB' },
@@ -397,8 +397,9 @@ export const INITIAL_PROPERTIES: Property[] = [
     commercialConditions: 'Se aceptan ofertas con pago de contado o estructuración de fiducia inmobiliaria.',
     isDemoData: true,
     images: [
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1524813686514-a57563d77965?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
     ],
     documentsAvailable: [
       { name: 'Pre-estudio Jurídico de Títulos', type: 'PDF', size: '1.4 MB' }
@@ -447,8 +448,8 @@ export const INITIAL_PROPERTIES: Property[] = [
     isDemoData: true,
     images: [
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80'
     ],
     documentsAvailable: [
       { name: 'Certificado de Tradición y Libertad', type: 'PDF', size: '750 KB' }
@@ -498,7 +499,7 @@ export const INITIAL_PROPERTIES: Property[] = [
     isDemoData: true,
     images: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80'
     ],
     documentsAvailable: [

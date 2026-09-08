@@ -28,22 +28,22 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E5E1D8] shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
         
-        {/* Brand Logo - Responsive & Anti-overlap */}
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 flex-1 sm:flex-initial">
+        {/* Brand Logo - Stacked Lockup (Sin truncar & sin desbordamientos) */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#1E3A2F] text-white flex items-center justify-center shadow-xs group-hover:bg-[#152921] transition-colors shrink-0">
             <Building2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-emerald-300" />
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-serif text-xs sm:text-base font-bold tracking-tight text-[#242321] leading-tight truncate max-w-[150px] xs:max-w-[190px] sm:max-w-none">
+          <div>
+            <span className="font-serif font-bold text-xs sm:text-sm tracking-tight text-[#242321] leading-tight block">
               ACTIVOS & INVERSIONES
-            </div>
-            <div className="text-[10px] font-mono tracking-wider uppercase text-[#1E3A2F] font-bold hidden sm:block">
-              DARIEN S.A.S.
-            </div>
+            </span>
+            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-[#1E3A2F] uppercase block">
+              DARIÉN S.A.S.
+            </span>
           </div>
         </Link>
 
-        {/* Central Navigation Links */}
+        {/* Central Navigation Links (Desktop) */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
           <Link
             href="/propiedades"
@@ -90,43 +90,35 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Right Actions Container: Portal Socios, Mi Dossier & Hamburger */}
+        {/* Right Actions Container: Desktop Actions & Mobile Menu Button */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
-          {/* Desktop Partner Access */}
+          {/* Desktop Partner Access (Portal Socios) */}
           <Link
             href="/admin"
-            className="hidden lg:flex text-[#6B6A63] hover:text-[#1E3A2F] text-xs font-semibold items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[#F8F7F2] transition-colors"
+            className="hidden md:flex text-[#6B6A63] hover:text-[#1E3A2F] text-xs font-semibold items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[#F8F7F2] transition-colors"
             title="Acceso Asesores & Panel Interno"
           >
             <Lock className="w-3.5 h-3.5 text-[#6B6A63]" />
             <span>Portal Socios</span>
           </Link>
 
-          <div className="hidden lg:block h-5 w-px bg-[#E5E1D8]" />
+          <div className="hidden md:block h-5 w-px bg-[#E5E1D8]" />
 
-          {/* Primary Action Button: Mi Dossier */}
+          {/* Primary Action Button: Mi Dossier (Desktop >= md) */}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="h-9 md:h-auto px-2.5 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-semibold text-xs shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] relative"
+            className="hidden md:flex px-4 py-2.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-semibold text-xs shadow-xs items-center gap-2.5 transition-all active:scale-[0.98]"
             title="Mi Dossier"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-300 shrink-0" />
-            <span className="hidden md:inline">Mi Dossier</span>
-            
-            {/* Dossier property count badge */}
-            {summary.propertyCount > 0 ? (
-              <span className="md:static absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#23866D] md:bg-white/20 text-[10px] md:text-xs font-mono font-bold text-white px-1 ring-2 ring-white md:ring-0">
-                {summary.propertyCount}
-              </span>
-            ) : (
-              <span className="hidden md:inline bg-white/20 text-white font-mono font-bold text-xs px-2 py-0.5 rounded-full">
-                0
-              </span>
-            )}
+            <span>Mi Dossier</span>
+            <span className="bg-white/20 text-white font-mono font-bold text-xs px-2 py-0.5 rounded-full">
+              {summary.propertyCount}
+            </span>
           </button>
 
-          {/* Mobile Navigation Toggle Button */}
+          {/* Mobile Navigation Toggle Button (Mobile < md) */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="h-9 w-9 flex md:hidden items-center justify-center rounded-lg border border-[#E5E1D8] text-[#242321] hover:bg-[#F8F7F2] transition-colors shrink-0"
@@ -142,7 +134,26 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-[#E5E1D8] px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top duration-200">
-          <div className="space-y-1 text-sm font-medium">
+          
+          {/* Highlighted Mobile Dossier CTA Button */}
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setIsDrawerOpen(true);
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-[#1E3A2F] text-white font-semibold text-xs shadow-sm active:scale-[0.99] transition-all"
+          >
+            <span className="flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-emerald-300" />
+              <span>Mi Dossier Ejecutivo</span>
+            </span>
+            <span className="bg-white/20 font-mono font-bold text-xs px-2.5 py-0.5 rounded-full">
+              {summary.propertyCount}
+            </span>
+          </button>
+
+          {/* Navigation Links */}
+          <div className="space-y-1 text-sm font-medium pt-1">
             <Link
               href="/propiedades"
               onClick={() => setMobileMenuOpen(false)}

@@ -6,18 +6,15 @@ import { useRouter } from 'next/navigation';
 import { 
   Search, 
   MapPin, 
-  Building2, 
   ShieldCheck, 
   Sparkles, 
   ArrowRight, 
-  CheckCircle2, 
-  TrendingUp, 
   Trees, 
   Warehouse, 
   Landmark,
   Compass,
   Store,
-  Briefcase
+  TrendingUp
 } from 'lucide-react';
 import { INITIAL_PROPERTIES } from '../data/mockProperties';
 import { PropertyCard } from '../components/catalog/PropertyCard';
@@ -48,142 +45,215 @@ export default function HomePage() {
   return (
     <div className="space-y-20 pb-20 bg-[#F8F7F2]">
       
-      {/* 1. HERO PRINCIPAL EDITORIAL & MARKETPLACE SEARCH */}
-      <section className="relative min-h-[85vh] flex items-center justify-center pt-12 pb-20 overflow-hidden bg-[#F1EFE8] border-b border-[#E5E1D8]">
+      {/* 1. HERO PRINCIPAL ASIMÉTRICO (SPLIT EDITORIAL 12-COLUMNS) */}
+      <section className="relative min-h-[85vh] flex items-center pt-10 pb-16 bg-[#F8F7F2] border-b border-[#E5E1D8] overflow-hidden">
         
-        {/* Landscape Background Image with Light Editorial Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2000&q=80" 
-            alt="Territorio Urabá Darién"
-            className="w-full h-full object-cover opacity-20 scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F1EFE8] via-[#F1EFE8]/70 to-[#F8F7F2]/40" />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          
-          {/* Brand Tag Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E5E1D8] text-[#1E3A2F] text-xs font-mono font-semibold shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-[#23866D]" />
-            <span>Firma Especializada en Gestión Inmobiliaria & Custodia SAE</span>
-          </div>
-
-          {/* Main Title & Subtitle */}
-          <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#242321] leading-[1.1]">
-              Activos con propósito. <br />
-              <span className="text-[#1E3A2F]">
-                Inversiones con territorio.
-              </span>
-            </h1>
-            <p className="text-base sm:text-xl text-[#6B6A63] max-w-2xl mx-auto leading-relaxed">
-              Descubre fincas, terrenos, bodegas, locales y oportunidades patrimoniales en Urabá, Darién y Colombia.
-            </p>
-          </div>
-
-          {/* Central Marketplace Search Card */}
-          <div className="max-w-5xl mx-auto bg-white border border-[#E5E1D8] p-6 rounded-3xl shadow-xl space-y-5 text-left">
-            <form id="property-search-form" onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* COLUMNA IZQUIERDA (7 COLUMNAS) */}
+            <div className="lg:col-span-7 space-y-6 text-left">
               
-              {/* Keyword */}
-              <div className="space-y-1.5">
-                <label className="text-[#6B6A63] font-semibold flex items-center gap-1.5">
-                  <Search className="w-3.5 h-3.5 text-[#1E3A2F]" /> ¿Qué activo buscas?
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej. Finca ganadera, Bodega..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#242321] placeholder-[#929087] focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F]"
-                />
+              {/* Badge Superior */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#1E3A2F]/30 text-[#1E3A2F] text-xs font-mono font-bold shadow-xs">
+                <ShieldCheck className="w-4 h-4 text-[#23866D]" />
+                <span>Gestión Inmobiliaria & Custodia SAE</span>
               </div>
 
-              {/* Location / Municipality */}
-              <div className="space-y-1.5">
-                <label className="text-[#6B6A63] font-semibold flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#0F766E]" /> ¿Dónde?
-                </label>
-                <select
-                  value={municipality}
-                  onChange={(e) => setMunicipality(e.target.value)}
-                  className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#242321] focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F]"
-                >
-                  <option value="">Todos los municipios</option>
-                  <option value="Apartadó">Apartadó</option>
-                  <option value="Turbo">Turbo</option>
-                  <option value="Necoclí">Necoclí</option>
-                  <option value="Carepa">Carepa</option>
-                  <option value="Chigorodó">Chigorodó</option>
-                  <option value="Acandí">Acandí</option>
-                  <option value="Unguía">Unguía</option>
-                </select>
+              {/* Título Principal */}
+              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#242321] leading-[1.15]">
+                Activos con propósito. <br />
+                <span className="text-[#1E3A2F]">
+                  Inversiones con territorio.
+                </span>
+              </h1>
+
+              {/* Subtítulo Editorial */}
+              <p className="text-sm sm:text-lg text-[#6B6A63] max-w-xl leading-relaxed">
+                Descubre fincas, terrenos, bodegas, locales y oportunidades patrimoniales de alta valorización en Urabá, Darién y Colombia.
+              </p>
+
+              {/* Buscador Compacto tipo Airbnb */}
+              <div className="bg-white border border-[#E5E1D8] p-4 rounded-2xl shadow-lg space-y-4">
+                <form id="property-search-form" onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  
+                  {/* Keyword */}
+                  <div className="space-y-1">
+                    <label className="text-[#6B6A63] font-semibold flex items-center gap-1">
+                      <Search className="w-3.5 h-3.5 text-[#1E3A2F]" /> ¿Qué buscas?
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Finca, Bodega..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] placeholder-[#929087] focus:outline-none focus:border-[#1E3A2F]"
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-1">
+                    <label className="text-[#6B6A63] font-semibold flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#0F766E]" /> ¿Dónde?
+                    </label>
+                    <select
+                      value={municipality}
+                      onChange={(e) => setMunicipality(e.target.value)}
+                      className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
+                    >
+                      <option value="">Todos los municipios</option>
+                      <option value="Apartadó">Apartadó</option>
+                      <option value="Turbo">Turbo</option>
+                      <option value="Necoclí">Necoclí</option>
+                      <option value="Carepa">Carepa</option>
+                      <option value="Chigorodó">Chigorodó</option>
+                      <option value="Acandí">Acandí</option>
+                      <option value="Unguía">Unguía</option>
+                    </select>
+                  </div>
+
+                  {/* Modality */}
+                  <div className="space-y-1">
+                    <label className="text-[#6B6A63] font-semibold">Modalidad</label>
+                    <select
+                      value={modality}
+                      onChange={(e) => setModality(e.target.value)}
+                      className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F] font-medium"
+                    >
+                      <option value="">Todas</option>
+                      <option value="Venta">Venta</option>
+                      <option value="Arriendo">Arriendo</option>
+                      <option value="Custodia">Custodia SAE</option>
+                      <option value="Inversión">Inversión</option>
+                    </select>
+                  </div>
+
+                  {/* Asset Type */}
+                  <div className="space-y-1">
+                    <label className="text-[#6B6A63] font-semibold">Tipo</label>
+                    <select
+                      value={assetType}
+                      onChange={(e) => setAssetType(e.target.value)}
+                      className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
+                    >
+                      <option value="">Todos</option>
+                      <option value="Finca">Fincas</option>
+                      <option value="Terreno">Terrenos</option>
+                      <option value="Bodega">Bodegas</option>
+                      <option value="Local">Locales</option>
+                      <option value="Activo Especial">SAE</option>
+                    </select>
+                  </div>
+
+                </form>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#E5E1D8]">
+                  <div className="text-[11px] text-[#6B6A63] font-mono flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
+                    <span>+10 predios validados en Urabá</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    form="property-search-form"
+                    className="px-6 py-2.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-bold text-xs shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]"
+                  >
+                    <span>Explorar Oportunidades</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              {/* Modality */}
-              <div className="space-y-1.5">
-                <label className="text-[#6B6A63] font-semibold">Modalidad</label>
-                <select
-                  value={modality}
-                  onChange={(e) => setModality(e.target.value)}
-                  className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#242321] focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F] font-medium"
-                >
-                  <option value="">Todas las modalidades</option>
-                  <option value="Venta">Venta</option>
-                  <option value="Arriendo">Arriendo</option>
-                  <option value="Custodia">Custodia SAE</option>
-                  <option value="Inversión">Oportunidad Inversión</option>
-                </select>
+              {/* Micro-Métricas Sobrias */}
+              <div className="grid grid-cols-3 gap-3 pt-2 font-mono text-xs border-t border-[#E5E1D8]">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[#1E3A2F] text-sm">12.000+ Ha</div>
+                  <div className="text-[#6B6A63] text-[11px]">Gestionadas</div>
+                </div>
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[#0F766E] text-sm">Urabá & Darién</div>
+                  <div className="text-[#6B6A63] text-[11px]">Cobertura Regional</div>
+                </div>
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[#6D4C7D] text-sm">Custodia SAE</div>
+                  <div className="text-[#6B6A63] text-[11px]">Especializada</div>
+                </div>
               </div>
 
-              {/* Asset Type */}
-              <div className="space-y-1.5">
-                <label className="text-[#6B6A63] font-semibold">Tipo de Activo</label>
-                <select
-                  value={assetType}
-                  onChange={(e) => setAssetType(e.target.value)}
-                  className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#242321] focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F]"
-                >
-                  <option value="">Todos los tipos</option>
-                  <option value="Finca">Fincas & Predios Rurales</option>
-                  <option value="Terreno">Terrenos & Lotes</option>
-                  <option value="Bodega">Bodegas & Logística</option>
-                  <option value="Casa">Casas & Residencial</option>
-                  <option value="Edificio">Edificios Corporativos</option>
-                  <option value="Local">Locales Comerciales</option>
-                  <option value="Oficina">Oficina</option>
-                  <option value="Activo Especial">Activo Especial SAE</option>
-                </select>
-              </div>
+            </div>
 
-            </form>
+            {/* COLUMNA DERECHA (5 COLUMNAS - ELEMENTO VISUAL CLAVE) */}
+            <div className="lg:col-span-5 relative">
+              {/* Decorative Subtle Backdrop Circle */}
+              <div className="absolute -inset-4 bg-[#EEF4EF] rounded-[40px] -z-10 rotate-1 transform" />
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between pt-3 border-t border-[#E5E1D8]">
-              <div className="text-xs text-[#6B6A63] font-mono flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#C6A15B]" />
-                <span>+10 inmuebles verificados en Urabá & Darién</span>
-              </div>
+              {/* Featured Asset Floating Card */}
+              <div className="bg-white border border-[#E5E1D8] rounded-3xl overflow-hidden shadow-2xl space-y-0 group transition-all duration-300">
+                
+                {/* Vibrant High-Quality Photo */}
+                <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-[#F1EFE8]">
+                  <img
+                    src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
+                    alt="Hacienda El Porvenir - Necoclí"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none" />
 
-              <div className="flex gap-3 w-full sm:w-auto">
-                <Link
-                  href="/contacto"
-                  className="flex-1 sm:flex-none px-5 py-3.5 rounded-xl bg-[#F8F7F2] hover:bg-[#E5E1D8] text-[#242321] font-semibold text-xs transition-colors text-center border border-[#E5E1D8]"
-                >
-                  Hablar con un Asesor
-                </Link>
-                <button
-                  type="submit"
-                  form="property-search-form"
-                  className="flex-1 sm:flex-none px-7 py-3.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-                >
-                  <span>Explorar Oportunidades</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  {/* Floating Badges */}
+                  <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
+                    <span className="bg-[#C6A15B] text-[#242321] font-bold text-[11px] px-3 py-1 rounded-full shadow-md">
+                      ★ Oportunidad Destacada
+                    </span>
+                    <span className="bg-white/90 backdrop-blur-md text-[#242321] font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-md">
+                      Necoclí, Antioquia
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 z-10">
+                    <span className="text-xs font-mono font-bold text-white bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
+                      DAR-FIN-001
+                    </span>
+                  </div>
+                </div>
+
+                {/* Footer of Floating Asset Card */}
+                <div className="p-6 space-y-4 text-left">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-xs font-mono text-[#1E3A2F] font-bold uppercase tracking-wider">
+                        Finca Agroganadera & Bananera
+                      </span>
+                      <h3 className="font-serif text-xl font-bold text-[#242321] mt-0.5">
+                        Hacienda El Porvenir
+                      </h3>
+                      <p className="text-xs text-[#6B6A63] mt-1">
+                        140 Hectáreas planas con riego propio y frente costero.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-[#E5E1D8] flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] text-[#6B6A63] font-mono block">Valor Comercial:</span>
+                      <span className="font-serif font-bold text-[#1E3A2F] text-lg">
+                        $4.200.000.000 COP
+                      </span>
+                    </div>
+
+                    <Link
+                      href="/propiedades/DAR-FIN-001"
+                      className="px-4 py-2.5 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all"
+                    >
+                      <span>+ Ver Predio</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </section>
 

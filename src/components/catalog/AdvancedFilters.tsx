@@ -50,22 +50,22 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   ].filter(Boolean).length;
 
   const quickChips = [
-    { label: 'Venta', action: () => updateField('modality', filters.modality === 'Venta' ? '' : 'Venta'), isActive: filters.modality === 'Venta' },
-    { label: 'Arriendo', action: () => updateField('modality', filters.modality === 'Arriendo' ? '' : 'Arriendo'), isActive: filters.modality === 'Arriendo' },
-    { label: 'Fincas', action: () => updateField('assetType', filters.assetType === 'Finca' ? '' : 'Finca'), isActive: filters.assetType === 'Finca' },
-    { label: 'Lotes / Terrenos', action: () => updateField('assetType', filters.assetType === 'Terreno' ? '' : 'Terreno'), isActive: filters.assetType === 'Terreno' },
+    { label: 'Todas', action: onResetFilters, isActive: activeFiltersCount === 0 },
+    { label: 'En Venta', action: () => updateField('modality', filters.modality === 'Venta' ? '' : 'Venta'), isActive: filters.modality === 'Venta' },
+    { label: 'En Arriendo', action: () => updateField('modality', filters.modality === 'Arriendo' ? '' : 'Arriendo'), isActive: filters.modality === 'Arriendo' },
+    { label: 'Fincas Ganaderas', action: () => updateField('assetType', filters.assetType === 'Finca' ? '' : 'Finca'), isActive: filters.assetType === 'Finca' },
+    { label: 'Tierras Agrícolas', action: () => updateField('assetType', filters.assetType === 'Terreno' ? '' : 'Terreno'), isActive: filters.assetType === 'Terreno' },
     { label: 'Bodegas', action: () => updateField('assetType', filters.assetType === 'Bodega' ? '' : 'Bodega'), isActive: filters.assetType === 'Bodega' },
-    { label: 'Saneado 100%', action: () => updateField('legalStatus', filters.legalStatus === 'Saneado' ? '' : 'Saneado'), isActive: filters.legalStatus === 'Saneado' },
     { label: 'Custodia SAE', action: () => updateField('modality', filters.modality === 'Custodia' ? '' : 'Custodia'), isActive: filters.modality === 'Custodia', isPurple: true },
-    { label: 'Alta valorización', action: () => updateField('isInvestmentOpportunity', !filters.isInvestmentOpportunity), isActive: filters.isInvestmentOpportunity, isGold: true },
+    { label: 'Alta Valorización', action: () => updateField('isInvestmentOpportunity', !filters.isInvestmentOpportunity), isActive: filters.isInvestmentOpportunity, isGold: true },
   ];
 
   return (
     <div className="bg-white border border-[#E5E1D8] rounded-2xl p-5 shadow-sm space-y-4">
       
-      {/* Quick Chips Row */}
-      <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-[#E5E1D8]">
-        <span className="text-xs font-mono font-bold text-[#6B6A63] uppercase tracking-wider mr-1">Filtros Rápidos:</span>
+      {/* Horizontally Scrollable Quick Chips Bar */}
+      <div className="flex items-center gap-2 pb-3 border-b border-[#E5E1D8] overflow-x-auto scrollbar-none py-1">
+        <span className="text-xs font-mono font-bold text-[#6B6A63] uppercase tracking-wider shrink-0 mr-1">Filtros Rápidos:</span>
         {quickChips.map((chip, idx) => {
           let activeStyles = 'bg-[#1E3A2F] text-white border-[#1E3A2F]';
           if (chip.isPurple) activeStyles = 'bg-[#6D4C7D] text-white border-[#6D4C7D]';
@@ -75,7 +75,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <button
               key={idx}
               onClick={chip.action}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 shrink-0 ${
                 chip.isActive
                   ? activeStyles
                   : 'bg-[#F8F7F2] text-[#242321] border-[#E5E1D8] hover:bg-[#E5E1D8]'
@@ -240,56 +240,6 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <option value="price-desc">Precio: Mayor a Menor</option>
             <option value="area-desc">Mayor Área Total</option>
           </select>
-        </div>
-
-        <div>
-          <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Precio mínimo (COP)</label>
-          <input
-            type="number"
-            min="0"
-            value={filters.minPrice}
-            onChange={(e) => updateField('minPrice', e.target.value)}
-            placeholder="Sin mínimo"
-            className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Precio máximo (COP)</label>
-          <input
-            type="number"
-            min="0"
-            value={filters.maxPrice}
-            onChange={(e) => updateField('maxPrice', e.target.value)}
-            placeholder="Sin máximo"
-            className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Área mínima (Ha)</label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={filters.minArea}
-            onChange={(e) => updateField('minArea', e.target.value)}
-            placeholder="Sin mínimo"
-            className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Área máxima (Ha)</label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={filters.maxArea}
-            onChange={(e) => updateField('maxArea', e.target.value)}
-            placeholder="Sin máximo"
-            className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
-          />
         </div>
       </div>
 

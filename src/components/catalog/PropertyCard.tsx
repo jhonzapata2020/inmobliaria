@@ -68,7 +68,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-        {/* Top Badges */}
+        {/* Top Badges & Actions */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start gap-2 z-10">
           <div className="flex flex-wrap gap-1.5 items-center">
             <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm ${modalityBadge.bgClass} ${modalityBadge.textClass}`}>
@@ -79,18 +79,41 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             </span>
           </div>
 
-          {/* Favorite Button */}
-          <button
-            onClick={() => toggleFavorite(property.id)}
-            className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
-              favorite 
-                ? 'bg-rose-600 text-white' 
-                : 'bg-white/90 text-[#6B6A63] hover:text-[#242321] hover:bg-white'
-            }`}
-            title={favorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-          >
-            <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {/* Quick Dossier Button Floating on Photo */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                inDossier ? removeFromDossier(property.id) : addToDossier(property);
+              }}
+              className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
+                inDossier 
+                  ? 'bg-[#23866D] text-white font-bold' 
+                  : 'bg-white/90 text-[#1E3A2F] hover:text-[#152921] hover:bg-white'
+              }`}
+              title={inDossier ? 'Quitar del dossier' : '+ Agregar al dossier'}
+            >
+              {inDossier ? <Check className="w-4 h-4 stroke-[3]" /> : <FileSpreadsheet className="w-4 h-4" />}
+            </button>
+
+            {/* Favorite Button */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFavorite(property.id);
+              }}
+              className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
+                favorite 
+                  ? 'bg-rose-600 text-white' 
+                  : 'bg-white/90 text-[#6B6A63] hover:text-[#242321] hover:bg-white'
+              }`}
+              title={favorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+            >
+              <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {/* Carousel Navigation Arrows */}

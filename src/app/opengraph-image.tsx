@@ -75,7 +75,7 @@ export default async function Image() {
               color: '#C6A15B',
               fontSize: '18px',
               fontWeight: '600',
-              width: 'fit-content',
+              alignSelf: 'flex-start',
             }}
           >
             Plataforma Inmobiliaria & Custodia SAE

@@ -48,8 +48,8 @@ export const INITIAL_PROPERTIES: Property[] = [
     price: 2250000000,
     images: [
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=1200&auto=format&fit=crop',
-      '/properties/satelite-aguas-claras.png'
+      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1200&auto=format&fit=crop',
+      '/properties/satelite-aguas-claras.jpg'
     ],
     featuredImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop',
     coordinates: { lat: 8.5562, lng: -76.7118 },

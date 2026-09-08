@@ -33,7 +33,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     return (
       <div 
         style={{ height }}
-        className="w-full bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center text-slate-500 text-sm font-mono animate-pulse"
+        className="w-full bg-[#F8F7F2] rounded-2xl border border-[#E5E1D8] flex items-center justify-center text-[#6B6A63] text-sm font-mono animate-pulse"
       >
         Cargando Mapa Territorial de Urabá & Darién...
       </div>
@@ -44,13 +44,13 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   const defaultCenter: [number, number] = [7.9351, -76.7289];
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl" style={{ height }}>
+    <div className="relative w-full rounded-2xl overflow-hidden border border-[#E5E1D8] shadow-md" style={{ height }}>
       {/* Map Control Tile Switcher */}
-      <div className="absolute top-4 right-4 z-[1000] bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-1 flex gap-1 shadow-lg text-xs font-mono">
+      <div className="absolute top-4 right-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#E5E1D8] rounded-xl p-1 flex gap-1 shadow-md text-xs font-mono text-[#242321]">
         <button
           onClick={() => setMapTile('streets')}
           className={`px-3 py-1.5 rounded-lg transition-colors font-semibold ${
-            mapTile === 'streets' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            mapTile === 'streets' ? 'bg-[#1E3A2F] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
           }`}
         >
           Mapa Vías
@@ -58,7 +58,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         <button
           onClick={() => setMapTile('satellite')}
           className={`px-3 py-1.5 rounded-lg transition-colors font-semibold ${
-            mapTile === 'satellite' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            mapTile === 'satellite' ? 'bg-[#0F766E] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
           }`}
         >
           Satelital
@@ -133,22 +133,22 @@ const LeafletMapInner: React.FC<{
       }
     });
 
-    // Custom Icon Generator
+    // Custom Icon Generator with Price Pill Pins
     const createCustomIcon = (code: string, modality: string) => {
-      let bg = 'bg-emerald-600';
-      if (modality === 'Arriendo') bg = 'bg-slate-800';
-      if (modality === 'Custodia') bg = 'bg-purple-700';
+      let bg = 'bg-white text-[#1E3A2F] border-[#1E3A2F]';
+      if (modality === 'Arriendo') bg = 'bg-white text-[#0F766E] border-[#0F766E]';
+      if (modality === 'Custodia') bg = 'bg-[#6D4C7D] text-white border-[#6D4C7D]';
 
       return L.divIcon({
         className: 'custom-map-pin',
         html: `
-          <div className="${bg} text-white font-mono font-bold text-[10px] px-2 py-1 rounded-md shadow-xl border border-white/40 flex items-center gap-1 hover:scale-110 transition-transform">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <div className="${bg} font-mono font-bold text-[10px] px-2 py-1 rounded-full shadow-md border flex items-center gap-1 hover:scale-110 transition-transform">
+            <span className="w-1.5 h-1.5 rounded-full ${modality === 'Custodia' ? 'bg-white' : 'bg-[#1E3A2F]'} animate-pulse"></span>
             ${code}
           </div>
         `,
-        iconSize: [80, 24],
-        iconAnchor: [40, 12]
+        iconSize: [85, 24],
+        iconAnchor: [42, 12]
       });
     };
 
@@ -169,17 +169,17 @@ const LeafletMapInner: React.FC<{
         const areaText = formatArea(prop.areaTotalHa, prop.areaTotalM2);
 
         const popupContent = `
-          <div style="font-family: inherit; width: 220px; color: #0f172a;">
-            <img src="${prop.images[0]}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;" />
+          <div style="font-family: inherit; width: 220px; color: #242321; background: #ffffff; padding: 4px; border-radius: 8px;">
+            <img src="${prop.images[0]}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px;" />
             <div style="margin-top: 8px;">
-              <span style="font-size: 10px; font-weight: bold; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${prop.code}</span>
-              <h4 style="font-size: 13px; font-weight: bold; margin: 4px 0 2px 0; color: #0f172a;">${prop.title}</h4>
-              <p style="font-size: 11px; color: #64748b; margin: 0 0 6px 0;">📍 ${prop.municipality}, ${prop.department}</p>
-              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; border-top: 1px solid #e2e8f0; pt: 4px;">
-                <span>${areaText}</span>
-                <span style="color: #059669;">${priceText}</span>
+              <span style="font-size: 10px; font-weight: bold; background: ${prop.modality === 'Custodia' ? '#6D4C7D' : '#1E3A2F'}; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${prop.code}</span>
+              <h4 style="font-size: 13px; font-weight: bold; margin: 4px 0 2px 0; color: #242321;">${prop.title}</h4>
+              <p style="font-size: 11px; color: #6B6A63; margin: 0 0 6px 0;">📍 ${prop.municipality}, ${prop.department}</p>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; border-top: 1px solid #E5E1D8; padding-top: 6px;">
+                <span style="color: #6B6A63;">${areaText}</span>
+                <span style="color: #1E3A2F;">${priceText}</span>
               </div>
-              <a href="/propiedades/${prop.id}" style="display: block; text-align: center; margin-top: 8px; background: #0f172a; color: white; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; text-decoration: none;">Ver Ficha 360°</a>
+              <a href="/propiedades/${prop.id}" style="display: block; text-align: center; margin-top: 8px; background: #1E3A2F; color: white; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; text-decoration: none;">Ver Ficha 360°</a>
             </div>
           </div>
         `;

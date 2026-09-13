@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import psycopg2
+from psycopg2.extras import execute_values
 import pandas as pd
 import numpy as np
 import unicodedata
@@ -9,7 +10,7 @@ import unicodedata
 # Connection configuration
 DB_URL = os.environ.get(
     "DATABASE_URL",
-    "postgresql://postgres.ehfejbgzronpllbeyzqj:Galimatias%402020@54.70.143.232:6543/postgres?sslmode=require"
+    "postgresql://postgres.beliwkapymtlufcytwxi:Galimatias%402020@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
 )
 
 EXCEL_PATH = "ANTIOQUIA.xlsx"
@@ -631,7 +632,7 @@ def main():
         dedup_df = filtered_df.drop_duplicates(subset=['IDACTIVO']).copy()
         print(f" -> Filas de Urabá procesadas: {len(dedup_df)}")
 
-        excel_inserted_count = 0
+        batch_params = []
         for _, row in dedup_df.iterrows():
             id_act = str(row['IDACTIVO']).strip()
             code = f"DAR-EXCEL-{id_act}"
@@ -657,61 +658,42 @@ def main():
             registry_folio = sanitize_text(row.get('FOLIO DE MATRÍCULA'), "")
             legal_status = sanitize_text(row.get('ESTADO LEGAL'), "Saneado")
 
-            sql = """
-                INSERT INTO public.properties (
-                    code, slug, title, short_description, description,
-                    asset_type, modality, is_sae, sae_id_activo, folio_matricula,
-                    sale_price_cop, estimated_value_cop, land_area_m2, land_area_ha,
-                    department, municipality, address, latitude, longitude,
-                    matricula_inmobiliaria, cedula_catastral, legal_status,
-                    editorial_status, availability, is_featured, is_investment_opportunity, updated_at
-                ) VALUES (
-                    %(code)s, %(slug)s, %(title)s, %(short_description)s, %(description)s,
-                    %(asset_type)s, %(modality)s, %(is_sae)s, %(sae_id_activo)s, %(folio_matricula)s,
-                    %(sale_price_cop)s, %(estimated_value_cop)s, %(land_area_m2)s, %(land_area_ha)s,
-                    %(department)s, %(municipality)s, %(address)s, %(latitude)s, %(longitude)s,
-                    %(matricula_inmobiliaria)s, %(cedula_catastral)s, %(legal_status)s,
-                    'published', 'Disponible', false, false, NOW()
-                )
-                ON CONFLICT (code) DO UPDATE SET
-                    title = EXCLUDED.title,
-                    sale_price_cop = EXCLUDED.sale_price_cop,
-                    land_area_m2 = EXCLUDED.land_area_m2,
-                    land_area_ha = EXCLUDED.land_area_ha,
-                    editorial_status = 'published',
-                    availability = 'Disponible',
-                    updated_at = NOW();
-            """
-            params = {
-                "code": code,
-                "slug": slug,
-                "title": title,
-                "short_description": desc_val[:200] if desc_val else f"Predio inventario SAE {id_act}",
-                "description": desc_val if desc_val else f"Predio en {muni_canonical} bajo inventario.",
-                "asset_type": asset_type,
-                "modality": "Custodia SAE",
-                "is_sae": True,
-                "sae_id_activo": id_act,
-                "folio_matricula": registry_folio,
-                "sale_price_cop": val_com,
-                "estimated_value_cop": val_com,
-                "land_area_m2": area_m2,
-                "land_area_ha": area_ha,
-                "department": dept_canonical,
-                "municipality": muni_canonical,
-                "address": dir_val if dir_val else f"Vereda / Sector {muni_canonical}",
-                "latitude": 8.0 + (excel_inserted_count * 0.01),
-                "longitude": -76.7 - (excel_inserted_count * 0.01),
-                "matricula_inmobiliaria": registry_folio,
-                "cedula_catastral": cadastral_id,
-                "legal_status": legal_status
-            }
-            cur.execute(sql, params)
-            excel_inserted_count += 1
+            lat = 8.0 + (len(batch_params) * 0.001)
+            lng = -76.7 - (len(batch_params) * 0.001)
 
-        print(f" -> Se procesaron e insertaron {excel_inserted_count} filas desde Excel.")
+            batch_params.append((
+                code, slug, title, desc_val[:200] if desc_val else f"Predio inventario SAE {id_act}",
+                desc_val if desc_val else f"Predio en {muni_canonical} bajo inventario.",
+                asset_type, "Custodia SAE", True, id_act, registry_folio,
+                val_com, val_com, area_m2, area_ha,
+                dept_canonical, muni_canonical, dir_val if dir_val else f"Vereda / Sector {muni_canonical}",
+                lat, lng, registry_folio, cadastral_id, legal_status,
+                'published', 'Disponible', False, False
+            ))
+
+        insert_sql = """
+            INSERT INTO public.properties (
+                code, slug, title, short_description, description,
+                asset_type, modality, is_sae, sae_id_activo, folio_matricula,
+                sale_price_cop, estimated_value_cop, land_area_m2, land_area_ha,
+                department, municipality, address, latitude, longitude,
+                matricula_inmobiliaria, cedula_catastral, legal_status,
+                editorial_status, availability, is_featured, is_investment_opportunity, updated_at
+            ) VALUES %s
+            ON CONFLICT (code) DO UPDATE SET
+                title = EXCLUDED.title,
+                sale_price_cop = EXCLUDED.sale_price_cop,
+                land_area_m2 = EXCLUDED.land_area_m2,
+                land_area_ha = EXCLUDED.land_area_ha,
+                editorial_status = 'published',
+                availability = 'Disponible',
+                updated_at = NOW();
+        """
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"
+        execute_values(cur, insert_sql, batch_params, template=template)
+        print(f" -> Se procesaron e insertaron en lote {len(batch_params)} filas desde Excel.", flush=True)
     else:
-        print(f" -> No se encontró {EXCEL_PATH}, continuando solo con canónicos.")
+        print(f" -> No se encontró {EXCEL_PATH}, continuando solo con canónicos.", flush=True)
 
     # Final Verification Query
     cur.execute("SELECT COUNT(*) FROM public.properties;")

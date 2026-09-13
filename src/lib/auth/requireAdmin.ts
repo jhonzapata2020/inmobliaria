@@ -23,30 +23,30 @@ export async function requireAdmin(allowedRoles: string[] = INVENTORY_ROLES): Pr
       };
     }
 
-    // Query public.profiles table for role and is_active
-    const { data: profile } = await supabase
+    // Query public.profiles as single source of truth
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role, is_active')
       .eq('id', user.id)
       .maybeSingle();
 
-    let userRole = profile?.role;
-    let isActive = profile?.is_active;
-
-    // Server-managed fallback ONLY to app_metadata (never user_metadata)
-    if (!userRole) {
-      userRole = user.app_metadata?.role;
-      if (userRole) {
-        isActive = true;
-      }
-    }
-
-    // Reject explicitly if missing, inactive, or role not in allowedRoles
-    if (!userRole || isActive !== true || !allowedRoles.includes(userRole)) {
+    // Reject explicitly if query errors, profile does not exist, or is inactive
+    if (profileError || !profile || profile.is_active !== true) {
       return {
         authorized: false,
         reason: 'FORBIDDEN',
-        message: 'No posee permisos suficientes o su perfil de usuario no se encuentra activo.'
+        message: 'Perfil de usuario inexistente, inactivo o no registrado.'
+      };
+    }
+
+    const userRole = profile.role;
+
+    // Check if role belongs to allowed domain roles
+    if (!allowedRoles.includes(userRole)) {
+      return {
+        authorized: false,
+        reason: 'FORBIDDEN',
+        message: 'No posee permisos suficientes para realizar esta acción.'
       };
     }
 

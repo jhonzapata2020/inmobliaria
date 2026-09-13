@@ -6,6 +6,7 @@ export type AssetType =
   | 'Lote'
   | 'Terreno'
   | 'Casa'
+  | 'Apartamento'
   | 'Bodega'
   | 'Edificio'
   | 'Local'

@@ -53,6 +53,48 @@ def sanitize_num(val):
     except (ValueError, TypeError):
         return None
 
+def normalize_asset_type(raw_type, dir_val="", desc_val=""):
+    raw_upper = strip_accents(str(raw_type))
+    dir_upper = strip_accents(str(dir_val))
+    desc_upper = strip_accents(str(desc_val))
+    combined = f"{raw_upper} {dir_upper} {desc_upper}"
+
+    # Priority 1: Check raw classification column
+    if "APARTAMENTO" in raw_upper:
+        return "Apartamento"
+    if "BODEGA" in raw_upper or "GALPON" in raw_upper or "NAVE" in raw_upper:
+        return "Bodega"
+    if "LOCAL" in raw_upper or "CENTRO COMERCIAL" in raw_upper or "TERMINAL" in raw_upper:
+        return "Local"
+    if "EDIFICIO" in raw_upper or "EDIFICACION PARA HOTEL" in raw_upper or "HOTEL" in raw_upper:
+        return "Edificio"
+    if "OFICINA" in raw_upper:
+        return "Oficina"
+    if "CASA" in raw_upper or "VIVIENDA" in raw_upper or "HABITACION" in raw_upper or "CASA LOTE" in raw_upper or "CASA RECREO" in raw_upper:
+        return "Casa"
+    if "LOTE" in raw_upper or "TERRENO" in raw_upper or "LOTE CON CONSTRUCCION" in raw_upper or "TERRAZA" in raw_upper or "GARAJE" in raw_upper:
+        return "Lote"
+    if "FINCA" in raw_upper or "HACIENDA" in raw_upper or "PARCELA" in raw_upper or "PREDIO RURAL" in raw_upper or "MEJORAS AGRICOLAS" in raw_upper:
+        return "Finca"
+
+    # Priority 2: Keyword search in Combined Title/Address/Description text
+    if any(k in combined for k in ["LOCAL", "MALL", "COMERCIAL"]):
+        return "Local"
+    if any(k in combined for k in ["BODEGA", "ALMACEN"]):
+        return "Bodega"
+    if any(k in combined for k in ["APARTAMENTO", "APTO", "PH"]):
+        return "Apartamento"
+    if any(k in combined for k in ["CASA", "VIVIENDA", "CS "]):
+        return "Casa"
+    if any(k in combined for k in ["LOTE", "TERRENO", "LT "]):
+        return "Lote"
+    if any(k in combined for k in ["FINCA", "FCA", "HACIENDA", "AGRO", "PREDIO RURAL"]):
+        return "Finca"
+    if any(k in combined for k in ["EDIFICIO", "ED "]):
+        return "Edificio"
+
+    return "Finca"
+
 def main():
     print("==================================================")
     print(" INGESTIÓN DE INVENTARIO A public.properties SUPABASE")
@@ -647,8 +689,8 @@ def main():
             raw_title = dir_val if dir_val else (desc_val if desc_val else f"Predio {id_act} - {muni_canonical}")
             title = sanitize_text(raw_title, f"Predio {id_act}")[:255]
 
-            asset_type_raw = sanitize_text(row.get('CLASIFICACIÓN ACTIVO'), "Finca")
-            asset_type = asset_type_raw if asset_type_raw in ["Finca", "Lote", "Terreno", "Bodega", "Edificio", "Local", "Casa"] else "Finca"
+            asset_type_raw = row.get('CLASIFICACIÓN ACTIVO')
+            asset_type = normalize_asset_type(asset_type_raw, dir_val, desc_val)
 
             area_m2 = sanitize_num(row.get('AREA TERRENO'))
             area_ha = area_m2 / 10000.0 if area_m2 else None
@@ -682,6 +724,7 @@ def main():
             ) VALUES %s
             ON CONFLICT (code) DO UPDATE SET
                 title = EXCLUDED.title,
+                asset_type = EXCLUDED.asset_type,
                 sale_price_cop = EXCLUDED.sale_price_cop,
                 land_area_m2 = EXCLUDED.land_area_m2,
                 land_area_ha = EXCLUDED.land_area_ha,
@@ -701,11 +744,17 @@ def main():
     cur.execute("SELECT COUNT(*) FROM public.properties WHERE editorial_status = 'published' AND availability <> 'Archivado';")
     public_visible = cur.fetchone()[0]
 
+    cur.execute("SELECT asset_type, count(*) FROM public.properties GROUP BY asset_type ORDER BY count(*) DESC;")
+    by_asset_type = cur.fetchall()
+
     print("\n==================================================")
     print(" INGESTIÓN Y VERIFICACIÓN DE BASE DE DATOS FINAL")
     print(f" Total registros en public.properties: {total}")
     print(f" Total visibles públicamente (published & !Archivado): {public_visible}")
-    print("==================================================")
+    print(" Desglose por Tipo de Activo (asset_type):")
+    for at, cnt in by_asset_type:
+        print(f"   - {at}: {cnt}")
+    print("==================================================", flush=True)
 
     conn.close()
 

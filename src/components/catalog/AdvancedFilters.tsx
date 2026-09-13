@@ -183,11 +183,13 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           >
             <option value="">Todos los tipos</option>
             <option value="Finca">Fincas</option>
-            <option value="Terreno">Terrenos / Lotes</option>
+            <option value="Lote">Terrenos / Lotes</option>
+            <option value="Casa">Casas</option>
+            <option value="Apartamento">Apartamentos</option>
+            <option value="Local">Locales Comerciales</option>
             <option value="Bodega">Bodegas</option>
             <option value="Edificio">Edificios</option>
-            <option value="Local">Locales Comerciales</option>
-            <option value="Casa">Casas Campestres</option>
+            <option value="Oficina">Oficinas</option>
             <option value="Activo Especial">Activo Especial SAE</option>
           </select>
         </div>
@@ -309,10 +311,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 >
                   <option value="">Todos los tipos</option>
                   <option value="Finca">Fincas</option>
-                  <option value="Terreno">Terrenos / Lotes</option>
+                  <option value="Lote">Terrenos / Lotes</option>
+                  <option value="Casa">Casas</option>
+                  <option value="Apartamento">Apartamentos</option>
+                  <option value="Local">Locales Comerciales</option>
                   <option value="Bodega">Bodegas</option>
                   <option value="Edificio">Edificios</option>
-                  <option value="Local">Locales Comerciales</option>
+                  <option value="Oficina">Oficinas</option>
+                  <option value="Activo Especial">Activo Especial SAE</option>
                 </select>
               </div>
 

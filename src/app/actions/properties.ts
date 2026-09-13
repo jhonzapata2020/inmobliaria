@@ -51,7 +51,11 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       }
 
       if (filters.assetType && filters.assetType !== 'all' && filters.assetType !== 'Todos') {
-        query = query.eq('asset_type', filters.assetType);
+        if (filters.assetType === 'Terreno' || filters.assetType === 'Lote') {
+          query = query.in('asset_type', ['Lote', 'Terreno']);
+        } else {
+          query = query.eq('asset_type', filters.assetType);
+        }
       }
 
       if (filters.municipality && filters.municipality !== 'all' && filters.municipality !== 'Todos') {

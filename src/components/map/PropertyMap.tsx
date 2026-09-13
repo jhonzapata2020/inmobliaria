@@ -137,13 +137,13 @@ const LeafletMapInner: React.FC<{
     const createCustomIcon = (code: string, modality: string) => {
       let bg = 'bg-white text-[#1E3A2F] border-[#1E3A2F]';
       if (modality === 'Arriendo') bg = 'bg-white text-[#0F766E] border-[#0F766E]';
-      if (modality === 'Custodia') bg = 'bg-[#6D4C7D] text-white border-[#6D4C7D]';
+      if (modality === 'Custodia SAE') bg = 'bg-[#6D4C7D] text-white border-[#6D4C7D]';
 
       return L.divIcon({
         className: 'custom-map-pin',
         html: `
           <div className="${bg} font-mono font-bold text-[10px] px-2 py-1 rounded-full shadow-md border flex items-center gap-1 hover:scale-110 transition-transform">
-            <span className="w-1.5 h-1.5 rounded-full ${modality === 'Custodia' ? 'bg-white' : 'bg-[#1E3A2F]'} animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full ${modality === 'Custodia SAE' ? 'bg-white' : 'bg-[#1E3A2F]'} animate-pulse"></span>
             ${code}
           </div>
         `,
@@ -160,26 +160,28 @@ const LeafletMapInner: React.FC<{
         }).addTo(map);
 
         const priceText = prop.modality === 'Venta'
-          ? formatCurrency(prop.price)
+          ? formatCurrency(prop.salePriceCop)
           : prop.modality === 'Arriendo'
-            ? `${formatCurrency(prop.monthlyRent)}/mes`
+            ? `${formatCurrency(prop.monthlyRentCop)}/mes`
             : prop.modality === 'Inversión'
-              ? formatCurrency(prop.price || prop.estimatedValue)
+              ? formatCurrency(prop.salePriceCop || prop.estimatedValueCop)
               : 'Regulada SAE';
-        const areaText = formatArea(prop.areaTotalHa, prop.areaTotalM2);
+        const areaText = formatArea(prop.landAreaHa, prop.landAreaM2);
+        const detailUrl = `/propiedades/${prop.slug || prop.id}`;
+        const mainImage = prop.featuredImage || prop.images?.[0] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef';
 
         const popupContent = `
           <div style="font-family: inherit; width: 220px; color: #242321; background: #ffffff; padding: 4px; border-radius: 8px;">
-            <img src="${prop.images[0]}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px;" />
+            <img src="${mainImage}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px;" />
             <div style="margin-top: 8px;">
-              <span style="font-size: 10px; font-weight: bold; background: ${prop.modality === 'Custodia' ? '#6D4C7D' : '#1E3A2F'}; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${prop.code}</span>
+              <span style="font-size: 10px; font-weight: bold; background: ${prop.modality === 'Custodia SAE' ? '#6D4C7D' : '#1E3A2F'}; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${prop.code}</span>
               <h4 style="font-size: 13px; font-weight: bold; margin: 4px 0 2px 0; color: #242321;">${prop.title}</h4>
               <p style="font-size: 11px; color: #6B6A63; margin: 0 0 6px 0;">📍 ${prop.municipality}, ${prop.department}</p>
               <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; border-top: 1px solid #E5E1D8; padding-top: 6px;">
                 <span style="color: #6B6A63;">${areaText}</span>
                 <span style="color: #1E3A2F;">${priceText}</span>
               </div>
-              <a href="/propiedades/${prop.id}" style="display: block; text-align: center; margin-top: 8px; background: #1E3A2F; color: white; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; text-decoration: none;">Ver Ficha 360°</a>
+              <a href="${detailUrl}" style="display: block; text-align: center; margin-top: 8px; background: #1E3A2F; color: white; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; text-decoration: none;">Ver Ficha 360°</a>
             </div>
           </div>
         `;

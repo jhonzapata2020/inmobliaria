@@ -41,7 +41,7 @@ export const DossierProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [dossierType, setDossierType] = useState<DossierType>('Inversionista');
   const [lastAddedTitle, setLastAddedTitle] = useState<string | null>(null);
 
-  // Load from localStorage
+  // Load from localStorage (client UI selection state)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('darien_dossier_properties');
@@ -98,21 +98,21 @@ export const DossierProvider: React.FC<{ children: React.ReactNode }> = ({ child
     let hasCustody = false;
 
     selectedProperties.forEach((p) => {
-      if (p.areaTotalHa) totalAreaHa += p.areaTotalHa;
-      if (p.areaTotalM2) totalAreaM2 += p.areaTotalM2;
+      if (p.landAreaHa) totalAreaHa += p.landAreaHa;
+      if (p.landAreaM2) totalAreaM2 += p.landAreaM2;
 
       if (p.modality === 'Venta') {
         hasSale = true;
-        if (p.price) totalSalePrice += p.price;
+        if (p.salePriceCop) totalSalePrice += p.salePriceCop;
       } else if (p.modality === 'Arriendo') {
         hasRent = true;
-        if (p.monthlyRent) totalMonthlyRent += p.monthlyRent;
-      } else if (p.modality === 'Custodia') {
+        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
+      } else if (p.modality === 'Custodia SAE') {
         hasCustody = true;
-        if (p.monthlyRent) totalMonthlyRent += p.monthlyRent;
+        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
       } else if (p.modality === 'Inversión') {
-        if (p.price) totalSalePrice += p.price;
-        if (p.monthlyRent) totalMonthlyRent += p.monthlyRent;
+        if (p.salePriceCop) totalSalePrice += p.salePriceCop;
+        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
         hasSale = true;
       }
     });

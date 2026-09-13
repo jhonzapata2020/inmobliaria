@@ -2,17 +2,20 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { LayoutGrid, Map, MapPin, SlidersHorizontal, Layers, Search, Sparkles } from 'lucide-react';
-import { INITIAL_PROPERTIES } from '../../data/mockProperties';
+import { LayoutGrid, Map, Layers } from 'lucide-react';
 import { PropertyFilterState, Property } from '../../types/property';
 import { PropertyCard } from '../../components/catalog/PropertyCard';
 import { AdvancedFilters } from '../../components/catalog/AdvancedFilters';
 import { PropertyMap } from '../../components/map/PropertyMap';
 import { useFavorites } from '../../context/FavoritesContext';
+import { getPublishedProperties } from '../actions/properties';
 
 function PropiedadesCatalogContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Initial filters from query params
   const [filters, setFilters] = useState<PropertyFilterState>({
@@ -36,6 +39,21 @@ function PropiedadesCatalogContent() {
   const { favoriteIds } = useFavorites();
 
   const [viewMode, setViewMode] = useState<'grid' | 'split' | 'map'>('grid');
+
+  useEffect(() => {
+    async function loadProperties() {
+      setLoading(true);
+      try {
+        const data = await getPublishedProperties(filters);
+        setProperties(data);
+      } catch (err) {
+        console.error('Failed to load published properties:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProperties();
+  }, [filters]);
 
   // Sync active filters to URL for shareable links
   useEffect(() => {
@@ -77,73 +95,10 @@ function PropiedadesCatalogContent() {
     });
   };
 
-  // Filter & Sort Logic
   const filteredProperties = useMemo(() => {
-    return INITIAL_PROPERTIES.filter((p) => {
-      const effectiveAreaHa = p.areaTotalHa ?? ((p.areaTotalM2 ?? 0) / 10000);
-      const effectivePrice = p.price ?? p.estimatedValue ?? p.monthlyRent ?? 0;
-
-      // Favorite filter
-      if (showOnlyFavorites && !favoriteIds.includes(p.id)) return false;
-
-      // Keyword search
-      if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase();
-        const matchTitle = p.title.toLowerCase().includes(q);
-        const matchCode = p.code.toLowerCase().includes(q);
-        const matchMun = p.municipality.toLowerCase().includes(q);
-        const matchDesc = p.shortDescription.toLowerCase().includes(q);
-        const matchUse = p.potentialUses.some((use) => use.toLowerCase().includes(q));
-        if (!matchTitle && !matchCode && !matchMun && !matchDesc && !matchUse) return false;
-      }
-
-      // Modality
-      if (filters.modality && p.modality !== filters.modality) return false;
-
-      // Asset Type
-      if (filters.assetType && p.assetType !== filters.assetType) return false;
-
-      // Municipality
-      if (filters.municipality && p.municipality !== filters.municipality) return false;
-
-      // Department
-      if (filters.department && p.department !== filters.department) return false;
-
-      // Legal status
-      if (filters.legalStatus && p.legalStatus !== filters.legalStatus) return false;
-
-      // Availability and potential use
-      if (filters.availability && p.availability !== filters.availability) return false;
-      if (filters.potentialUse && !p.potentialUses.includes(filters.potentialUse as Property['potentialUses'][number])) return false;
-
-      // Numeric filters. Area is interpreted in hectares; square-meter assets are converted.
-      const minPrice = Number(filters.minPrice);
-      const maxPrice = Number(filters.maxPrice);
-      const minArea = Number(filters.minArea);
-      const maxArea = Number(filters.maxArea);
-      if (filters.minPrice && Number.isFinite(minPrice) && effectivePrice < minPrice) return false;
-      if (filters.maxPrice && Number.isFinite(maxPrice) && effectivePrice > maxPrice) return false;
-      if (filters.minArea && Number.isFinite(minArea) && effectiveAreaHa < minArea) return false;
-      if (filters.maxArea && Number.isFinite(maxArea) && effectiveAreaHa > maxArea) return false;
-
-      // Investment flag
-      if (filters.isInvestmentOpportunity && !p.isInvestmentOpportunity) return false;
-
-      return true;
-    }).sort((a, b) => {
-      const priceA = a.price ?? a.estimatedValue ?? a.monthlyRent ?? 0;
-      const priceB = b.price ?? b.estimatedValue ?? b.monthlyRent ?? 0;
-      if (filters.sortBy === 'price-asc') return priceA - priceB;
-      if (filters.sortBy === 'price-desc') return priceB - priceA;
-      if (filters.sortBy === 'area-desc') {
-        const areaA = a.areaTotalHa ?? ((a.areaTotalM2 ?? 0) / 10000);
-        const areaB = b.areaTotalHa ?? ((b.areaTotalM2 ?? 0) / 10000);
-        return areaB - areaA;
-      }
-      if (filters.sortBy === 'featured') return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
-      return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
-    });
-  }, [filters, showOnlyFavorites, favoriteIds]);
+    if (!showOnlyFavorites) return properties;
+    return properties.filter((p) => favoriteIds.includes(p.id));
+  }, [properties, showOnlyFavorites, favoriteIds]);
 
   return (
     <div className="min-h-screen bg-[#F8F7F2] pb-20">
@@ -200,57 +155,66 @@ function PropiedadesCatalogContent() {
           totalResults={filteredProperties.length}
         />
 
-        {/* VIEW MODE 1: GRID VIEW */}
-        {viewMode === 'grid' && (
+        {/* Loading Indicator */}
+        {loading ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] text-xs font-mono text-[#6B6A63] shadow-sm">
+            Consultando base de datos persistente en Supabase...
+          </div>
+        ) : (
           <>
-            {filteredProperties.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] space-y-4 shadow-sm">
-                <p className="text-[#6B6A63] text-sm font-semibold">No se encontraron propiedades con los filtros aplicados.</p>
-                <button
-                  onClick={handleResetFilters}
-                  className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921]"
-                >
-                  Limpiar Filtros
-                </button>
+            {/* VIEW MODE 1: GRID VIEW */}
+            {viewMode === 'grid' && (
+              <>
+                {filteredProperties.length === 0 ? (
+                  <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] space-y-4 shadow-sm">
+                    <p className="text-[#6B6A63] text-sm font-semibold">No se encontraron propiedades con los filtros aplicados.</p>
+                    <button
+                      onClick={handleResetFilters}
+                      className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921]"
+                    >
+                      Limpiar Filtros
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProperties.map((property) => (
+                      <PropertyCard key={property.id} property={property} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* VIEW MODE 2: SPLIT LIST & MAP */}
+            {viewMode === 'split' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div className="lg:col-span-6 space-y-4 max-h-[800px] overflow-y-auto pr-2">
+                  {filteredProperties.map((property) => (
+                    <PropertyCard key={property.id} property={property} />
+                  ))}
+                </div>
+                <div className="lg:col-span-6 sticky top-24">
+                  <PropertyMap properties={filteredProperties} height="780px" />
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProperties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
+            )}
+
+            {/* VIEW MODE 3: FULL MAP */}
+            {viewMode === 'map' && (
+              <div className="space-y-4">
+                <PropertyMap properties={filteredProperties} height="700px" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {filteredProperties.map((p) => (
+                    <div key={p.id} className="p-3 bg-white rounded-xl border border-[#E5E1D8] text-xs shadow-sm">
+                      <span className="font-mono text-[#1E3A2F] font-bold">{p.code}</span>
+                      <h4 className="font-bold text-[#242321] truncate">{p.title}</h4>
+                      <p className="text-[#6B6A63]">{p.municipality}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </>
-        )}
-
-        {/* VIEW MODE 2: SPLIT LIST & MAP */}
-        {viewMode === 'split' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-6 space-y-4 max-h-[800px] overflow-y-auto pr-2">
-              {filteredProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-            <div className="lg:col-span-6 sticky top-24">
-              <PropertyMap properties={filteredProperties} height="780px" />
-            </div>
-          </div>
-        )}
-
-        {/* VIEW MODE 3: FULL MAP */}
-        {viewMode === 'map' && (
-          <div className="space-y-4">
-            <PropertyMap properties={filteredProperties} height="700px" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredProperties.map((p) => (
-                <div key={p.id} className="p-3 bg-white rounded-xl border border-[#E5E1D8] text-xs shadow-sm">
-                  <span className="font-mono text-[#1E3A2F] font-bold">{p.code}</span>
-                  <h4 className="font-bold text-[#242321] truncate">{p.title}</h4>
-                  <p className="text-[#6B6A63]">{p.municipality}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         )}
 
       </div>

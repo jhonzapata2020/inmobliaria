@@ -41,7 +41,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (property.images.length > 1) {
+    if (property.images && property.images.length > 1) {
       setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
     }
   };
@@ -49,10 +49,12 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (property.images.length > 1) {
+    if (property.images && property.images.length > 1) {
       setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
     }
   };
+
+  const detailHref = `/propiedades/${property.slug || property.id}`;
 
   return (
     <div className="group bg-white border border-[#E5E1D8] hover:border-[#1E3A2F]/40 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
@@ -60,7 +62,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       {/* Photo Container */}
       <div className="relative h-56 w-full bg-[#F1EFE8] overflow-hidden">
         <img
-          src={property.images[currentImageIndex] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
+          src={property.featuredImage || property.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
           alt={property.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -117,7 +119,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         </div>
 
         {/* Carousel Navigation Arrows */}
-        {property.images.length > 1 && (
+        {property.images && property.images.length > 1 && (
           <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={prevImage}
@@ -135,7 +137,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         )}
 
         {/* Image Indicators */}
-        {property.images.length > 1 && (
+        {property.images && property.images.length > 1 && (
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
             {property.images.map((_, i) => (
               <span
@@ -173,7 +175,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           </div>
 
           {/* Title */}
-          <Link href={`/propiedades/${property.id}`} className="block group-hover:text-[#1E3A2F] transition-colors">
+          <Link href={detailHref} className="block group-hover:text-[#1E3A2F] transition-colors">
             <h3 className="font-serif text-base font-bold text-[#242321] line-clamp-1">
               {property.title}
             </h3>
@@ -192,7 +194,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <div>
               <span className="text-[10px] text-[#929087] block leading-none">Área Total</span>
               <span className="font-mono font-bold text-[#242321] text-xs">
-                {formatArea(property.areaTotalHa, property.areaTotalM2)}
+                {formatArea(property.landAreaHa, property.landAreaM2)}
               </span>
             </div>
           </div>
@@ -202,7 +204,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <div>
               <span className="text-[10px] text-[#929087] block leading-none">Topografía</span>
               <span className="font-semibold text-[#242321] text-xs truncate block max-w-[90px]">
-                {property.topography}
+                {property.topography || 'No especificada'}
               </span>
             </div>
           </div>
@@ -213,10 +215,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           <div className="flex justify-between items-baseline">
             <span className="text-xs text-[#6B6A63] font-mono">Valor Comercial:</span>
             <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono">
-              {property.modality === 'Venta' && formatCurrency(property.price)}
-              {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRent)}/mes`}
-              {property.modality === 'Custodia' && 'Regulada SAE'}
-              {property.modality === 'Inversión' && formatCurrency(property.price || property.estimatedValue)}
+              {property.modality === 'Venta' && formatCurrency(property.salePriceCop)}
+              {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRentCop)}/mes`}
+              {property.modality === 'Custodia SAE' && 'Regulada SAE'}
+              {property.modality === 'Inversión' && formatCurrency(property.salePriceCop || property.estimatedValueCop)}
             </span>
           </div>
 

@@ -1,116 +1,142 @@
 'use client';
 
-import React, { useState } from 'react';
-import { INITIAL_PROPERTIES } from '../../data/mockProperties';
-import { PropertyMap } from '../../components/map/PropertyMap';
-import { MapPin, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatArea } from '../../lib/formatters';
+import { ArrowLeft, Layers, MapPin, Building } from 'lucide-react';
+import { PropertyMap } from '../../components/map/PropertyMap';
+import { PropertyCard } from '../../components/catalog/PropertyCard';
+import { Property } from '../../types/property';
+import { getPublishedProperties } from '../actions/properties';
 
 export default function MapaPage() {
-  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
-  const [selectedMun, setSelectedMun] = useState<string>('');
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
 
-  const filteredProperties = selectedMun 
-    ? INITIAL_PROPERTIES.filter((p) => p.municipality === selectedMun)
-    : INITIAL_PROPERTIES;
+  useEffect(() => {
+    async function loadProperties() {
+      try {
+        const data = await getPublishedProperties();
+        setProperties(data);
+      } catch (err) {
+        console.error('Failed to load map properties:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProperties();
+  }, []);
+
+  const selectedProperty = properties.find((p) => p.id === selectedPropertyId);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F2] pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="min-h-screen bg-[#F8F7F2] pb-10">
+      
+      {/* Top Header Bar */}
+      <div className="bg-white border-b border-[#E5E1D8] px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/propiedades"
+            className="p-2 rounded-xl bg-[#F8F7F2] border border-[#E5E1D8] text-[#242321] hover:bg-[#E5E1D8] transition-colors"
+            title="Volver al catálogo"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
           <div>
-            <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold tracking-wider">
-              Georreferenciación & Catastro
+            <span className="text-[10px] font-mono uppercase text-[#0F766E] font-bold tracking-wider block">
+              Visor Georreferenciado 360°
             </span>
-            <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#242321] mt-1">
-              Explorador Territorial de Urabá & Darién
+            <h1 className="font-serif text-lg font-bold text-[#242321]">
+              Mapa Territorial de Activos (Urabá & Darién)
             </h1>
-            <p className="text-xs text-[#6B6A63] font-mono mt-1">
-              Mapa interactivo con marcadores geolocalizados de fincas, terrenos y bodegas.
-            </p>
-          </div>
-
-          {/* Municipality selector */}
-          <div className="flex items-center gap-2 text-xs">
-            <label className="text-[#6B6A63] font-mono font-medium">Municipio:</label>
-            <select
-              value={selectedMun}
-              onChange={(e) => setSelectedMun(e.target.value)}
-              className="bg-white border border-[#E5E1D8] rounded-xl px-3.5 py-2 text-[#242321] font-semibold focus:outline-none focus:border-[#1E3A2F]"
-            >
-              <option value="">Todos ({INITIAL_PROPERTIES.length})</option>
-              <option value="Necoclí">Necoclí</option>
-              <option value="Turbo">Turbo</option>
-              <option value="Apartadó">Apartadó</option>
-              <option value="Carepa">Carepa</option>
-              <option value="Chigorodó">Chigorodó</option>
-              <option value="Acandí">Acandí</option>
-              <option value="Unguía">Unguía</option>
-            </select>
           </div>
         </div>
 
-        {/* Main Map & Side List View */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Map Container */}
-          <div className="lg:col-span-8 sticky top-24">
+        <div className="flex items-center gap-3 text-xs font-mono">
+          <span className="bg-[#EEF4EF] text-[#1E3A2F] border border-[#E5E1D8] px-3 py-1.5 rounded-xl font-bold">
+            {properties.length} Activos Mapeados
+          </span>
+          <Link
+            href="/propiedades"
+            className="px-3.5 py-1.5 bg-[#1E3A2F] text-white rounded-xl font-semibold hover:bg-[#152921] transition-colors"
+          >
+            Ver en Lista
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Split Layout */}
+      <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Full Interactive Map */}
+        <div className="lg:col-span-8 bg-white border border-[#E5E1D8] rounded-2xl overflow-hidden shadow-md">
+          {loading ? (
+            <div className="h-[700px] flex items-center justify-center text-xs font-mono text-[#6B6A63]">
+              Cargando mapa interactivo...
+            </div>
+          ) : (
             <PropertyMap 
-              properties={filteredProperties} 
-              selectedPropertyId={selectedId}
-              onSelectProperty={(id) => setSelectedId(id)}
+              properties={properties} 
               height="720px" 
+              selectedPropertyId={selectedPropertyId}
+              onSelectProperty={(id) => setSelectedPropertyId(id)}
             />
+          )}
+        </div>
+
+        {/* Selected Property Preview Sidebar */}
+        <div className="lg:col-span-4 space-y-4">
+          <div className="bg-white border border-[#E5E1D8] rounded-2xl p-4 space-y-3 shadow-sm">
+            <h3 className="font-serif text-base font-bold text-[#242321] flex items-center justify-between">
+              <span>Ficha Técnica Seleccionada</span>
+              <span className="text-xs font-mono font-normal text-[#6B6A63]">
+                {selectedProperty ? selectedProperty.code : 'Ninguno'}
+              </span>
+            </h3>
+
+            {selectedProperty ? (
+              <PropertyCard property={selectedProperty} />
+            ) : (
+              <div className="text-center py-16 px-4 bg-[#F8F7F2] rounded-xl border border-dashed border-[#E5E1D8] space-y-2 text-xs">
+                <MapPin className="w-8 h-8 text-[#0F766E] mx-auto animate-bounce" />
+                <p className="font-semibold text-[#242321]">Selecciona un pin en el mapa</p>
+                <p className="text-[#6B6A63]">
+                  Haz clic sobre cualquiera de los marcadores en el mapa de Urabá para desplegar su ficha detallada.
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Lateral Property List View */}
-          <div className="lg:col-span-4 space-y-4 max-h-[720px] overflow-y-auto pr-1">
-            {filteredProperties.map((prop) => (
-              <div
-                key={prop.id}
-                onClick={() => setSelectedId(prop.id)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                  selectedId === prop.id
-                    ? 'bg-white border-[#1E3A2F] shadow-md ring-2 ring-[#1E3A2F]/20'
-                    : 'bg-white border-[#E5E1D8] hover:border-[#1E3A2F]/40 shadow-sm'
-                }`}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-[10px] font-mono font-bold text-white bg-[#1E3A2F] px-2 py-0.5 rounded">
-                    {prop.code}
-                  </span>
-                  <span className="text-xs font-mono font-bold text-[#242321]">
-                    {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                    {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/m`}
-                    {prop.modality === 'Custodia' && 'Regulada SAE'}
-                  </span>
-                </div>
-
-                <h4 className="font-bold text-sm text-[#242321] mt-1.5 line-clamp-1">{prop.title}</h4>
-                <p className="text-xs text-[#6B6A63] flex items-center gap-1 mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#0F766E]" />
-                  {prop.municipality}, {prop.department}
-                </p>
-
-                <div className="flex justify-between items-center text-xs pt-3 mt-3 border-t border-[#E5E1D8] text-[#6B6A63] font-mono">
-                  <span>{formatArea(prop.areaTotalHa, prop.areaTotalM2)}</span>
-                  <Link
-                    href={`/propiedades/${prop.id}`}
-                    className="text-[#1E3A2F] font-bold hover:underline flex items-center gap-1"
-                  >
-                    Ver Ficha 360° <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            ))}
+          {/* Quick List of Properties */}
+          <div className="bg-white border border-[#E5E1D8] rounded-2xl p-4 space-y-3 max-h-[260px] overflow-y-auto shadow-sm">
+            <h4 className="text-xs font-mono font-bold text-[#1E3A2F] uppercase tracking-wider">
+              Listado Rápido de Ubicaciones
+            </h4>
+            <div className="space-y-2">
+              {properties.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPropertyId(p.id)}
+                  className={`w-full text-left p-2.5 rounded-xl border transition-all text-xs flex justify-between items-center ${
+                    selectedPropertyId === p.id 
+                      ? 'bg-[#EEF4EF] border-[#1E3A2F] text-[#1E3A2F] font-bold' 
+                      : 'bg-[#F8F7F2] border-[#E5E1D8] text-[#242321] hover:bg-[#F1EFE8]'
+                  }`}
+                >
+                  <div className="truncate pr-2">
+                    <span className="font-mono text-[10px] block text-[#6B6A63]">{p.code}</span>
+                    <span className="truncate block">{p.title}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#0F766E] shrink-0">{p.municipality}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
         </div>
 
       </div>
+
     </div>
   );
 }

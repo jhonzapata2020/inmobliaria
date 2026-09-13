@@ -1,13 +1,10 @@
 export type CRMStage = 
-  | 'Nuevo interesado'
+  | 'Nuevo'
   | 'Contactado'
-  | 'Visita programada'
-  | 'En análisis de necesidad'
-  | 'En estudio jurídico'
-  | 'Oferta radicada'
+  | 'En Visita'
   | 'Negociación'
-  | 'Cierre / contrato'
-  | 'No concretado';
+  | 'Cerrado'
+  | 'Descartado';
 
 export type LeadPriority = 'Alta' | 'Media' | 'Baja';
 
@@ -28,25 +25,27 @@ export interface LeadActivity {
 }
 
 export interface Lead {
-  id: string;
+  id: string; // UUID
   clientName: string;
   companyName?: string;
   phone: string;
   email: string;
-  propertyOfInterestId: string;
-  propertyOfInterestTitle: string;
-  propertyCode: string;
-  potentialValue: number;
+  propertyOfInterestId?: string;
+  propertyOfInterestTitle?: string;
+  propertyCode?: string;
+  potentialValue?: number;
   stage: CRMStage;
   priority: LeadPriority;
-  nextActivity: string;
-  assignedAgent: string;
+  nextActivity?: string;
+  assignedAgent?: string;
   updatedDate: string;
   createdDate: string;
   tags: string[];
   notes: LeadNote[];
   activities: LeadActivity[];
 }
+
+export type CrmLead = Lead;
 
 export interface CRMMetrics {
   totalLeads: number;

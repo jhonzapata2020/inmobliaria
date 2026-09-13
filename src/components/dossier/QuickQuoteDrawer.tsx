@@ -127,13 +127,13 @@ export const QuickQuoteDrawer: React.FC = () => {
                     <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E5E1D8]">
                       <div className="flex items-center gap-1 text-[#6B6A63] font-mono">
                         <Ruler className="w-3.5 h-3.5 text-[#0F766E]" />
-                        {formatArea(prop.areaTotalHa, prop.areaTotalM2)}
+                        {formatArea(prop.landAreaHa, prop.landAreaM2)}
                       </div>
                       <div className="font-semibold text-[#1E3A2F]">
-                        {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/mes`}
-                        {prop.modality === 'Custodia' && 'Regulada SAE'}
-                        {prop.modality === 'Inversión' && formatCurrency(prop.price || prop.estimatedValue)}
+                        {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
+                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/mes`}
+                        {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
+                        {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
                       </div>
                     </div>
                   </div>

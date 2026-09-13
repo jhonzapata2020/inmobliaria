@@ -40,10 +40,10 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
       opportunityAnalysis: '',
       assetType: 'Finca',
       modality: 'Venta',
-      price: 1500000000,
-      monthlyRent: 0,
-      areaTotalHa: 10,
-      areaTotalM2: 100000,
+      salePriceCop: 1500000000,
+      monthlyRentCop: 0,
+      landAreaHa: 10,
+      landAreaM2: 100000,
       builtAreaM2: 250,
       department: 'Antioquia',
       municipality: 'Apartadó',
@@ -300,7 +300,7 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                 >
                   <option value="Venta">Venta</option>
                   <option value="Arriendo">Arriendo</option>
-                  <option value="Custodia">Custodia SAE</option>
+                  <option value="Custodia SAE">Custodia SAE</option>
                   <option value="Inversión">Oportunidad de Inversión</option>
                 </select>
               </div>
@@ -310,8 +310,8 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                   <label className="block text-slate-400 mb-1 font-mono">Precio Venta / Estimado (COP)</label>
                   <input
                     type="number"
-                    value={formData.price || 0}
-                    onChange={(e) => updateField('price', parseFloat(e.target.value))}
+                    value={formData.salePriceCop || 0}
+                    onChange={(e) => updateField('salePriceCop', parseFloat(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-emerald-400 font-mono font-bold text-sm"
                   />
                 </div>
@@ -319,8 +319,8 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                   <label className="block text-slate-400 mb-1 font-mono">Canon Mensual Arriendo (COP)</label>
                   <input
                     type="number"
-                    value={formData.monthlyRent || 0}
-                    onChange={(e) => updateField('monthlyRent', parseFloat(e.target.value))}
+                    value={formData.monthlyRentCop || 0}
+                    onChange={(e) => updateField('monthlyRentCop', parseFloat(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-teal-300 font-mono font-bold text-sm"
                   />
                 </div>
@@ -337,8 +337,8 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                   <input
                     type="number"
                     step="any"
-                    value={formData.areaTotalHa || 0}
-                    onChange={(e) => updateField('areaTotalHa', parseFloat(e.target.value))}
+                    value={formData.landAreaHa || 0}
+                    onChange={(e) => updateField('landAreaHa', parseFloat(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono"
                   />
                 </div>
@@ -346,8 +346,8 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                   <label className="block text-slate-400 mb-1 font-mono">Área m²</label>
                   <input
                     type="number"
-                    value={formData.areaTotalM2 || 0}
-                    onChange={(e) => updateField('areaTotalM2', parseInt(e.target.value))}
+                    value={formData.landAreaM2 || 0}
+                    onChange={(e) => updateField('landAreaM2', parseInt(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono"
                   />
                 </div>

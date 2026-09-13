@@ -35,32 +35,32 @@ export default function AdminDashboardPage() {
 
   // Metrics Calculations
   const totalHectaresInCustody = useMemo(() => {
-    return properties.reduce((sum, p) => sum + (p.areaTotalHa || (p.areaTotalM2 ? p.areaTotalM2 / 10000 : 0)), 0);
+    return properties.reduce((sum, p) => sum + (p.landAreaHa || (p.landAreaM2 ? p.landAreaM2 / 10000 : 0)), 0);
   }, [properties]);
 
   const availableCount = properties.filter((p) => p.availability === 'Disponible').length;
 
   const saeInProcessCount = properties.filter(
-    (p) => p.legalStatus === 'Activo especial SAE' || p.legalStatus === 'En estudio jurídico' || p.modality === 'Custodia'
+    (p) => p.legalStatus === 'Activo especial SAE' || p.legalStatus === 'En estudio jurídico' || p.modality === 'Custodia SAE'
   ).length;
 
   const totalMonthlyEstimatedRent = useMemo(() => {
-    return properties.reduce((sum, p) => sum + (p.monthlyRent || 0), 0);
+    return properties.reduce((sum, p) => sum + (p.monthlyRentCop || 0), 0);
   }, [properties]);
 
   // Filter Table Results
   const filteredProperties = useMemo(() => {
     return properties.filter((p) => {
       const matchQuery = 
-        p.matriculaInmobiliaria.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.matriculaInmobiliaria || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.municipality.toLowerCase().includes(searchQuery.toLowerCase());
 
       if (legalFilter === 'Todos') return matchQuery;
       if (legalFilter === 'Saneado') return matchQuery && p.legalStatus === 'Saneado';
-      if (legalFilter === 'En Inspección SAE') return matchQuery && (p.legalStatus === 'Activo especial SAE' || p.modality === 'Custodia');
-      if (legalFilter === 'En Arriendo') return matchQuery && (p.modality === 'Arriendo' || p.monthlyRent);
+      if (legalFilter === 'En Inspección SAE') return matchQuery && (p.legalStatus === 'Activo especial SAE' || p.modality === 'Custodia SAE');
+      if (legalFilter === 'En Arriendo') return matchQuery && (p.modality === 'Arriendo' || !!p.monthlyRentCop);
       if (legalFilter === 'En Estudio Jurídico') return matchQuery && p.legalStatus === 'En estudio jurídico';
 
       return matchQuery;
@@ -273,7 +273,7 @@ export default function AdminDashboardPage() {
 
                     {/* Área */}
                     <td className="p-4 font-bold text-[#1C1917]">
-                      {formatArea(prop.areaTotalHa, prop.areaTotalM2)}
+                      {formatArea(prop.landAreaHa, prop.landAreaM2)}
                     </td>
 
                     {/* Estado Legal */}
@@ -416,12 +416,12 @@ export default function AdminDashboardPage() {
                   {/* Specs & Pricing */}
                   <div className="flex justify-between items-center text-xs font-mono pt-2 border-t border-[#E5E7EB]">
                     <span className="text-stone-600 font-semibold">
-                      {formatArea(prop.areaTotalHa, prop.areaTotalM2)}
+                      {formatArea(prop.landAreaHa, prop.landAreaM2)}
                     </span>
                     <span className="font-bold text-[#1E3A2F] text-sm">
-                      {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                      {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/m`}
-                      {prop.modality === 'Custodia' && 'Regulada SAE'}
+                      {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
+                      {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/m`}
+                      {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
                     </span>
                   </div>
                 </div>

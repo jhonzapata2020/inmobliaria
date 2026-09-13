@@ -1,62 +1,83 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Kanban, 
   Plus, 
   Search, 
-  Filter, 
-  Phone, 
-  Building2, 
   TrendingUp, 
   Calendar, 
-  Tag, 
-  User, 
   ChevronRight, 
   ChevronLeft,
   Coins,
-  ShieldCheck,
-  CheckCircle2
+  ShieldCheck
 } from 'lucide-react';
-import { Lead, CRMStage, CRMMetrics } from '../../types/crm';
+import { Lead, CRMStage } from '../../types/crm';
 import { INITIAL_LEADS } from '../../data/mockLeads';
 import { formatCurrency } from '../../lib/formatters';
 import { LeadDetailModal } from './LeadDetailModal';
+import { getLeadsAction, updateLeadStageAction } from '../../app/actions/leads';
 
-export const KanbanBoard: React.FC = () => {
-  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
+interface KanbanBoardProps {
+  initialLeads?: Lead[];
+}
+
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads || INITIAL_LEADS);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<string>('');
 
+  useEffect(() => {
+    async function loadLeads() {
+      const dbLeads = await getLeadsAction();
+      if (dbLeads && dbLeads.length > 0) {
+        setLeads(dbLeads);
+      }
+    }
+    if (!initialLeads) {
+      loadLeads();
+    }
+  }, [initialLeads]);
+
   const stages: CRMStage[] = [
-    'Nuevo interesado',
+    'Nuevo',
     'Contactado',
-    'Visita programada',
-    'En análisis de necesidad',
-    'En estudio jurídico',
-    'Oferta radicada',
+    'En Visita',
     'Negociación',
-    'Cierre / contrato',
-    'No concretado'
+    'Cerrado',
+    'Descartado'
   ];
 
   // Move lead stage
-  const moveLead = (leadId: string, direction: 'next' | 'prev') => {
+  const moveLead = async (leadId: string, direction: 'next' | 'prev') => {
+    const targetLead = leads.find((l) => l.id === leadId);
+    if (!targetLead) return;
+
+    const currentIndex = stages.indexOf(targetLead.stage);
+    let newStage = targetLead.stage;
+
+    if (direction === 'next' && currentIndex < stages.length - 1) {
+      newStage = stages[currentIndex + 1];
+    } else if (direction === 'prev' && currentIndex > 0) {
+      newStage = stages[currentIndex - 1];
+    }
+
+    if (newStage === targetLead.stage) return;
+
+    // Optimistic UI update
     setLeads((prevLeads) =>
       prevLeads.map((lead) => {
         if (lead.id !== leadId) return lead;
-
-        const currentIndex = stages.indexOf(lead.stage);
-        if (direction === 'next' && currentIndex < stages.length - 1) {
-          return { ...lead, stage: stages[currentIndex + 1], updatedDate: new Date().toISOString().split('T')[0] };
-        }
-        if (direction === 'prev' && currentIndex > 0) {
-          return { ...lead, stage: stages[currentIndex - 1], updatedDate: new Date().toISOString().split('T')[0] };
-        }
-        return lead;
+        return {
+          ...lead,
+          stage: newStage,
+          updatedDate: new Date().toISOString().split('T')[0]
+        };
       })
     );
+
+    // Persist to Supabase DB
+    await updateLeadStageAction(leadId, newStage);
   };
 
   const handleUpdateLead = (updatedLead: Lead) => {
@@ -66,21 +87,21 @@ export const KanbanBoard: React.FC = () => {
 
   // Filtered Leads
   const filteredLeads = leads.filter((lead) => {
-    const matchesSearch = 
-      lead.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.propertyOfInterestTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.propertyCode.toLowerCase().includes(searchQuery.toLowerCase());
+    const titleMatch = (lead.propertyOfInterestTitle || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const codeMatch = (lead.propertyCode || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const nameMatch = lead.clientName.toLowerCase().includes(searchQuery.toLowerCase());
 
+    const matchesSearch = nameMatch || titleMatch || codeMatch;
     const matchesPriority = priorityFilter ? lead.priority === priorityFilter : true;
     return matchesSearch && matchesPriority;
   });
 
   // Calculate Metrics
-  const totalPipelineValue = leads.reduce((sum, l) => sum + l.potentialValue, 0);
-  const activeOffersCount = leads.filter((l) => l.stage === 'Oferta radicada' || l.stage === 'Negociación').length;
-  const scheduledVisitsCount = leads.filter((l) => l.stage === 'Visita programada').length;
-  const closedCount = leads.filter((l) => l.stage === 'Cierre / contrato').length;
-  const conversionRate = Math.round((closedCount / leads.length) * 100) || 15;
+  const totalPipelineValue = leads.reduce((sum, l) => sum + (l.potentialValue || 0), 0);
+  const activeOffersCount = leads.filter((l) => l.stage === 'Negociación').length;
+  const scheduledVisitsCount = leads.filter((l) => l.stage === 'En Visita').length;
+  const closedCount = leads.filter((l) => l.stage === 'Cerrado').length;
+  const conversionRate = Math.round((closedCount / (leads.length || 1)) * 100) || 15;
 
   return (
     <div className="space-y-6">
@@ -104,7 +125,7 @@ export const KanbanBoard: React.FC = () => {
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-xs text-slate-400 font-mono">Ofertas / Negociación</div>
+            <div className="text-xs text-slate-400 font-mono">Negociaciones Activas</div>
             <div className="text-xl font-bold text-teal-300 font-mono">{activeOffersCount} Oportunidades</div>
           </div>
         </div>
@@ -162,7 +183,7 @@ export const KanbanBoard: React.FC = () => {
       <div className="flex gap-4 overflow-x-auto pb-6">
         {stages.map((stage) => {
           const stageLeads = filteredLeads.filter((l) => l.stage === stage);
-          const stageTotalValue = stageLeads.reduce((sum, l) => sum + l.potentialValue, 0);
+          const stageTotalValue = stageLeads.reduce((sum, l) => sum + (l.potentialValue || 0), 0);
 
           return (
             <div key={stage} className="w-80 shrink-0 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col max-h-[75vh]">
@@ -197,9 +218,11 @@ export const KanbanBoard: React.FC = () => {
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <span className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-950 px-1.5 py-0.5 rounded">
-                            {lead.propertyCode}
-                          </span>
+                          {lead.propertyCode && (
+                            <span className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-950 px-1.5 py-0.5 rounded">
+                              {lead.propertyCode}
+                            </span>
+                          )}
                           <h4 className="font-bold text-xs text-white mt-1 group-hover:text-emerald-400 transition-colors">
                             {lead.clientName}
                           </h4>
@@ -216,16 +239,18 @@ export const KanbanBoard: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="text-xs text-slate-300 font-semibold line-clamp-1">
-                        {lead.propertyOfInterestTitle}
-                      </div>
+                      {lead.propertyOfInterestTitle && (
+                        <div className="text-xs text-slate-300 font-semibold line-clamp-1">
+                          {lead.propertyOfInterestTitle}
+                        </div>
+                      )}
 
                       <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-800/80 font-mono">
                         <span className="font-bold text-emerald-400">
                           {formatCurrency(lead.potentialValue)}
                         </span>
                         <span className="text-[10px] text-slate-500">
-                          👤 {lead.assignedAgent.split(' ')[1] || lead.assignedAgent}
+                          👤 {(lead.assignedAgent || 'Asesor').split(' ')[1] || lead.assignedAgent || 'Asesor'}
                         </span>
                       </div>
 

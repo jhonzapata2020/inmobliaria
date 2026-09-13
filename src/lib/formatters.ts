@@ -1,7 +1,7 @@
 import { LegalStatus, Modality } from '../types/property';
 
 export function formatCurrency(amount?: number): string {
-  if (amount === undefined || amount === null) return 'Bajo solicitud';
+  if (amount === undefined || amount === null || amount === 0) return 'Bajo solicitud';
   if (amount >= 1000000000) {
     const millones = amount / 1000000;
     return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} Millones COP`;
@@ -19,7 +19,8 @@ export function formatCurrency(amount?: number): string {
 
 export function formatArea(areaHa?: number, areaM2?: number): string {
   if (areaHa && areaHa > 0) {
-    return `${areaHa.toLocaleString('es-CO')} Ha (${(areaHa * 10000).toLocaleString('es-CO')} m²)`;
+    const m2 = areaM2 || areaHa * 10000;
+    return `${areaHa.toLocaleString('es-CO')} Ha (${m2.toLocaleString('es-CO')} m²)`;
   }
   if (areaM2 && areaM2 > 0) {
     if (areaM2 >= 10000) {
@@ -70,7 +71,7 @@ export function getLegalStatusBadge(status: LegalStatus): { label: string; bgCla
       };
     default:
       return {
-        label: 'Bajo solicitud',
+        label: status || 'Bajo solicitud',
         bgClass: 'bg-blue-50 dark:bg-blue-950/40',
         textClass: 'text-blue-700 dark:text-blue-300',
         borderClass: 'border-blue-200 dark:border-blue-800'
@@ -92,7 +93,7 @@ export function getModalityBadge(modality: Modality): { label: string; bgClass: 
         bgClass: 'bg-slate-700',
         textClass: 'text-white'
       };
-    case 'Custodia':
+    case 'Custodia SAE':
       return {
         label: 'Custodia SAE',
         bgClass: 'bg-purple-700',

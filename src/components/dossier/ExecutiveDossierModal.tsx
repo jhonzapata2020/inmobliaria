@@ -56,7 +56,7 @@ export const ExecutiveDossierModal: React.FC = () => {
         <div className="p-4 bg-[#F8F7F2] border-b border-[#E5E1D8] flex items-center justify-between print:hidden">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[#1E3A2F] bg-[#EEF4EF] border border-[#E5E1D8] px-2.5 py-1 rounded-md font-bold">
-              DOSSIER OFICIAL • ACTIVOS DARIEN
+              DOSSIER OFICIAL • ACTIVOS DARIÉN
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export const ExecutiveDossierModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Dossier Document Container (Styled for Screen & Print) */}
+        {/* Dossier Document Container */}
         <div className="p-6 sm:p-10 bg-white text-[#242321] overflow-y-auto space-y-8 print:p-0 print:bg-white print:text-black">
           
           {/* Header Letterhead */}
@@ -94,7 +94,7 @@ export const ExecutiveDossierModal: React.FC = () => {
               </div>
               <div>
                 <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#242321] tracking-tight">
-                  ACTIVOS & INVERSIONES DARIEN S.A.S.
+                  ACTIVOS & INVERSIONES DARIÉN S.A.S.
                 </h1>
                 <p className="text-xs text-[#1E3A2F] font-mono font-semibold">
                   NIT 901.884.210-4 • PORTAFOLIO EJECUTIVO DE ACTIVOS
@@ -264,10 +264,10 @@ export const ExecutiveDossierModal: React.FC = () => {
                     <div className="text-left sm:text-right font-mono">
                       <div className="text-xs text-[#6B6A63]">Valor / Canon Comercial</div>
                       <div className="text-lg font-bold text-[#1E3A2F] font-serif">
-                        {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/mes`}
-                        {prop.modality === 'Custodia' && 'Regulada SAE'}
-                        {prop.modality === 'Inversión' && formatCurrency(prop.price || prop.estimatedValue)}
+                        {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
+                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/mes`}
+                        {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
+                        {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
                       </div>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export const ExecutiveDossierModal: React.FC = () => {
                   {prop.images && prop.images[0] && (
                     <div className="h-48 w-full rounded-xl overflow-hidden bg-[#F1EFE8] relative">
                       <img 
-                        src={prop.images[0]} 
+                        src={prop.featuredImage || prop.images[0]} 
                         alt={prop.title}
                         className="w-full h-full object-cover"
                       />
@@ -287,19 +287,19 @@ export const ExecutiveDossierModal: React.FC = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-white p-4 rounded-xl border border-[#E5E1D8] font-mono">
                     <div>
                       <span className="text-[#6B6A63] block">Área Total:</span>
-                      <span className="font-bold text-[#242321]">{formatArea(prop.areaTotalHa, prop.areaTotalM2)}</span>
+                      <span className="font-bold text-[#242321]">{formatArea(prop.landAreaHa, prop.landAreaM2)}</span>
                     </div>
                     <div>
                       <span className="text-[#6B6A63] block">Área Construida:</span>
                       <span className="font-bold text-[#242321]">{prop.builtAreaM2 ? `${prop.builtAreaM2} m²` : 'N/A'}</span>
                     </div>
                     <div>
-                      <span className="text-[#6B6A63] block">Matrícula (Mock):</span>
-                      <span className="font-bold text-[#1E3A2F]">{prop.matriculaInmobiliaria}</span>
+                      <span className="text-[#6B6A63] block">Matrícula (MI):</span>
+                      <span className="font-bold text-[#1E3A2F]">{prop.matriculaInmobiliaria || prop.folioMatricula || 'Sujeto a verificación'}</span>
                     </div>
                     <div>
                       <span className="text-[#6B6A63] block">Topografía:</span>
-                      <span className="font-bold text-[#242321]">{prop.topography}</span>
+                      <span className="font-bold text-[#242321]">{prop.topography || 'N/A'}</span>
                     </div>
                   </div>
 
@@ -320,14 +320,14 @@ export const ExecutiveDossierModal: React.FC = () => {
               Aviso Legal & Términos de Verificación Comercial
             </div>
             <p>
-              Este documento tiene carácter strictly informativo y comercial emitido por ACTIVOS & INVERSIONES DARIEN S.A.S. La información, linderos, matrículas inmobiliarias y cifras están sujetas a validación técnica, jurídica, catastral, ambiental y comercial previa a cualquier firma de promesa, negociación, contrato o transacción oficial.
+              Este documento tiene carácter estrictamente informativo y comercial emitido por ACTIVOS & INVERSIONES DARIÉN S.A.S. La información, linderos, matrículas inmobiliarias y cifras están sujetas a validación técnica, jurídica, catastral, ambiental y comercial previa a cualquier firma de promesa, negociación, contrato o transacción oficial.
             </p>
           </div>
 
           {/* Corporate Footer & Signature */}
           <div className="pt-6 border-t border-[#E5E1D8] flex flex-col sm:flex-row justify-between items-center text-xs text-[#6B6A63] gap-4">
             <div>
-              <p className="font-semibold text-[#242321]">ACTIVOS & INVERSIONES DARIEN S.A.S.</p>
+              <p className="font-semibold text-[#242321]">ACTIVOS & INVERSIONES DARIÉN S.A.S.</p>
               <p>Departamento de Gestión Comercial & Custodia Patrimonial</p>
             </div>
             <div className="flex items-center gap-2">

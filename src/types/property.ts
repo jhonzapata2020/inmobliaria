@@ -1,4 +1,5 @@
-export type Modality = 'Venta' | 'Arriendo' | 'Custodia' | 'Inversión' | 'Custodia SAE';
+export type Modality = 'Venta' | 'Arriendo' | 'Custodia SAE' | 'Inversión';
+export type PropertyModality = Modality;
 
 export type AssetType = 
   | 'Finca'
@@ -21,11 +22,19 @@ export type LegalStatus =
   | string;
 
 export type AvailabilityStatus = 'Disponible' | 'En negociación' | 'Reservado' | 'Adjudicado';
+export type EditorialStatus = 'draft' | 'review' | 'published' | 'archived';
+
+export interface DocumentItem {
+  name: string;
+  type: string;
+  size: string;
+  url?: string;
+}
 
 export interface Property {
-  id: string;
+  id: string; // UUID or string id
   code: string;
-  slug?: string;
+  slug: string;
   title: string;
   shortDescription: string;
   description: string;
@@ -38,20 +47,17 @@ export interface Property {
   saeIdActivo?: string;
   folioMatricula?: string;
 
-  price?: number; // COP for sale
-  priceTotal?: number; // Alias for price
-  monthlyRent?: number; // COP for rent
-  rentMonthly?: number; // Alias for monthlyRent
-  estimatedValue?: number; // COP for custody evaluation
+  // Canonical Financial Fields (COP)
+  salePriceCop?: number;
+  monthlyRentCop?: number;
+  estimatedValueCop?: number;
   
-  totalArea?: number;
-  areaUnit?: string;
-  areaTotalHa?: number; // Hectares if rural
-  areaTotalM2?: number; // Square meters
-  builtAreaM2?: number; // Built area
-  builtArea?: number;
+  // Canonical Area Fields
+  landAreaM2?: number;
+  landAreaHa?: number; // Calculated: landAreaM2 / 10000
+  builtAreaM2?: number;
   
-  // Location
+  // Canonical Location Coordinates
   department: string;
   municipality: string;
   sectorVereda?: string;
@@ -59,8 +65,8 @@ export interface Property {
   address?: string;
   latitude: number;
   longitude: number;
+  isConfidentialCoords?: boolean;
   altitudeMsl?: number;
-  coordinates?: { lat: number; lng: number };
   
   // Specs & Tech info
   matriculaInmobiliaria: string;
@@ -74,18 +80,19 @@ export interface Property {
   existingInfrastructure: string[];
   environmentalNotes: string;
   
-  // Legal & Verification
+  // Legal & Editorial
   legalStatus: LegalStatus;
   documentStatus: string;
   commercialConditions: string;
-  isDemoData: boolean;
+  editorialStatus?: EditorialStatus;
+  isDemoData?: boolean;
   
-  // Media & Metadata
+  // Media & Documents
   images: string[];
   featuredImage?: string;
   videoUrl?: string;
   virtualTourUrl?: string;
-  documentsAvailable: { name: string; type: string; size: string }[];
+  documentsAvailable: DocumentItem[];
   
   // Status & Flags
   availability: AvailabilityStatus;

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Layers, Trash2, MapPin, CheckCircle, AlertTriangle } from 'lucide-react';
+import { X, Layers, Trash2, MapPin } from 'lucide-react';
 import { useCompare } from '../../context/CompareContext';
 import { formatCurrency, formatArea, getLegalStatusBadge } from '../../lib/formatters';
 
@@ -99,14 +99,14 @@ export const CompareModal: React.FC = () => {
                     </div>
 
                     <div className="h-10 flex items-center font-bold text-emerald-400 text-sm font-mono">
-                      {prop.modality === 'Venta' && formatCurrency(prop.price)}
-                      {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRent)}/m`}
-                      {prop.modality === 'Custodia' && 'Regulada SAE'}
-                      {prop.modality === 'Inversión' && formatCurrency(prop.price)}
+                      {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
+                      {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/m`}
+                      {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
+                      {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
                     </div>
 
                     <div className="h-10 flex items-center font-mono font-semibold text-slate-200">
-                      {formatArea(prop.areaTotalHa, prop.areaTotalM2)}
+                      {formatArea(prop.landAreaHa, prop.landAreaM2)}
                     </div>
 
                     <div className="h-10 flex items-center font-mono text-slate-300">
@@ -128,15 +128,15 @@ export const CompareModal: React.FC = () => {
                     </div>
 
                     <div className="h-10 flex items-center text-slate-300">
-                      {prop.topography}
+                      {prop.topography || 'N/A'}
                     </div>
 
                     <div className="h-10 flex items-center text-slate-300 line-clamp-2 text-[11px]">
-                      {prop.accessRoads}
+                      {prop.accessRoads || 'N/A'}
                     </div>
 
                     <div className="h-10 flex items-center flex-wrap gap-1 text-[10px]">
-                      {prop.potentialUses.map((u) => (
+                      {(prop.potentialUses || []).map((u) => (
                         <span key={u} className="px-1.5 py-0.5 bg-slate-800 text-teal-300 rounded">
                           {u}
                         </span>

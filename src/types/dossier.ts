@@ -10,6 +10,23 @@ export interface ClientInfo {
 }
 
 export type DossierType = 'Inversionista' | 'Ejecutivo' | 'Bancario / Financiero' | 'Institucional';
+export type DossierStatus = 'draft' | 'active' | 'expired';
+
+export interface ExecutiveDossier {
+  id: string; // UUID
+  propertyIds: string[];
+  clientName: string;
+  clientCompany?: string;
+  clientEmail: string;
+  clientPhone: string;
+  clientCity: string;
+  dossierType: DossierType;
+  status: DossierStatus;
+  notes?: string;
+  assignedAgent?: string;
+  expiresAt?: string;
+  createdDate: string;
+}
 
 export interface DossierSummary {
   propertyCount: number;

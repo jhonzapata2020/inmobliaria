@@ -71,7 +71,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
       title: newActivityTitle,
       dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
       completed: false,
-      assignedTo: lead.assignedAgent
+      assignedTo: lead.assignedAgent || 'Asesor Comercial'
     };
 
     const updatedLead: Lead = {
@@ -105,15 +105,12 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
   const stagesList: CRMStage[] = [
-    'Nuevo interesado',
+    'Nuevo',
     'Contactado',
-    'Visita programada',
-    'En análisis de necesidad',
-    'En estudio jurídico',
-    'Oferta radicada',
+    'En Visita',
     'Negociación',
-    'Cierre / contrato',
-    'No concretado'
+    'Cerrado',
+    'Descartado'
   ];
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -17,13 +17,12 @@ import {
   TrendingUp,
   ChevronLeft,
   ChevronRight,
-  Building,
-  Grid
+  Building
 } from 'lucide-react';
-import { INITIAL_PROPERTIES } from '../data/mockProperties';
 import { PropertyCard } from '../components/catalog/PropertyCard';
 import { PropertyMap } from '../components/map/PropertyMap';
 import { Property } from '../types/property';
+import { getPublishedProperties } from './actions/properties';
 
 interface CarouselSectionProps {
   title: string;
@@ -113,12 +112,29 @@ function AssetCarouselSection({ title, subtitle, badge, badgeColor = 'text-[#1E3
 
 export default function HomePage() {
   const router = useRouter();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Search Bar State
   const [searchQuery, setSearchQuery] = useState('');
   const [modality, setModality] = useState('');
   const [assetType, setAssetType] = useState('');
   const [municipality, setMunicipality] = useState('');
+
+  useEffect(() => {
+    async function loadProperties() {
+      try {
+        const data = await getPublishedProperties();
+        setProperties(data);
+      } catch (err) {
+        console.error('Failed to load published properties:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProperties();
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -130,29 +146,20 @@ export default function HomePage() {
     router.push(`/propiedades?${params.toString()}`);
   };
 
-  const filteredProperties = INITIAL_PROPERTIES;
-
-  // Featured properties logic: hero property (prop-001) moved further back (position 4)
-  const allFeatured = filteredProperties.filter((p) => p.isFeatured);
-  const heroPropInFeatured = allFeatured.find((p) => p.id === 'prop-001');
-  const otherFeatured = allFeatured.filter((p) => p.id !== 'prop-001');
-  const featuredProperties = heroPropInFeatured
-    ? [...otherFeatured.slice(0, 3), heroPropInFeatured, ...otherFeatured.slice(3)]
-    : allFeatured;
-
-  const ruralFarms = filteredProperties.filter((p) => p.assetType === 'Finca' || p.assetType === 'Terreno');
-  const commercialLogistics = filteredProperties.filter((p) => p.assetType === 'Bodega' || p.assetType === 'Local' || p.assetType === 'Edificio');
-  const saeAssets = filteredProperties.filter((p) => p.modality === 'Custodia' || p.assetType === 'Activo Especial');
+  const featuredProperties = properties.filter((p) => p.isFeatured);
+  const ruralFarms = properties.filter((p) => p.assetType === 'Finca' || p.assetType === 'Terreno' || p.assetType === 'Lote');
+  const commercialLogistics = properties.filter((p) => p.assetType === 'Bodega' || p.assetType === 'Local' || p.assetType === 'Edificio' || p.assetType === 'Oficina');
+  const saeAssets = properties.filter((p) => p.modality === 'Custodia SAE' || p.isSae || p.assetType === 'Activo Especial');
 
   return (
     <div className="space-y-16 pb-20 bg-[#F8F7F2]">
       
-      {/* HERO PRINCIPAL ASIMÉTRICO (SPLIT LAYOUT 12-COLUMNS WITH AIRBNB PILL SEARCH BAR) */}
+      {/* HERO PRINCIPAL ASIMÉTRICO */}
       <section className="relative pt-6 sm:pt-8 pb-14 bg-[#F8F7F2] border-b border-[#E5E1D8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
-            {/* COLUMNA IZQUIERDA (7 COLUMNAS): BADGE, TÍTULO, SUBTÍTULO, PÍLDORA DE BÚSQUEDA Y MÉTRICAS */}
+            {/* COLUMNA IZQUIERDA (7 COLUMNAS) */}
             <div className="order-2 lg:order-1 lg:col-span-7 space-y-6 text-left">
               
               {/* Encabezado y Título Principal */}
@@ -163,7 +170,7 @@ export default function HomePage() {
                   <span>Gestión Inmobiliaria & Custodia SAE</span>
                 </div>
 
-                {/* Título Principal Proporcional */}
+                {/* Título Principal */}
                 <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#242321] leading-[1.15]">
                   Activos con propósito. <br />
                   <span className="text-[#1E3A2F]">
@@ -177,11 +184,11 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* BUSCADOR EN PÍLDORA FLOTANTE (AIRBNB UX PILL) INTEGRADO */}
+              {/* BUSCADOR EN PÍLDORA FLOTANTE */}
               <div className="bg-white border border-[#E5E1D8] rounded-2xl sm:rounded-full p-3 sm:p-2 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 sm:divide-x divide-[#E5E1D8] text-xs">
                   
-                  {/* Segmento 1: Territorio / Municipio */}
+                  {/* Segmento 1: Territorio */}
                   <div className="px-3.5 py-2 sm:py-1 space-y-0.5 text-left flex-1 hover:bg-[#F8F7F2] rounded-xl sm:rounded-l-full transition-colors cursor-pointer">
                     <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#1E3A2F] flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-[#0F766E]" /> Territorio
@@ -197,12 +204,12 @@ export default function HomePage() {
                       <option value="Necoclí">Necoclí</option>
                       <option value="Carepa">Carepa</option>
                       <option value="Chigorodó">Chigorodó</option>
-                      <option value="Acandí">Acandí</option>
-                      <option value="Unguía">Unguía</option>
+                      <option value="Arboletes">Arboletes</option>
+                      <option value="Mutatá">Mutatá</option>
                     </select>
                   </div>
 
-                  {/* Segmento 2: Tipo de Inmueble */}
+                  {/* Segmento 2: Tipo Activo */}
                   <div className="px-3.5 py-2 sm:py-1 space-y-0.5 text-left flex-1 hover:bg-[#F8F7F2] transition-colors cursor-pointer">
                     <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#1E3A2F] flex items-center gap-1">
                       <Building className="w-3.5 h-3.5 text-[#1E3A2F]" /> Tipo Activo
@@ -214,7 +221,7 @@ export default function HomePage() {
                     >
                       <option value="">Fincas, Bodegas...</option>
                       <option value="Finca">Fincas</option>
-                      <option value="Terreno">Terrenos & Lotes</option>
+                      <option value="Lote">Terrenos & Lotes</option>
                       <option value="Bodega">Bodegas</option>
                       <option value="Local">Locales</option>
                       <option value="Casa">Casas</option>
@@ -235,12 +242,12 @@ export default function HomePage() {
                       <option value="">Venta, Arriendo...</option>
                       <option value="Venta">Venta</option>
                       <option value="Arriendo">Arriendo</option>
-                      <option value="Custodia">Custodia SAE</option>
+                      <option value="Custodia SAE">Custodia SAE</option>
                       <option value="Inversión">Inversión</option>
                     </select>
                   </div>
 
-                  {/* Botón Final: Lupa Verde */}
+                  {/* Botón Lupa */}
                   <div className="p-1 sm:pl-2 flex items-center justify-center">
                     <button
                       type="submit"
@@ -274,22 +281,17 @@ export default function HomePage() {
 
             {/* COLUMNA DERECHA (5 COLUMNAS): TARJETA DESTACADA CON FOTO DE PREDIO INSIGNIA */}
             <div className="order-1 lg:order-2 lg:col-span-5 relative">
-              {/* Decorative Subtle Backdrop Circle */}
               <div className="absolute -inset-4 bg-[#EEF4EF] rounded-[40px] -z-10 rotate-1 transform hidden sm:block" />
 
-              {/* Featured Asset Floating Card */}
               <div className="bg-white border border-[#E5E1D8] rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl space-y-0 group transition-all duration-300">
-                
-                {/* Photo Container */}
                 <div className="relative max-h-[260px] sm:max-h-[320px] h-60 sm:h-80 w-full overflow-hidden bg-[#F1EFE8]">
                   <img
                     src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
-                    alt="Hacienda El Porvenir - Necoclí"
+                    alt="Hacienda El Reposo N° 1 - Necoclí"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none" />
 
-                  {/* Floating Badges */}
                   <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-4 flex justify-between items-center z-10">
                     <span className="bg-[#C6A15B] text-[#242321] font-bold text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full shadow-md">
                       ★ Oportunidad Destacada
@@ -306,7 +308,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Footer of Floating Asset Card */}
                 <div className="p-4 sm:p-5 space-y-3 text-left">
                   <div className="flex justify-between items-start">
                     <div>
@@ -331,7 +332,7 @@ export default function HomePage() {
                     </div>
 
                     <Link
-                      href="/propiedades/DAR-SAE-001"
+                      href="/propiedades/hacienda-el-reposo-1-necocli"
                       className="px-3.5 py-2 rounded-xl bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
                     >
                       <span>+ Ver Dossier</span>
@@ -347,48 +348,48 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. FILAS DE ACTIVOS HORIZONTALES CON FLECHAS DE NAVEGACIÓN (CARRUSELES AIRBNB) */}
-      <div className="space-y-16">
-        
-        {/* Carrusel 1: Destacados */}
-        <AssetCarouselSection
-          title="Predios e Inversiones Destacadas en Urabá & Darién"
-          subtitle="Oportunidades de alta valorización con dictamen de títulos y vocación productiva certificada."
-          badge="Portafolio Exclusivo"
-          badgeColor="text-[#1E3A2F]"
-          properties={featuredProperties}
-        />
+      {/* CARRUSELES HORIZONTALES CONECTADOS A SUPABASE */}
+      {loading ? (
+        <div className="text-center py-12 text-xs font-mono text-[#6B6A63]">
+          Cargando inventario persistente desde Supabase...
+        </div>
+      ) : (
+        <div className="space-y-16">
+          <AssetCarouselSection
+            title="Predios e Inversiones Destacadas en Urabá & Darién"
+            subtitle="Oportunidades de alta valorización con dictamen de títulos y vocación productiva certificada."
+            badge="Portafolio Exclusivo"
+            badgeColor="text-[#1E3A2F]"
+            properties={featuredProperties.length > 0 ? featuredProperties : properties}
+          />
 
-        {/* Carrusel 2: Fincas & Activos Rurales */}
-        <AssetCarouselSection
-          title="Fincas & Activos Rurales de Alta Aptitud"
-          subtitle="Tierras fértiles con fuentes hídricas permanentes, pastos mejorados y vocación agrologística."
-          badge="Sector Agropecuario"
-          badgeColor="text-[#23866D]"
-          properties={ruralFarms}
-        />
+          <AssetCarouselSection
+            title="Fincas & Activos Rurales de Alta Aptitud"
+            subtitle="Tierras fértiles con fuentes hídricas permanentes, pastos mejorados y vocación agrologística."
+            badge="Sector Agropecuario"
+            badgeColor="text-[#23866D]"
+            properties={ruralFarms}
+          />
 
-        {/* Carrusel 3: Renta Logística & Comercial */}
-        <AssetCarouselSection
-          title="Bodegas, Locales & Eje Portuario AAA"
-          subtitle="Infraestructura lista para operación logística, acopio y comercio en Apartadó y Turbo."
-          badge="Desarrollo Urbano & Logístico"
-          badgeColor="text-[#0F766E]"
-          properties={commercialLogistics}
-        />
+          <AssetCarouselSection
+            title="Bodegas, Locales & Eje Portuario AAA"
+            subtitle="Infraestructura lista para operación logística, acopio y comercio en Apartadó y Turbo."
+            badge="Desarrollo Urbano & Logístico"
+            badgeColor="text-[#0F766E]"
+            properties={commercialLogistics}
+          />
 
-        {/* Carrusel 4: Custodia SAE */}
-        <AssetCarouselSection
-          title="Activos Especiales en Custodia SAE"
-          subtitle="Predios territoriales bajo administración, custodia e inventario técnico institucional."
-          badge="Custodia Especializada"
-          badgeColor="text-[#6D4C7D]"
-          properties={saeAssets}
-        />
+          <AssetCarouselSection
+            title="Activos Especiales en Custodia SAE"
+            subtitle="Predios territoriales bajo administración, custodia e inventario técnico institucional."
+            badge="Custodia Especializada"
+            badgeColor="text-[#6D4C7D]"
+            properties={saeAssets}
+          />
+        </div>
+      )}
 
-      </div>
-
-      {/* 4. EXPLORAR POR CATEGORÍA */}
+      {/* EXPLORAR POR CATEGORÍA */}
       <section className="bg-[#EEF4EF] border-y border-[#E5E1D8] py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center space-y-1.5 max-w-2xl mx-auto">
@@ -404,7 +405,6 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            
             <Link 
               href="/propiedades?assetType=Finca"
               className="p-5 bg-white border border-[#E5E1D8] hover:border-[#1E3A2F] rounded-2xl space-y-3 group transition-all duration-200 shadow-sm hover:shadow-md text-center flex flex-col items-center"
@@ -421,7 +421,7 @@ export default function HomePage() {
             </Link>
 
             <Link 
-              href="/propiedades?assetType=Terreno"
+              href="/propiedades?assetType=Lote"
               className="p-5 bg-white border border-[#E5E1D8] hover:border-[#C9795B] rounded-2xl space-y-3 group transition-all duration-200 shadow-sm hover:shadow-md text-center flex flex-col items-center"
             >
               <div className="w-12 h-12 rounded-xl bg-[#F1EFE8] text-[#C9795B] flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -499,7 +499,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. EXPLORADOR TERRITORIAL CON MAPA */}
+      {/* EXPLORADOR TERRITORIAL CON MAPA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex justify-between items-end border-b border-[#E5E1D8] pb-4">
           <div>
@@ -518,16 +518,16 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <PropertyMap properties={INITIAL_PROPERTIES} height="480px" />
+        <PropertyMap properties={properties} height="480px" />
       </section>
 
-      {/* 6. RESPALDO Y METRICAS DE CONFIANZA */}
+      {/* RESPALDO Y METRICAS DE CONFIANZA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white border border-[#E5E1D8] rounded-3xl p-8 sm:p-12 space-y-8 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="space-y-4">
               <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold">
-                ¿Por qué ACTIVOS & INVERSIONES DARIEN?
+                ¿Por qué ACTIVOS & INVERSIONES DARIÉN?
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#242321] leading-tight">
                 Respaldo jurídico, conocimiento del territorio y rigor patrimonial.
@@ -535,9 +535,6 @@ export default function HomePage() {
               <p className="text-xs sm:text-sm text-[#6B6A63] leading-relaxed">
                 Somos estructuradores de proyectos inmobiliarios, gestores de activos especiales y aliados estratégicos para el desarrollo patrimonial en Urabá y el Darién.
               </p>
-              <div className="text-[11px] font-mono text-[#929087]">
-                * Datos e indicadores demostrativos de plataforma.
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
@@ -565,44 +562,6 @@ export default function HomePage() {
                 <div className="text-[#6B6A63] text-[11px]">Cotizador rápido consolidado.</div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. LLAMADO FINAL A LA ACCIÓN */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="bg-[#1E3A2F] text-white rounded-3xl p-10 sm:p-14 space-y-6 shadow-xl">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold">
-            ¿Buscas un activo específico o deseas poner tu propiedad en valor?
-          </h2>
-          <p className="text-sm text-slate-200 max-w-xl mx-auto">
-            Nuestro equipo interdisciplinario te acompañará en todo el proceso técnico, comercial y legal.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 pt-2">
-            <Link
-              href="/contacto"
-              className="px-6 py-3.5 rounded-xl bg-[#23866D] hover:bg-[#152921] text-white font-bold text-sm shadow-md"
-            >
-              Hablar con un Asesor
-            </Link>
-            <Link
-              href="/contacto"
-              className="px-6 py-3.5 rounded-xl bg-white text-[#1E3A2F] hover:bg-[#F1EFE8] font-bold text-sm"
-            >
-              Consignar un Inmueble
-            </Link>
-            <Link
-              href="/inversion"
-              className="px-6 py-3.5 rounded-xl bg-[#C6A15B] text-[#242321] hover:bg-amber-400 font-bold text-sm"
-            >
-              Solicitar Oportunidad de Inversión
-            </Link>
-            <Link
-              href="/custodia-sae"
-              className="px-6 py-3.5 rounded-xl bg-[#6D4C7D] text-white hover:bg-purple-900 font-bold text-sm"
-            >
-              Consultar Custodia SAE
-            </Link>
           </div>
         </div>
       </section>

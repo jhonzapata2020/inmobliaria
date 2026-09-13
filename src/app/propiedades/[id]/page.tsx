@@ -1,39 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Building2, 
   MapPin, 
-  Ruler, 
-  ShieldCheck, 
-  FileSpreadsheet, 
   Download, 
   CheckCircle2, 
   ArrowLeft,
   Share2,
-  Check
+  Check,
+  FileSpreadsheet
 } from 'lucide-react';
-import { INITIAL_PROPERTIES } from '../../../data/mockProperties';
+import { Property } from '../../../types/property';
 import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge } from '../../../lib/formatters';
 import { useDossier } from '../../../context/DossierContext';
 import { useFavorites } from '../../../context/FavoritesContext';
-import { useCompare } from '../../../context/CompareContext';
 import { PropertyMap } from '../../../components/map/PropertyMap';
-import { PropertyCard } from '../../../components/catalog/PropertyCard';
+import { getPropertyBySlug, getPublishedProperties } from '../../actions/properties';
 
 export default function PropertyDetailPage() {
   const params = useParams();
   const router = useRouter();
   const propertyId = params?.id as string;
 
-  const property = INITIAL_PROPERTIES.find(
-    (p) => p.id === propertyId || p.code === propertyId || p.slug === propertyId || p.saeIdActivo === propertyId
-  );
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   // Form states
   const [contactSubmitted, setContactSubmitted] = useState(false);
@@ -44,7 +40,39 @@ export default function PropertyDetailPage() {
 
   const { addToDossier, isInDossier, removeFromDossier } = useDossier();
   const { toggleFavorite, isFavorite } = useFavorites();
-  const { addToCompare, isInCompare } = useCompare();
+
+  useEffect(() => {
+    async function loadDetail() {
+      setLoading(true);
+      try {
+        const data = await getPropertyBySlug(propertyId);
+        setProperty(data);
+
+        if (data) {
+          const allProps = await getPublishedProperties();
+          const similar = allProps.filter(
+            (p) => p.id !== data.id && (p.assetType === data.assetType || p.municipality === data.municipality)
+          ).slice(0, 3);
+          setSimilarProperties(similar);
+        }
+      } catch (err) {
+        console.error('Failed to load property detail:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (propertyId) loadDetail();
+  }, [propertyId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8F7F2]">
+        <div className="max-w-3xl mx-auto px-4 py-24 text-center text-xs font-mono text-[#6B6A63]">
+          Cargando ficha técnica 360° desde Supabase...
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -63,7 +91,6 @@ export default function PropertyDetailPage() {
 
   const inDossier = isInDossier(property.id);
   const favorite = isFavorite(property.id);
-  const inCompare = isInCompare(property.id);
 
   const legalBadge = getLegalStatusBadge(property.legalStatus);
   const modalityBadge = getModalityBadge(property.modality);
@@ -85,10 +112,6 @@ export default function PropertyDetailPage() {
       alert('¡Enlace de la propiedad copiado al portapapeles!');
     }
   };
-
-  const similarProperties = INITIAL_PROPERTIES.filter(
-    (p) => p.id !== property.id && (p.assetType === property.assetType || p.municipality === property.municipality)
-  ).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#F8F7F2] pb-20">
@@ -141,10 +164,10 @@ export default function PropertyDetailPage() {
             <div className="bg-white border border-[#E5E1D8] p-4 rounded-2xl text-left font-mono shadow-sm">
               <div className="text-xs text-[#6B6A63]">Valor / Canon Comercial</div>
               <div className="text-2xl font-bold text-[#1E3A2F] font-serif">
-                {property.modality === 'Venta' && formatCurrency(property.price)}
-                {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRent)}/mes`}
-                {property.modality === 'Custodia' && 'Regulada SAE'}
-                {property.modality === 'Inversión' && formatCurrency(property.price || property.estimatedValue)}
+                {property.modality === 'Venta' && formatCurrency(property.salePriceCop)}
+                {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRentCop)}/mes`}
+                {property.modality === 'Custodia SAE' && 'Regulada SAE'}
+                {property.modality === 'Inversión' && formatCurrency(property.salePriceCop || property.estimatedValueCop)}
               </div>
             </div>
 
@@ -165,22 +188,16 @@ export default function PropertyDetailPage() {
 
         {/* Photo Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div 
-            className="md:col-span-2 h-[420px] rounded-2xl overflow-hidden bg-[#F1EFE8] border border-[#E5E1D8] relative group cursor-pointer shadow-sm"
-            onClick={() => setShowGalleryModal(true)}
-          >
+          <div className="md:col-span-2 h-[420px] rounded-2xl overflow-hidden bg-[#F1EFE8] border border-[#E5E1D8] relative group shadow-sm">
             <img 
-              src={property.images[activeImageIndex] || property.images[0]} 
+              src={property.featuredImage || property.images?.[activeImageIndex] || property.images?.[0] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'} 
               alt={property.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover"
             />
-            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-mono text-[#242321] border border-[#E5E1D8] shadow-sm">
-              Hacer clic para ampliar ({activeImageIndex + 1} de {property.images.length})
-            </div>
           </div>
 
           <div className="space-y-4 flex flex-col justify-between">
-            {property.images.slice(0, 2).map((imgUrl, i) => (
+            {(property.images || []).slice(0, 2).map((imgUrl, i) => (
               <div 
                 key={i}
                 className={`h-[200px] rounded-2xl overflow-hidden bg-[#F1EFE8] cursor-pointer border-2 transition-all shadow-sm ${
@@ -198,7 +215,7 @@ export default function PropertyDetailPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white p-6 rounded-2xl border border-[#E5E1D8] font-mono text-xs shadow-sm">
           <div>
             <span className="text-[#6B6A63] block">Área Total:</span>
-            <span className="text-base font-bold text-[#242321]">{formatArea(property.areaTotalHa, property.areaTotalM2)}</span>
+            <span className="text-base font-bold text-[#242321]">{formatArea(property.landAreaHa, property.landAreaM2)}</span>
           </div>
           <div>
             <span className="text-[#6B6A63] block">Área Construida:</span>
@@ -206,7 +223,7 @@ export default function PropertyDetailPage() {
           </div>
           <div>
             <span className="text-[#6B6A63] block">Topografía:</span>
-            <span className="text-base font-bold text-[#242321]">{property.topography}</span>
+            <span className="text-base font-bold text-[#242321]">{property.topography || 'No especificada'}</span>
           </div>
           <div>
             <span className="text-[#6B6A63] block">Estado Jurídico:</span>
@@ -217,7 +234,7 @@ export default function PropertyDetailPage() {
         {/* Detailed Technical & Commercial Specs Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          {/* Left Column: Commercial Description & Technical Sheet */}
+          {/* Left Column */}
           <div className="lg:col-span-8 space-y-10">
             
             {/* Commercial Overview */}
@@ -228,13 +245,15 @@ export default function PropertyDetailPage() {
               <p className="text-sm leading-relaxed text-[#6B6A63]">
                 {property.description}
               </p>
-              <div className="p-5 bg-[#EEF4EF] border border-[#E5E1D8] rounded-xl space-y-1.5 text-xs">
-                <span className="font-mono text-[#1E3A2F] font-bold block uppercase tracking-wider">Análisis de Oportunidad & Desarrollo</span>
-                <p className="text-[#242321] leading-relaxed">{property.opportunityAnalysis}</p>
-              </div>
+              {property.opportunityAnalysis && (
+                <div className="p-5 bg-[#EEF4EF] border border-[#E5E1D8] rounded-xl space-y-1.5 text-xs">
+                  <span className="font-mono text-[#1E3A2F] font-bold block uppercase tracking-wider">Análisis de Oportunidad & Desarrollo</span>
+                  <p className="text-[#242321] leading-relaxed">{property.opportunityAnalysis}</p>
+                </div>
+              )}
             </div>
 
-            {/* Complete Technical Specification Sheet */}
+            {/* Ficha Técnica 360 */}
             <div className="space-y-4">
               <h2 className="font-serif text-2xl font-bold text-[#242321] border-b border-[#E5E1D8] pb-3">
                 Ficha Técnica & Jurídica 360°
@@ -254,11 +273,11 @@ export default function PropertyDetailPage() {
                 )}
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block font-mono">Folio de Matrícula Inmobiliaria:</span>
-                  <span className="font-mono font-bold text-base text-[#1E3A2F]">{property.folioMatricula || property.matriculaInmobiliaria}</span>
+                  <span className="font-mono font-bold text-base text-[#1E3A2F]">{property.folioMatricula || property.matriculaInmobiliaria || 'Sujeto a verificación'}</span>
                 </div>
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block font-mono">Cédula Catastral:</span>
-                  <span className="font-mono font-bold text-[#0F766E] break-all">{property.cedulaCatastral}</span>
+                  <span className="font-mono font-bold text-[#0F766E] break-all">{property.cedulaCatastral || 'Sujeto a verificación'}</span>
                 </div>
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block">Altitud sobre el nivel del mar:</span>
@@ -266,15 +285,7 @@ export default function PropertyDetailPage() {
                 </div>
                 <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 shadow-sm">
                   <span className="text-[#6B6A63] block">Fuentes Hídricas:</span>
-                  <span className="font-bold text-[#242321]">{property.waterSources}</span>
-                </div>
-                <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 sm:col-span-2 shadow-sm">
-                  <span className="text-[#6B6A63] block">Vías de Acceso:</span>
-                  <span className="font-bold text-[#242321]">{property.accessRoads}</span>
-                </div>
-                <div className="p-4 bg-white rounded-xl border border-[#E5E1D8] space-y-1 sm:col-span-2 shadow-sm">
-                  <span className="text-[#6B6A63] block">Estado Documental & Tradición:</span>
-                  <span className="font-bold text-[#242321]">{property.documentStatus}</span>
+                  <span className="font-bold text-[#242321]">{property.waterSources || 'Información en proceso'}</span>
                 </div>
               </div>
             </div>
@@ -287,37 +298,9 @@ export default function PropertyDetailPage() {
               <PropertyMap properties={[property]} height="400px" />
             </div>
 
-            {/* Downloadable Documents */}
-            <div className="space-y-4">
-              <h2 className="font-serif text-2xl font-bold text-[#242321] border-b border-[#E5E1D8] pb-3">
-                Documentos Disponibles
-              </h2>
-              <div className="space-y-2">
-                {property.documentsAvailable.map((doc, idx) => (
-                  <div key={idx} className="p-4 bg-white border border-[#E5E1D8] rounded-xl flex justify-between items-center text-xs shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-[#EEF4EF] text-[#1E3A2F] rounded-lg font-mono font-bold">
-                        {doc.type}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-[#242321]">{doc.name}</h4>
-                        <span className="text-[#6B6A63] font-mono">{doc.size}</span>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => alert(`Descargando documento de demostración: ${doc.name}`)}
-                      className="px-3.5 py-2 bg-[#F1EFE8] hover:bg-[#E5E1D8] text-[#1E3A2F] font-semibold rounded-xl flex items-center gap-1.5 border border-[#E5E1D8]"
-                    >
-                      <Download className="w-4 h-4 text-[#1E3A2F]" /> Descargar
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
           </div>
 
-          {/* Right Column: Sticky Inquiry & Advisory Form */}
+          {/* Right Column Form */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 bg-white border border-[#E5E1D8] rounded-2xl p-6 space-y-6 shadow-md">
               
@@ -326,7 +309,7 @@ export default function PropertyDetailPage() {
                   Solicitar Información o Visita
                 </h3>
                 <p className="text-xs text-[#6B6A63]">
-                  Contacta directamente con un asesor de ACTIVOS & INVERSIONES DARIEN.
+                  Contacta directamente con un asesor de ACTIVOS & INVERSIONES DARIÉN.
                 </p>
               </div>
 
@@ -391,7 +374,7 @@ export default function PropertyDetailPage() {
                   <CheckCircle2 className="w-10 h-10 text-[#23866D] mx-auto" />
                   <h4 className="font-bold text-[#242321] text-sm">¡Solicitud Recibida con Éxito!</h4>
                   <p className="text-xs text-[#6B6A63]">
-                    Un asesor comercial de ACTIVOS & INVERSIONES DARIEN se pondrá en contacto contigo en breve.
+                    Un asesor comercial de ACTIVOS & INVERSIONES DARIÉN se pondrá en contacto contigo en breve.
                   </p>
                 </div>
               )}
@@ -400,20 +383,6 @@ export default function PropertyDetailPage() {
           </div>
 
         </div>
-
-        {/* Similar Properties Section */}
-        {similarProperties.length > 0 && (
-          <div className="pt-10 border-t border-[#E5E1D8] space-y-6">
-            <h2 className="font-serif text-2xl font-bold text-[#242321]">
-              Propiedades Similares en la Región
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {similarProperties.map((p) => (
-                <PropertyCard key={p.id} property={p} />
-              ))}
-            </div>
-          </div>
-        )}
 
       </div>
     </div>

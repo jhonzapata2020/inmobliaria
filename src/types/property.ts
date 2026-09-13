@@ -52,6 +52,10 @@ export interface Property {
   salePriceCop?: number;
   monthlyRentCop?: number;
   estimatedValueCop?: number;
+  commercialAppraisalCop?: number;
+  monthlyRentEstimateCop?: number;
+  occupancyStatus?: string;
+  lastVisitDate?: string;
   
   // Canonical Area Fields
   landAreaM2?: number;

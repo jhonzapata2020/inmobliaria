@@ -6,6 +6,7 @@ from psycopg2.extras import execute_values
 import pandas as pd
 import numpy as np
 import unicodedata
+import datetime
 
 # Connection configuration
 DB_URL = os.environ.get(
@@ -15,18 +16,26 @@ DB_URL = os.environ.get(
 
 EXCEL_PATH = "ANTIOQUIA.xlsx"
 
-URABA_CANONICAL_MAP = {
-    'TURBO': 'Turbo',
-    'NECOCLI': 'Necoclí',
-    'APARTADO': 'Apartadó',
-    'CAREPA': 'Carepa',
-    'CHIGORODO': 'Chigorodó',
-    'SAN PEDRO DE URABA': 'San Pedro de Urabá',
-    'ARBOLETES': 'Arboletes',
-    'SAN JUAN DE URABA': 'San Juan de Urabá',
-    'MUTATA': 'Mutatá',
-    'MURINDO': 'Murindó',
-    'VIGIA DEL FUERTE': 'Vigía del Fuerte'
+# Strategic Whitelist Map: (Normalized Key) -> (Canonical Municipality, Department)
+STRATEGIC_WHITELIST_MAP = {
+    # Antioquia Strategic Municipalities
+    'TURBO': ('Turbo', 'Antioquia'),
+    'NECOCLI': ('Necoclí', 'Antioquia'),
+    'APARTADO': ('Apartadó', 'Antioquia'),
+    'CAREPA': ('Carepa', 'Antioquia'),
+    'CHIGORODO': ('Chigorodó', 'Antioquia'),
+    'ARBOLETES': ('Arboletes', 'Antioquia'),
+    'MUTATA': ('Mutatá', 'Antioquia'),
+    'SAN PEDRO DE URABA': ('San Pedro de Urabá', 'Antioquia'),
+    'SAN JUAN DE URABA': ('San Juan de Urabá', 'Antioquia'),
+    
+    # Chocó Strategic Municipalities
+    'ACANDI': ('Acandí', 'Chocó'),
+    'UNGUIA': ('Unguía', 'Chocó'),
+    'UNGUA': ('Unguía', 'Chocó'),
+    'RIOSUCIO': ('Riosucio', 'Chocó'),
+    'BAHIA SOLANO': ('Bahía Solano', 'Chocó'),
+    'JURADO': ('Juradó', 'Chocó')
 }
 
 def strip_accents(s):
@@ -49,9 +58,28 @@ def sanitize_num(val):
         return None
     try:
         n = float(val)
-        return None if np.isnan(n) else n
+        return None if (np.isnan(n) or n <= 0) else n
     except (ValueError, TypeError):
         return None
+
+def parse_date(val):
+    if pd.isna(val) or val is None:
+        return None
+    if isinstance(val, (datetime.datetime, datetime.date)):
+        return val.strftime('%Y-%m-%d')
+    try:
+        dt = pd.to_datetime(val)
+        if pd.isna(dt):
+            return None
+        return dt.strftime('%Y-%m-%d')
+    except Exception:
+        return None
+
+def find_col(df, keyword):
+    for c in df.columns:
+        if keyword.upper() in strip_accents(c):
+            return c
+    return None
 
 def normalize_asset_type(raw_type, dir_val="", desc_val=""):
     raw_upper = strip_accents(str(raw_type))
@@ -77,7 +105,7 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
     if "FINCA" in raw_upper or "HACIENDA" in raw_upper or "PARCELA" in raw_upper or "PREDIO RURAL" in raw_upper or "MEJORAS AGRICOLAS" in raw_upper:
         return "Finca"
 
-    # Priority 2: Keyword search in Combined Title/Address/Description text
+    # Priority 2: Keyword search in Combined Text
     if any(k in combined for k in ["LOCAL", "MALL", "COMERCIAL"]):
         return "Local"
     if any(k in combined for k in ["BODEGA", "ALMACEN"]):
@@ -95,9 +123,35 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
 
     return "Finca"
 
+def format_title(asset_type, dir_val, desc_val, id_act, muni_name):
+    """
+    Format property title nicely for Urban vs Rural assets.
+    Urban assets (Casa, Local, Bodega, Apartamento, Edificio, Oficina, Lote):
+    - "Casa - CL 107 B # 107-26", "Local Comercial - Carrera 100"
+    Rural assets (Finca):
+    - "Finca El Reposo - Vereda ..." or "Finca - Predio 528835"
+    """
+    is_urban = asset_type in ["Casa", "Apartamento", "Local", "Bodega", "Edificio", "Oficina", "Lote"]
+    
+    clean_dir = sanitize_text(dir_val)
+    clean_desc = sanitize_text(desc_val)
+
+    if is_urban and clean_dir:
+        if clean_dir.upper().startswith(asset_type.upper()):
+            return clean_dir[:255]
+        return f"{asset_type} - {clean_dir}"[:255]
+    
+    if clean_desc and len(clean_desc) > 3 and not clean_desc.lower().startswith("nan"):
+        return clean_desc[:255]
+
+    if clean_dir:
+        return f"{asset_type} - {clean_dir}"[:255]
+
+    return f"{asset_type} Predio {id_act} - {muni_name}"[:255]
+
 def main():
     print("==================================================")
-    print(" INGESTIÓN DE INVENTARIO A public.properties SUPABASE")
+    print(" INGESTIÓN Y ACTUALIZACIÓN FINANCIERA EN public.properties")
     print("==================================================")
 
     conn = psycopg2.connect(DB_URL)
@@ -144,6 +198,9 @@ def main():
             "is_demo_data": False,
             "monthly_rent_cop": 6800000,
             "sale_price_cop": 2250000000,
+            "commercial_appraisal_cop": 2250000000,
+            "monthly_rent_estimate_cop": 6800000,
+            "occupancy_status": "Desocupado",
             "images": [
                 "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop",
                 "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1200&auto=format&fit=crop"
@@ -161,7 +218,7 @@ def main():
             "code": "DAR-SAE-002",
             "slug": "finca-betania-turbo",
             "title": "Finca Ganadera Betania",
-            "short_description": "Predio rural altamente productivo con vocación pecuaria y agropecuaria en Turbo.",
+            "short_description": "Predio rural highly productivo con vocación pecuaria y agropecuaria en Turbo.",
             "description": "Predio rural altamente productivo con vocación pecuaria y agropecuaria. Excelente conexión vial hacia los ejes logísticos de Urabá y cercanía al puerto.",
             "opportunity_analysis": "Ubicación estratégica cercana al eje portuario de Turbo.",
             "asset_type": "Finca",
@@ -193,6 +250,9 @@ def main():
             "is_demo_data": False,
             "monthly_rent_cop": 5500000,
             "sale_price_cop": 1820000000,
+            "commercial_appraisal_cop": 1820000000,
+            "monthly_rent_estimate_cop": 5500000,
+            "occupancy_status": "Desocupado",
             "images": [
                 "https://images.unsplash.com/photo-1500076656116-558758c991c1?q=80&w=1200&auto=format&fit=crop"
             ],
@@ -241,6 +301,9 @@ def main():
             "is_demo_data": False,
             "monthly_rent_cop": 8900000,
             "sale_price_cop": 3200000000,
+            "commercial_appraisal_cop": 3200000000,
+            "monthly_rent_estimate_cop": 8900000,
+            "occupancy_status": "Ocupado",
             "images": [
                 "https://images.unsplash.com/photo-1527842891421-42eec6e703ea?q=80&w=1200&auto=format&fit=crop"
             ],
@@ -289,6 +352,9 @@ def main():
             "is_demo_data": False,
             "monthly_rent_cop": 15000000,
             "sale_price_cop": 7300000000,
+            "commercial_appraisal_cop": 7300000000,
+            "monthly_rent_estimate_cop": 15000000,
+            "occupancy_status": "Desocupado",
             "images": [
                 "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop"
             ],
@@ -304,7 +370,7 @@ def main():
         {
             "code": "DAR-SAE-005",
             "slug": "bodega-logistica-calle-103-turbo",
-            "title": "Bodega Logística Calle 103",
+            "title": "Bodega Logística - Calle 103 # 13 - 57",
             "short_description": "Infraestructura comercial y de almacenamiento ubicada sobre corredor urbano-industrial en Turbo.",
             "description": "Infraestructura comercial y de almacenamiento ubicada sobre corredor urbano-industrial en Turbo. Diseñada para acopio de insumos agrícolas o maquinaria.",
             "opportunity_analysis": "Excelente oportunidad de arriendo sobre vía comercial de alto flujo en Turbo.",
@@ -337,6 +403,9 @@ def main():
             "is_demo_data": False,
             "monthly_rent_cop": 4200000,
             "sale_price_cop": 850000000,
+            "commercial_appraisal_cop": 850000000,
+            "monthly_rent_estimate_cop": 4200000,
+            "occupancy_status": "Desocupado",
             "images": [
                 "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop"
             ],
@@ -348,184 +417,6 @@ def main():
             "availability": "Disponible",
             "is_featured": False,
             "is_investment_opportunity": True
-        },
-        {
-            "code": "DAR-BAN-006",
-            "slug": "finca-bananera-la-palma-apartado",
-            "title": "Finca Agroindustrial Bananera \"La Palma\"",
-            "short_description": "Finca bananera en plena producción de 85 Ha con empacadora tecnificada en Apartadó.",
-            "description": "Propiedad agrícola de alto rendimiento productivo con 82 hectáreas sembradas en variedad Cavendish.",
-            "opportunity_analysis": "Activo con rentabilidad demostrable.",
-            "asset_type": "Finca",
-            "modality": "Venta",
-            "sale_price_cop": 8500000000,
-            "land_area_ha": 85,
-            "land_area_m2": 850000,
-            "built_area_m2": 1200,
-            "department": "Antioquia",
-            "municipality": "Apartadó",
-            "sector_vereda": "Vereda Churidó",
-            "latitude": 7.8421,
-            "longitude": -76.6812,
-            "altitude_msl": 25,
-            "matricula_inmobiliaria": "034-55102",
-            "cedula_catastral": "0504500000020087000",
-            "topography": "Plana con drenajes profundos.",
-            "access_roads": "Vía afirmada de uso agrícola.",
-            "water_sources": "Río Churidó y pozo profundo.",
-            "public_services": ["Energía Trifásica", "Agua potable"],
-            "current_use": "Explotación agroindustrial bananera.",
-            "potential_uses": ["Agropecuario", "Industrial"],
-            "existing_infrastructure": ["Empacadora tecnificada", "Cable vía"],
-            "legal_status": "Saneado",
-            "editorial_status": "published",
-            "availability": "Disponible",
-            "is_featured": True,
-            "is_investment_opportunity": True,
-            "images": ["https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80"],
-            "featured_image": "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80"
-        },
-        {
-            "code": "DAR-LOC-007",
-            "slug": "local-comercial-plaza-darien-carepa",
-            "title": "Local Comercial de Esquina \"Plaza Darién\"",
-            "short_description": "Local comercial en estratégica esquina de alto flujo peatonal y vehicular en Carepa.",
-            "description": "Magnífica unidad comercial de 320 m2 distribuidos en planta libre en primer nivel con vitrina acristalada.",
-            "opportunity_analysis": "Inmueble con altísima demanda de arrendamiento corporativo.",
-            "asset_type": "Local",
-            "modality": "Arriendo",
-            "monthly_rent_cop": 12500000,
-            "sale_price_cop": 1650000000,
-            "land_area_m2": 320,
-            "land_area_ha": 0.032,
-            "built_area_m2": 320,
-            "department": "Antioquia",
-            "municipality": "Carepa",
-            "sector_vereda": "Centro Calle Principal",
-            "latitude": 7.7551,
-            "longitude": -76.6542,
-            "altitude_msl": 28,
-            "matricula_inmobiliaria": "034-88301",
-            "cedula_catastral": "0514701000010022000",
-            "topography": "Plana urbana",
-            "access_roads": "Sobre calle peatonal y comercial.",
-            "public_services": ["Energía eléctrica 220V", "Acueducto y Alcantarillado"],
-            "current_use": "Desocupado listo para adecuación.",
-            "potential_uses": ["Comercial"],
-            "existing_infrastructure": ["Persianas metálicas automatizadas"],
-            "legal_status": "Saneado",
-            "editorial_status": "published",
-            "availability": "Disponible",
-            "is_featured": False,
-            "is_investment_opportunity": False,
-            "images": ["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"],
-            "featured_image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
-        },
-        {
-            "code": "DAR-TER-008",
-            "slug": "terreno-multimodal-ruta-del-mar-chigorodo",
-            "title": "Terreno Multimodal \"Ruta del Mar\" en Chigorodó",
-            "short_description": "Lote de 15 Hectáreas ideal para desarrollo agrologístico sobre el corredor arterial de Chigorodó.",
-            "description": "Estratégica franja de tierra con topografía 100% plana ubicada a la entrada norte del municipio de Chigorodó.",
-            "opportunity_analysis": "Sector en alta valorización.",
-            "asset_type": "Terreno",
-            "modality": "Venta",
-            "sale_price_cop": 3300000000,
-            "land_area_ha": 15,
-            "land_area_m2": 150000,
-            "built_area_m2": 0,
-            "department": "Antioquia",
-            "municipality": "Chigorodó",
-            "sector_vereda": "Sector El Guaimaro",
-            "latitude": 7.6691,
-            "longitude": -76.6805,
-            "altitude_msl": 34,
-            "matricula_inmobiliaria": "034-33921",
-            "cedula_catastral": "0517200000010056000",
-            "topography": "Plana con excelente drenaje.",
-            "access_roads": "Acceso directo por vía pavimentada.",
-            "public_services": ["Disponibilidad de servicios urbanos"],
-            "current_use": "Pastoreo extensivo.",
-            "potential_uses": ["Logístico", "Industrial"],
-            "existing_infrastructure": ["Cercado en alambre de púas"],
-            "legal_status": "En estudio jurídico",
-            "editorial_status": "published",
-            "availability": "Disponible",
-            "is_featured": False,
-            "is_investment_opportunity": True,
-            "images": ["https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=1200&q=80"],
-            "featured_image": "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=1200&q=80"
-        },
-        {
-            "code": "DAR-CAS-009",
-            "slug": "casa-campestre-villa-esmeralda-mutata",
-            "title": "Casa Campestre Residencial \"Villa Esmeralda\"",
-            "short_description": "Espectacular propiedad de recreo de 3.500 m2 de lote en Mutatá.",
-            "description": "Hermosa residencia campestre construida con finos acabados en teca y piedra natural.",
-            "opportunity_analysis": "Ideal para residencia permanente o alquiler vacacional.",
-            "asset_type": "Casa",
-            "modality": "Venta",
-            "sale_price_cop": 980000000,
-            "land_area_m2": 3500,
-            "land_area_ha": 0.35,
-            "built_area_m2": 380,
-            "department": "Antioquia",
-            "municipality": "Mutatá",
-            "sector_vereda": "Sector Parcelación La Selva",
-            "latitude": 7.2421,
-            "longitude": -76.4351,
-            "altitude_msl": 180,
-            "matricula_inmobiliaria": "034-22019",
-            "cedula_catastral": "0548001000020011000",
-            "topography": "Suave colina con vista panorámica.",
-            "access_roads": "Vía interna pavimentada.",
-            "public_services": ["Energía EPM", "Acueducto veredal"],
-            "current_use": "Residencia campestre.",
-            "potential_uses": ["Residencial", "Turístico"],
-            "existing_infrastructure": ["Piscina de 50 m2", "Kiosco BBQ"],
-            "legal_status": "Saneado",
-            "editorial_status": "published",
-            "availability": "Disponible",
-            "is_featured": True,
-            "is_investment_opportunity": False,
-            "images": ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"],
-            "featured_image": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
-        },
-        {
-            "code": "DAR-EDI-010",
-            "slug": "edificio-corporativo-torre-darien-apartado",
-            "title": "Edificio Corporativo de Oficinas \"Torre Darién\"",
-            "short_description": "Inmueble comercial corporativo de 4 pisos y 1.200 m2 construidos en Apartadó.",
-            "description": "Moderna estructura corporativa acondicionada para sedes de aseguradoras o entidades financieras.",
-            "opportunity_analysis": "Renta patrimonial estabilizada.",
-            "asset_type": "Edificio",
-            "modality": "Venta",
-            "sale_price_cop": 7900000000,
-            "monthly_rent_cop": 68000000,
-            "land_area_m2": 500,
-            "land_area_ha": 0.05,
-            "built_area_m2": 1200,
-            "department": "Antioquia",
-            "municipality": "Apartadó",
-            "sector_vereda": "Barrio Ortiz - Zona Comercial",
-            "latitude": 7.8856,
-            "longitude": -76.6292,
-            "altitude_msl": 30,
-            "matricula_inmobiliaria": "034-99104",
-            "cedula_catastral": "0504501000010099000",
-            "topography": "Plana urbana",
-            "access_roads": "Sobre avenida principal.",
-            "public_services": ["Energía Trifásica", "Acueducto y Alcantarillado"],
-            "current_use": "Oficinas corporativas.",
-            "potential_uses": ["Comercial", "Oficina"],
-            "existing_infrastructure": ["Ascensor Mitsubishi", "Planta eléctrica 100 kW"],
-            "legal_status": "Saneado",
-            "editorial_status": "published",
-            "availability": "Disponible",
-            "is_featured": True,
-            "is_investment_opportunity": True,
-            "images": ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"],
-            "featured_image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"
         }
     ]
 
@@ -535,6 +426,7 @@ def main():
                 code, slug, title, short_description, description, opportunity_analysis,
                 asset_type, modality, is_sae, sae_id_activo, folio_matricula,
                 sale_price_cop, monthly_rent_cop, estimated_value_cop,
+                commercial_appraisal_cop, monthly_rent_estimate_cop, occupancy_status,
                 land_area_m2, land_area_ha, built_area_m2,
                 department, municipality, sector_vereda, vereda, address,
                 latitude, longitude, is_confidential_coords, altitude_msl,
@@ -547,6 +439,7 @@ def main():
                 %(code)s, %(slug)s, %(title)s, %(short_description)s, %(description)s, %(opportunity_analysis)s,
                 %(asset_type)s, %(modality)s, %(is_sae)s, %(sae_id_activo)s, %(folio_matricula)s,
                 %(sale_price_cop)s, %(monthly_rent_cop)s, %(estimated_value_cop)s,
+                %(commercial_appraisal_cop)s, %(monthly_rent_estimate_cop)s, %(occupancy_status)s,
                 %(land_area_m2)s, %(land_area_ha)s, %(built_area_m2)s,
                 %(department)s, %(municipality)s, %(sector_vereda)s, %(vereda)s, %(address)s,
                 %(latitude)s, %(longitude)s, %(is_confidential_coords)s, %(altitude_msl)s,
@@ -570,6 +463,9 @@ def main():
                 sale_price_cop = EXCLUDED.sale_price_cop,
                 monthly_rent_cop = EXCLUDED.monthly_rent_cop,
                 estimated_value_cop = EXCLUDED.estimated_value_cop,
+                commercial_appraisal_cop = EXCLUDED.commercial_appraisal_cop,
+                monthly_rent_estimate_cop = EXCLUDED.monthly_rent_estimate_cop,
+                occupancy_status = EXCLUDED.occupancy_status,
                 land_area_m2 = EXCLUDED.land_area_m2,
                 land_area_ha = EXCLUDED.land_area_ha,
                 built_area_m2 = EXCLUDED.built_area_m2,
@@ -619,6 +515,9 @@ def main():
             "sale_price_cop": prop.get("sale_price_cop"),
             "monthly_rent_cop": prop.get("monthly_rent_cop"),
             "estimated_value_cop": prop.get("estimated_value_cop"),
+            "commercial_appraisal_cop": prop.get("commercial_appraisal_cop"),
+            "monthly_rent_estimate_cop": prop.get("monthly_rent_estimate_cop"),
+            "occupancy_status": prop.get("occupancy_status"),
             "land_area_m2": prop.get("land_area_m2"),
             "land_area_ha": prop.get("land_area_ha"),
             "built_area_m2": prop.get("built_area_m2"),
@@ -659,56 +558,108 @@ def main():
     if os.path.exists(EXCEL_PATH):
         print(f"\n[2/2] Leyendo e Ingestando Inventario desde {EXCEL_PATH}...")
         df_raw = pd.read_excel(EXCEL_PATH, engine="calamine")
-        print(f" -> Filas totales leídas: {len(df_raw)}")
+        print(f" -> Filas totales leídas en Excel: {len(df_raw)}")
         
-        df_raw['DEPARTAMENTO_NORM'] = df_raw['DEPARTAMENTO'].apply(strip_accents)
-        df_raw['MUNICIPIO_NORM'] = df_raw['MUNICIPIO'].apply(strip_accents)
+        # Locate exact column headers dynamically
+        muni_col = find_col(df_raw, 'MUNICIPIO')
+        dept_col = find_col(df_raw, 'DEPARTAMENTO')
+        id_col = find_col(df_raw, 'IDACTIVO')
+        class_col = find_col(df_raw, 'CLASIFICACION ACTIVO')
+        dir_col = find_col(df_raw, 'DIRECCION')
+        desc_col = find_col(df_raw, 'DESCRIPCION')
+        vereda_col = find_col(df_raw, 'VEREDA')
+        folio_col = find_col(df_raw, 'FOLIO DE MATRICULA')
+        catastral_col = find_col(df_raw, 'CEDULA CATASTRAL')
+        legal_col = find_col(df_raw, 'ESTADO LEGAL')
+        area_m2_col = find_col(df_raw, 'AREA TERRENO')
+        built_m2_col = find_col(df_raw, 'AREA CONSTRUIDA')
+        
+        # Financial & Operational Columns
+        avaluo_col = find_col(df_raw, 'AVALUO COMERCIAL')
+        renta_col = find_col(df_raw, 'ESTIMATIVO DE RENTA')
+        ocupacion_col = find_col(df_raw, 'ESTADO DE OCUPACION')
+        venta_col = find_col(df_raw, 'VENTA ALISTAMIENTO JURIDICO')
+        visita_col = find_col(df_raw, 'FECHA ULTIMA VISITA')
 
-        target_muni_keys = set(URABA_CANONICAL_MAP.keys())
-        filtered_df = df_raw[
-            (df_raw['DEPARTAMENTO_NORM'] == 'ANTIOQUIA') & 
-            (df_raw['MUNICIPIO_NORM'].isin(target_muni_keys))
-        ].copy()
+        df_raw['MUNI_NORM'] = df_raw[muni_col].apply(strip_accents)
 
-        filtered_df['IDACTIVO'] = filtered_df['IDACTIVO'].astype(str).str.strip()
-        dedup_df = filtered_df.drop_duplicates(subset=['IDACTIVO']).copy()
-        print(f" -> Filas de Urabá procesadas: {len(dedup_df)}")
+        # Filter by strategic whitelist
+        filtered_df = df_raw[df_raw['MUNI_NORM'].isin(STRATEGIC_WHITELIST_MAP.keys())].copy()
+        filtered_df[id_col] = filtered_df[id_col].astype(str).str.strip()
+        dedup_df = filtered_df.drop_duplicates(subset=[id_col]).copy()
+        print(f" -> Predios de Municipios Estratégicos (deduplicados): {len(dedup_df)}")
 
         batch_params = []
-        for _, row in dedup_df.iterrows():
-            id_act = str(row['IDACTIVO']).strip()
+        for idx_count, (_, row) in enumerate(dedup_df.iterrows()):
+            id_act = str(row[id_col]).strip()
             code = f"DAR-EXCEL-{id_act}"
             slug = f"predio-excel-{id_act.lower()}"
             
-            muni_norm = strip_accents(row['MUNICIPIO'])
-            muni_canonical = URABA_CANONICAL_MAP.get(muni_norm, str(row['MUNICIPIO']).strip().title())
-            dept_canonical = 'Antioquia'
+            muni_norm = strip_accents(row[muni_col])
+            muni_canonical, dept_canonical = STRATEGIC_WHITELIST_MAP.get(muni_norm, (str(row[muni_col]).strip().title(), 'Antioquia'))
 
-            dir_val = sanitize_text(row.get('DIRECCIÓN'))
-            desc_val = sanitize_text(row.get('DESCRIPCION'))
-            raw_title = dir_val if dir_val else (desc_val if desc_val else f"Predio {id_act} - {muni_canonical}")
-            title = sanitize_text(raw_title, f"Predio {id_act}")[:255]
+            dir_val = sanitize_text(row.get(dir_col))
+            desc_val = sanitize_text(row.get(desc_col))
+            vereda_val = sanitize_text(row.get(vereda_col))
+            asset_type_raw = row.get(class_col)
 
-            asset_type_raw = row.get('CLASIFICACIÓN ACTIVO')
             asset_type = normalize_asset_type(asset_type_raw, dir_val, desc_val)
 
-            area_m2 = sanitize_num(row.get('AREA TERRENO'))
+            # Urban title composition logic:
+            title = format_title(asset_type, dir_val, desc_val, id_act, muni_canonical)
+
+            area_m2 = sanitize_num(row.get(area_m2_col))
             area_ha = area_m2 / 10000.0 if area_m2 else None
-            val_com = sanitize_num(row.get('AVALUO COMERCIAL'))
+            built_m2 = sanitize_num(row.get(built_m2_col))
 
-            cadastral_id = sanitize_text(row.get('CÉDULA CATASTRAL'), "")
-            registry_folio = sanitize_text(row.get('FOLIO DE MATRÍCULA'), "")
-            legal_status = sanitize_text(row.get('ESTADO LEGAL'), "Saneado")
+            avaluo_com = sanitize_num(row.get(avaluo_col))
+            renta_est = sanitize_num(row.get(renta_col))
+            occupancy_status = sanitize_text(row.get(ocupacion_col), "Desocupado")
+            last_visit = parse_date(row.get(visita_col))
 
-            lat = 8.0 + (len(batch_params) * 0.001)
-            lng = -76.7 - (len(batch_params) * 0.001)
+            venta_raw = strip_accents(str(row.get(venta_col)))
+
+            # Financial Assignment Logic
+            sale_price_cop = None
+            monthly_rent_cop = None
+            estimated_value_cop = None
+            modality = "Custodia SAE"
+
+            if avaluo_com and avaluo_com > 0:
+                sale_price_cop = avaluo_com
+                estimated_value_cop = avaluo_com
+                if renta_est and renta_est > 0:
+                    monthly_rent_cop = renta_est
+                modality = "Venta"
+            elif renta_est and renta_est > 0:
+                monthly_rent_cop = renta_est
+                # Rent capitalization estimate: round(rent / 0.006, -6)
+                estimated_value_cop = round(renta_est / 0.006, -6)
+                if "NO" in venta_raw:
+                    modality = "Arriendo"
+                else:
+                    modality = "Venta"
+
+            cadastral_id = sanitize_text(row.get(catastral_col), "")
+            registry_folio = sanitize_text(row.get(folio_col), "")
+            legal_status = sanitize_text(row.get(legal_col), "Saneado")
+
+            # Deterministic Coordinate Dispersion per municipality
+            lat = 8.0 + (idx_count * 0.0005)
+            lng = -76.7 - (idx_count * 0.0005)
+
+            address_str = dir_val if dir_val else (f"Vereda {vereda_val}" if vereda_val else f"Sector {muni_canonical}")
+
+            short_desc = desc_val[:200] if desc_val else f"{asset_type} inventariado en {muni_canonical}, {dept_canonical}."
+            full_desc = desc_val if desc_val else f"{asset_type} ubicado en {muni_canonical}, bajo inventario y administración territorial."
 
             batch_params.append((
-                code, slug, title, desc_val[:200] if desc_val else f"Predio inventario SAE {id_act}",
-                desc_val if desc_val else f"Predio en {muni_canonical} bajo inventario.",
-                asset_type, "Custodia SAE", True, id_act, registry_folio,
-                val_com, val_com, area_m2, area_ha,
-                dept_canonical, muni_canonical, dir_val if dir_val else f"Vereda / Sector {muni_canonical}",
+                code, slug, title, short_desc, full_desc,
+                asset_type, modality, True, id_act, registry_folio,
+                sale_price_cop, monthly_rent_cop, estimated_value_cop,
+                avaluo_com, renta_est, occupancy_status, last_visit,
+                area_m2, area_ha, built_m2,
+                dept_canonical, muni_canonical, vereda_val if vereda_val else None, vereda_val if vereda_val else None, address_str,
                 lat, lng, registry_folio, cadastral_id, legal_status,
                 'published', 'Disponible', False, False
             ))
@@ -717,43 +668,87 @@ def main():
             INSERT INTO public.properties (
                 code, slug, title, short_description, description,
                 asset_type, modality, is_sae, sae_id_activo, folio_matricula,
-                sale_price_cop, estimated_value_cop, land_area_m2, land_area_ha,
-                department, municipality, address, latitude, longitude,
-                matricula_inmobiliaria, cedula_catastral, legal_status,
+                sale_price_cop, monthly_rent_cop, estimated_value_cop,
+                commercial_appraisal_cop, monthly_rent_estimate_cop, occupancy_status, last_visit_date,
+                land_area_m2, land_area_ha, built_area_m2,
+                department, municipality, sector_vereda, vereda, address,
+                latitude, longitude, matricula_inmobiliaria, cedula_catastral, legal_status,
                 editorial_status, availability, is_featured, is_investment_opportunity, updated_at
             ) VALUES %s
             ON CONFLICT (code) DO UPDATE SET
                 title = EXCLUDED.title,
+                short_description = EXCLUDED.short_description,
+                description = EXCLUDED.description,
                 asset_type = EXCLUDED.asset_type,
+                modality = EXCLUDED.modality,
                 sale_price_cop = EXCLUDED.sale_price_cop,
+                monthly_rent_cop = EXCLUDED.monthly_rent_cop,
+                estimated_value_cop = EXCLUDED.estimated_value_cop,
+                commercial_appraisal_cop = EXCLUDED.commercial_appraisal_cop,
+                monthly_rent_estimate_cop = EXCLUDED.monthly_rent_estimate_cop,
+                occupancy_status = EXCLUDED.occupancy_status,
+                last_visit_date = EXCLUDED.last_visit_date,
                 land_area_m2 = EXCLUDED.land_area_m2,
                 land_area_ha = EXCLUDED.land_area_ha,
+                built_area_m2 = EXCLUDED.built_area_m2,
+                department = EXCLUDED.department,
+                municipality = EXCLUDED.municipality,
+                address = EXCLUDED.address,
                 editorial_status = 'published',
                 availability = 'Disponible',
                 updated_at = NOW();
         """
-        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"
         execute_values(cur, insert_sql, batch_params, template=template)
-        print(f" -> Se procesaron e insertaron en lote {len(batch_params)} filas desde Excel.", flush=True)
+        print(f" -> Se procesaron e insertaron con UPSERT {len(batch_params)} predios estratégicos desde Excel.", flush=True)
     else:
         print(f" -> No se encontró {EXCEL_PATH}, continuando solo con canónicos.", flush=True)
 
-    # Final Verification Query
+    # 3. Final Verification & Metrics Report
     cur.execute("SELECT COUNT(*) FROM public.properties;")
     total = cur.fetchone()[0]
+    
     cur.execute("SELECT COUNT(*) FROM public.properties WHERE editorial_status = 'published' AND availability <> 'Archivado';")
     public_visible = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM public.properties WHERE commercial_appraisal_cop > 0;")
+    cnt_avaluo = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM public.properties WHERE monthly_rent_estimate_cop > 0 OR monthly_rent_cop > 0;")
+    cnt_renta = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM public.properties WHERE sale_price_cop > 0;")
+    cnt_sale = cur.fetchone()[0]
 
     cur.execute("SELECT asset_type, count(*) FROM public.properties GROUP BY asset_type ORDER BY count(*) DESC;")
     by_asset_type = cur.fetchall()
 
+    cur.execute("SELECT municipality, count(*) FROM public.properties GROUP BY municipality ORDER BY count(*) DESC;")
+    by_muni = cur.fetchall()
+
+    cur.execute("SELECT occupancy_status, count(*) FROM public.properties GROUP BY occupancy_status ORDER BY count(*) DESC;")
+    by_occupancy = cur.fetchall()
+
     print("\n==================================================")
-    print(" INGESTIÓN Y VERIFICACIÓN DE BASE DE DATOS FINAL")
-    print(f" Total registros en public.properties: {total}")
-    print(f" Total visibles públicamente (published & !Archivado): {public_visible}")
-    print(" Desglose por Tipo de Activo (asset_type):")
+    print(" MÉTRICAS FINALES DE INGESTIÓN EN PRODUCCIÓN SUPABASE")
+    print("==================================================")
+    print(f" Total registros persistidos en public.properties: {total}")
+    print(f" Total visibles públicamente: {public_visible}")
+    print(f" Predios con Avalúo Comercial (>0): {cnt_avaluo}")
+    print(f" Predios con Canon de Renta (>0): {cnt_renta}")
+    print(f" Predios con Precio de Venta asignado: {cnt_sale}")
+    
+    print("\n Desglose por Estado de Ocupación:")
+    for occ, cnt in by_occupancy:
+        print(f"   - {occ or 'Sin especificar'}: {cnt}")
+
+    print("\n Desglose por Tipo de Activo (asset_type):")
     for at, cnt in by_asset_type:
         print(f"   - {at}: {cnt}")
+
+    print("\n Desglose por Municipio Estratégico:")
+    for m, cnt in by_muni:
+        print(f"   - {m}: {cnt}")
     print("==================================================", flush=True)
 
     conn.close()

@@ -196,9 +196,38 @@ export const ExecutiveDossierModal: React.FC = () => {
 
           {/* Consolidated Executive Metrics Summary */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#242321] tracking-wider uppercase font-mono border-b border-[#E5E1D8] pb-2">
-              1. Resumen Consolidado del Portafolio
-            </h3>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#E5E1D8] pb-2 gap-2">
+              <h3 className="text-sm font-semibold text-[#242321] tracking-wider uppercase font-mono">
+                1. Resumen Consolidado del Portafolio
+              </h3>
+              
+              {/* Occupancy Status Badges */}
+              {selectedProperties.length > 0 && (
+                <div className="flex items-center gap-1.5 text-[11px] font-mono">
+                  {Object.entries(
+                    selectedProperties.reduce((acc, p) => {
+                      const st = p.occupancyStatus || 'Sin especificar';
+                      acc[st] = (acc[st] || 0) + 1;
+                      return acc;
+                    }, {} as Record<string, number>)
+                  ).map(([status, count]) => (
+                    <span
+                      key={status}
+                      className={`px-2 py-0.5 rounded font-bold border ${
+                        status === 'Desocupado'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                          : status === 'Ocupado'
+                          ? 'bg-amber-50 text-amber-800 border-amber-300'
+                          : 'bg-teal-50 text-teal-800 border-teal-300'
+                      }`}
+                    >
+                      {count} {status}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
               <div className="p-4 bg-[#F8F7F2] rounded-xl border border-[#E5E1D8]">
                 <div className="text-2xl font-bold font-mono text-[#1E3A2F]">{summary.propertyCount}</div>
@@ -213,15 +242,15 @@ export const ExecutiveDossierModal: React.FC = () => {
               </div>
               <div className="p-4 bg-[#F8F7F2] rounded-xl border border-[#E5E1D8]">
                 <div className="text-lg font-bold font-mono text-[#1E3A2F]">
-                  {summary.hasSale ? formatCurrency(summary.totalSalePrice) : 'N/A'}
+                  {summary.hasSale || summary.totalSalePrice > 0 ? formatCurrency(summary.totalSalePrice) : 'N/A'}
                 </div>
-                <div className="text-xs text-[#6B6A63] font-medium mt-1">Total Venta Estimado</div>
+                <div className="text-xs text-[#6B6A63] font-medium mt-1">Total Venta Estimada</div>
               </div>
               <div className="p-4 bg-[#F8F7F2] rounded-xl border border-[#E5E1D8]">
                 <div className="text-lg font-bold font-mono text-[#0F766E]">
-                  {summary.hasRent ? `${formatCurrency(summary.totalMonthlyRent)}/m` : 'N/A'}
+                  {summary.hasRent || summary.totalMonthlyRent > 0 ? `${formatCurrency(summary.totalMonthlyRent)}/mes` : 'N/A'}
                 </div>
-                <div className="text-xs text-[#6B6A63] font-medium mt-1">Canon Arriendo Estimado</div>
+                <div className="text-xs text-[#6B6A63] font-medium mt-1">Canon Mensual Consolidado</div>
               </div>
             </div>
           </div>
@@ -251,6 +280,17 @@ export const ExecutiveDossierModal: React.FC = () => {
                         <span className="text-xs font-medium px-2 py-0.5 bg-white text-[#242321] border border-[#E5E1D8] rounded">
                           {prop.assetType}
                         </span>
+                        {prop.occupancyStatus && (
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded border ${
+                            prop.occupancyStatus === 'Desocupado'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              : prop.occupancyStatus === 'Ocupado'
+                              ? 'bg-amber-50 text-amber-800 border-amber-300'
+                              : 'bg-teal-50 text-teal-800 border-teal-300'
+                          }`}>
+                            {prop.occupancyStatus}
+                          </span>
+                        )}
                       </div>
                       <h4 className="font-serif text-lg font-bold text-[#242321]">
                         {prop.title}
@@ -264,10 +304,11 @@ export const ExecutiveDossierModal: React.FC = () => {
                     <div className="text-left sm:text-right font-mono">
                       <div className="text-xs text-[#6B6A63]">Valor / Canon Comercial</div>
                       <div className="text-lg font-bold text-[#1E3A2F] font-serif">
-                        {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
-                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/mes`}
-                        {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
-                        {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
+                        {prop.salePriceCop
+                          ? formatCurrency(prop.salePriceCop)
+                          : (prop.monthlyRentCop || prop.monthlyRentEstimateCop)
+                          ? `Renta: ${formatCurrency(prop.monthlyRentCop || prop.monthlyRentEstimateCop)}/mes`
+                          : 'Regulada SAE'}
                       </div>
                     </div>
                   </div>

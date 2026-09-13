@@ -79,6 +79,17 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border backdrop-blur-md ${legalBadge.bgClass} ${legalBadge.textClass} ${legalBadge.borderClass}`}>
               {legalBadge.label}
             </span>
+            {property.occupancyStatus && (
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border backdrop-blur-md ${
+                property.occupancyStatus === 'Desocupado'
+                  ? 'bg-emerald-600/90 text-white border-emerald-400'
+                  : property.occupancyStatus === 'Ocupado'
+                  ? 'bg-amber-600/90 text-white border-amber-400'
+                  : 'bg-teal-600/90 text-white border-teal-400'
+              }`}>
+                {property.occupancyStatus}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -213,13 +224,23 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         {/* Price & Action Buttons */}
         <div className="pt-3 border-t border-[#E5E1D8] space-y-3">
           <div className="flex justify-between items-baseline">
-            <span className="text-xs text-[#6B6A63] font-mono">Valor Comercial:</span>
-            <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono">
-              {property.modality === 'Venta' && formatCurrency(property.salePriceCop)}
-              {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRentCop)}/mes`}
-              {property.modality === 'Custodia SAE' && 'Regulada SAE'}
-              {property.modality === 'Inversión' && formatCurrency(property.salePriceCop || property.estimatedValueCop)}
+            <span className="text-xs text-[#6B6A63] font-mono">
+              {property.salePriceCop ? 'Precio Venta:' : (property.monthlyRentCop || property.monthlyRentEstimateCop) ? 'Renta Mensual:' : 'Valor Comercial:'}
             </span>
+            <div className="text-right">
+              <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono block">
+                {property.salePriceCop
+                  ? formatCurrency(property.salePriceCop)
+                  : (property.monthlyRentCop || property.monthlyRentEstimateCop)
+                  ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
+                  : 'Regulada SAE'}
+              </span>
+              {!property.salePriceCop && property.estimatedValueCop && property.estimatedValueCop > 0 && (
+                <span className="text-[10px] text-[#0F766E] font-mono bg-[#EEF4EF] px-1.5 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-0.5 font-bold">
+                  Capitalización: ~{formatCurrency(property.estimatedValueCop)}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 pt-1">

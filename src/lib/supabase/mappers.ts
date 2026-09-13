@@ -42,6 +42,10 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
     salePriceCop: parseNum(row.sale_price_cop),
     monthlyRentCop: parseNum(row.monthly_rent_cop),
     estimatedValueCop: parseNum(row.estimated_value_cop),
+    commercialAppraisalCop: parseNum(row.commercial_appraisal_cop),
+    monthlyRentEstimateCop: parseNum(row.monthly_rent_estimate_cop),
+    occupancyStatus: row.occupancy_status ? String(row.occupancy_status) : undefined,
+    lastVisitDate: row.last_visit_date ? String(row.last_visit_date).split('T')[0] : undefined,
 
     landAreaM2,
     landAreaHa,

@@ -101,19 +101,21 @@ export const DossierProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (p.landAreaHa) totalAreaHa += p.landAreaHa;
       if (p.landAreaM2) totalAreaM2 += p.landAreaM2;
 
-      if (p.modality === 'Venta') {
+      const saleVal = p.salePriceCop || p.commercialAppraisalCop || p.estimatedValueCop || 0;
+      const rentVal = p.monthlyRentCop || p.monthlyRentEstimateCop || 0;
+
+      if (saleVal > 0) {
         hasSale = true;
-        if (p.salePriceCop) totalSalePrice += p.salePriceCop;
-      } else if (p.modality === 'Arriendo') {
+        totalSalePrice += saleVal;
+      }
+
+      if (rentVal > 0) {
         hasRent = true;
-        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
-      } else if (p.modality === 'Custodia SAE') {
+        totalMonthlyRent += rentVal;
+      }
+
+      if (p.modality === 'Custodia SAE') {
         hasCustody = true;
-        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
-      } else if (p.modality === 'Inversión') {
-        if (p.salePriceCop) totalSalePrice += p.salePriceCop;
-        if (p.monthlyRentCop) totalMonthlyRent += p.monthlyRentCop;
-        hasSale = true;
       }
     });
 

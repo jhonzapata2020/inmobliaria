@@ -59,36 +59,74 @@
 
 /* Strict Print Isolation for Executive Dossier */
 @media print {
-  /* Hide all website DOM elements by default */
-  body * {
-    visibility: hidden;
+  /* Collapse main page content, navigation, headers and footers to 0px height */
+  main,
+  header,
+  footer,
+  nav,
+  aside,
+  .no-print,
+  [data-radix-portal] {
+    display: none !important;
   }
 
-  /* Exclusively render the dossier printable area and its children */
-  #dossier-printable-area,
-  #dossier-printable-area * {
-    visibility: visible;
+  /* Reset body and html layout */
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Position printable container at origin of paper */
+  /* Modal Backdrop & Container Print Reset */
+  .executive-dossier-backdrop {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .executive-dossier-card {
+    position: static !important;
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+    background: white !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* The printable container */
   #dossier-printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 10mm;
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
     background: white !important;
     color: black !important;
     box-shadow: none !important;
     border: none !important;
   }
 
-  /* Hide interactive controls and buttons during print */
-  .no-print,
-  button,
-  .dossier-close-btn,
-  .dossier-actions {
+  /* Hide interactive form controls inside the dossier during print */
+  #dossier-printable-area form,
+  #dossier-printable-area select,
+  #dossier-printable-area button,
+  #dossier-printable-area .no-print {
     display: none !important;
   }
 

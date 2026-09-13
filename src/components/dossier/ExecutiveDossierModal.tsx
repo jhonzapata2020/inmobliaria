@@ -49,8 +49,8 @@ export const ExecutiveDossierModal: React.FC = () => {
   });
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-4 sm:p-6 md:p-10 flex justify-center animate-in fade-in duration-200">
-      <div className="bg-white text-[#242321] w-full max-w-4xl rounded-2xl shadow-2xl border border-[#E5E1D8] flex flex-col my-auto overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-4 sm:p-6 md:p-10 flex justify-center animate-in fade-in duration-200 executive-dossier-backdrop print:static print:bg-white print:p-0 print:m-0 print:overflow-visible">
+      <div className="bg-white text-[#242321] w-full max-w-4xl rounded-2xl shadow-2xl border border-[#E5E1D8] flex flex-col my-auto overflow-hidden executive-dossier-card print:static print:shadow-none print:border-none print:overflow-visible">
         
         {/* Modal Top Action Bar */}
         <div className="p-4 bg-[#F8F7F2] border-b border-[#E5E1D8] flex items-center justify-between no-print print:hidden">

@@ -163,13 +163,21 @@ export default function PropertyDetailPage() {
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             {/* Price Tag */}
             <div className="bg-white border border-[#E5E1D8] p-4 rounded-2xl text-left font-mono shadow-sm">
-              <div className="text-xs text-[#6B6A63]">Valor / Canon Comercial</div>
-              <div className="text-2xl font-bold text-[#1E3A2F] font-serif">
-                {property.modality === 'Venta' && formatCurrency(property.salePriceCop)}
-                {property.modality === 'Arriendo' && `${formatCurrency(property.monthlyRentCop)}/mes`}
-                {property.modality === 'Custodia SAE' && 'Regulada SAE'}
-                {property.modality === 'Inversión' && formatCurrency(property.salePriceCop || property.estimatedValueCop)}
+              <div className="text-xs text-[#6B6A63]">
+                {property.code.startsWith('DAR-EXCEL-') ? 'Ref. Comercial / Valor Estimado' : 'Valor / Canon Comercial'}
               </div>
+              <div className="text-xl sm:text-2xl font-bold text-[#1E3A2F] font-serif">
+                {property.salePriceCop || property.estimatedValueCop
+                  ? formatCurrency(property.salePriceCop || property.estimatedValueCop)
+                  : (property.monthlyRentCop || property.monthlyRentEstimateCop)
+                  ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
+                  : 'Valoración Bajo Solicitud / En Estudio Técnico'}
+              </div>
+              {!property.salePriceCop && property.estimatedValueCop && property.estimatedValueCop > 0 && (
+                <div className="text-xs text-[#0F766E] font-mono bg-[#EEF4EF] px-2 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-1 font-bold">
+                  Capitalización Estimada: ~{formatCurrency(property.estimatedValueCop)}
+                </div>
+              )}
             </div>
 
             {/* Dossier Toggle CTA */}

@@ -41,6 +41,50 @@ STRATEGIC_WHITELIST_MAP = {
     'JURADO': ('Juradó', 'Chocó')
 }
 
+RUIN_TERMS = ['AMENAZA DE RUINA', 'MAL ESTADO', 'INHABITABLE', 'DEMOLICION', 'SOLO MEJORAS DETERIORADAS', 'RUINA', 'DETERIORADO']
+STRATEGIC_TERMS = ['MAR', 'PLAYA', 'LITORAL', 'COSTERO', 'TRONCAL', 'RUTA NACIONAL', 'CARRETERA', 'CORREDOR']
+
+# Curated regional tropical image pools per asset type
+IMAGE_POOLS = {
+    "Finca": [
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1500076656116-558758c991c1?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1527842891421-42eec6e703ea?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Lote": [
+        "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Casa": [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Apartamento": [
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Local": [
+        "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Bodega": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Edificio": [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "Oficina": [
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop"
+    ]
+}
+
 def strip_accents(s):
     if not isinstance(s, str):
         return ""
@@ -147,7 +191,7 @@ def format_title(asset_type, dir_val, desc_val, id_act, muni_name):
 
 def main():
     print("==================================================")
-    print(" INGESTIÓN Y ACTUALIZACIÓN FINANCIERA EN public.properties")
+    print(" MOTOR DE VALORACIÓN CONTEXTUAL & INGESTIÓN SUPABASE")
     print("==================================================")
 
     conn = psycopg2.connect(DB_URL)
@@ -199,7 +243,7 @@ def main():
             "occupancy_status": "Desocupado",
             "images": [
                 "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1200&auto=format&fit=crop"
+                "https://images.unsplash.com/photo-1500076656116-558758c991c1?q=80&w=1200&auto=format&fit=crop"
             ],
             "featured_image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop",
             "latitude": 8.5562,
@@ -420,7 +464,7 @@ def main():
             "title": "Lote Comercial & EDS - Troncal Ruta 74",
             "short_description": "Lote plano de 2 Ha sobre la Ruta Nacional 74. Ideal para Estación de Servicio (EDS), parador logístico de transporte pesado o centro de acopio.",
             "description": "Excelente lote comercial de 2 Hectáreas (20.000 m2) ubicado sobre el corredor vial de la Ruta Nacional 74 en Los Córdobas, Córdoba. Topografía 100% plana a ras de calzada, con frente amplio sobre la vía pavimentada. Ideal para desarrollos logísticos, estaciones de servicio (EDS), estaciones de descanso o centros de distribución agroindustrial.",
-            "opportunity_analysis": "Frente a carretera troncal pavimentada de alto tráfico vehicular entre Urabá y Córdoba. Topografía plana a ras de calzada con visual despejada.",
+            "opportunity_analysis": "Predio con frente estratégico de alta plusvalía y conectividad sobre eje vial/costero.",
             "asset_type": "Lote",
             "modality": "Venta",
             "sale_price_cop": 500000000,
@@ -444,9 +488,9 @@ def main():
             "access_roads": "Acceso directo sobre vía troncal pavimentada.",
             "public_services": ["Energía eléctrica", "Cobertura celular 4G"],
             "images": [
-                "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"
+                "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=1200&auto=format&fit=crop"
             ],
-            "featured_image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"
+            "featured_image": "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=1200&auto=format&fit=crop"
         },
         {
             "code": "DAR-SJU-012",
@@ -454,7 +498,7 @@ def main():
             "title": "Lote Costero & Comercial con Playa - Ruta 90",
             "short_description": "Predio mixto de 4 Ha con 100 m sobre Ruta 90 y 100 m lineales de orilla de playa natural sobre el Mar Caribe.",
             "description": "Ubicación privilegiada de 4 Hectáreas (40.000 m2) en San Juan de Urabá con doble vocación: frente de 100 metros sobre la Ruta Nacional 90 y salida directa de 100 metros a orilla de playa en el Mar Caribe. Configuración excepcional para proyecto ecoturístico, parador comercial de servicio o inversión patrimonial de alta valorización.",
-            "opportunity_analysis": "Potencial dual: frente vial apto para Estación de Servicio o parador comercial 24h, y zona posterior costera apta para complejo ecoturístico o cabañas.",
+            "opportunity_analysis": "Predio con frente estratégico de alta plusvalía y conectividad sobre eje vial/costero.",
             "asset_type": "Lote",
             "modality": "Venta",
             "sale_price_cop": 1000000000,
@@ -655,6 +699,10 @@ def main():
         print(f" -> Predios de Municipios Estratégicos (deduplicados): {len(dedup_df)}")
 
         batch_params = []
+        ruin_count = 0
+        strategic_count = 0
+        no_data_count = 0
+
         for idx_count, (_, row) in enumerate(dedup_df.iterrows()):
             id_act = str(row[id_col]).strip()
             code = f"DAR-EXCEL-{id_act}"
@@ -668,9 +716,11 @@ def main():
             vereda_val = sanitize_text(row.get(vereda_col))
             asset_type_raw = row.get(class_col)
 
+            text_combined = strip_accents(f"{dir_val} {desc_val}")
+
             asset_type = normalize_asset_type(asset_type_raw, dir_val, desc_val)
 
-            # Urban title composition logic:
+            # Title composition logic:
             title = format_title(asset_type, dir_val, desc_val, id_act, muni_canonical)
 
             area_m2 = sanitize_num(row.get(area_m2_col))
@@ -685,18 +735,50 @@ def main():
 
             venta_raw = strip_accents(str(row.get(venta_col)))
 
-            # Financial Assignment Logic (Market Reference Policy)
+            # Semantic Analysis Flags
+            is_ruin = any(term in text_combined for term in RUIN_TERMS)
+            is_strategic = any(term in text_combined for term in STRATEGIC_TERMS)
+            has_physical_data = any(v is not None and v > 0 for v in [area_m2, built_m2, avaluo_com, avaluo_cat, renta_est])
+
+            # Contextual Valuation Engine Rules
             sale_price_cop = None
             monthly_rent_cop = None
             estimated_value_cop = None
             modality = "Custodia SAE"
+            opp_analysis = f"Activo estratégico ubicado en {muni_canonical}, {dept_canonical}."
 
-            if avaluo_com and avaluo_com > 0:
+            if not has_physical_data:
+                # Rule 4: No physical data recorded -> Set NULL, display "Valoración Bajo Solicitud / En Estudio Técnico"
+                no_data_count += 1
+                sale_price_cop = None
+                estimated_value_cop = None
+                monthly_rent_cop = None
+                opp_analysis = "Predio en estudio técnico y deslinde catastral; valoración comercial bajo solicitud."
+                modality = "Custodia SAE"
+            elif is_ruin:
+                # Rule 1: Ruin / Obsolescence Detection -> Value Land Only
+                ruin_count += 1
+                if area_m2 and area_m2 > 0:
+                    estimated_value_cop = round(area_m2 * 250000, -6)
+                else:
+                    estimated_value_cop = 25000000
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+                opp_analysis = "Inmueble con potencial sobre terreno; construcción existente en estado de obsolescencia o ruina."
+            elif avaluo_com and avaluo_com > 0:
                 sale_price_cop = avaluo_com
                 estimated_value_cop = avaluo_com
                 if renta_est and renta_est > 0:
                     monthly_rent_cop = renta_est
                 modality = "Venta"
+                opp_analysis = "Predio con avalúo comercial previo validado."
+            elif is_strategic and area_ha and area_ha > 0:
+                # Rule 2: Strategic Location Plusvalía (Troncal Road / Coastal Beachfront)
+                strategic_count += 1
+                estimated_value_cop = round(area_ha * 200000000, -6) # $200M COP / Ha plusvalía rate
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+                opp_analysis = "Predio con frente estratégico de alta plusvalía y conectividad sobre eje vial/costero."
             elif renta_est and renta_est > 0:
                 monthly_rent_cop = renta_est
                 estimated_value_cop = round(renta_est / 0.006, -6)
@@ -705,30 +787,46 @@ def main():
                 else:
                     modality = "Venta"
                     sale_price_cop = estimated_value_cop
+                opp_analysis = "Renta estabilizada con potencial de capitalización."
+            elif area_ha and area_ha >= 1.0:
+                # Traditional rural farm: $40M COP / Ha
+                estimated_value_cop = round(area_ha * 40000000, -6)
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+                opp_analysis = "Vocación agropecuaria con área rural homogénea."
             elif avaluo_cat and avaluo_cat > 0:
+                # Cadastral multiplier 1.8x
                 estimated_value_cop = round(avaluo_cat * 1.8, -6)
                 sale_price_cop = estimated_value_cop
                 modality = "Venta"
-            elif area_ha and area_ha >= 1.0:
-                # Rural property with 1+ Hectares: $45M COP / Ha market reference
-                estimated_value_cop = round(area_ha * 45000000, -6)
-                sale_price_cop = estimated_value_cop
-                modality = "Venta"
             elif built_m2 and built_m2 > 0:
-                # Built area estimation: $2.5M COP / m2
+                # Built area urban estimation $2.5M COP / m2
                 estimated_value_cop = round(built_m2 * 2500000, -6)
                 sale_price_cop = estimated_value_cop
                 modality = "Venta"
             elif area_m2 and area_m2 > 0:
-                # Urban lot area estimation: $350k COP / m2
+                # Urban lot m2 estimation $350k COP / m2
                 estimated_value_cop = round(area_m2 * 350000, -6)
                 sale_price_cop = estimated_value_cop
                 modality = "Venta"
             else:
-                # Fallback opportunity reference
-                estimated_value_cop = 250000000
-                sale_price_cop = 250000000
+                # Rule 3: Market Floor Price
+                estimated_value_cop = 45000000
+                sale_price_cop = 45000000
                 modality = "Venta"
+
+            # Enforce Market Floor Prices for valued properties:
+            if estimated_value_cop and not is_ruin:
+                if asset_type in ["Casa", "Apartamento", "Local", "Bodega", "Edificio", "Oficina"]:
+                    if estimated_value_cop < 45000000:
+                        estimated_value_cop = 45000000
+                        if sale_price_cop:
+                            sale_price_cop = 45000000
+                elif asset_type in ["Lote", "Terreno"]:
+                    if estimated_value_cop < 20000000:
+                        estimated_value_cop = 20000000
+                        if sale_price_cop:
+                            sale_price_cop = 20000000
 
             cadastral_id = sanitize_text(row.get(catastral_id_col), "")
             registry_folio = sanitize_text(row.get(folio_col), "")
@@ -743,32 +841,38 @@ def main():
             short_desc = desc_val[:200] if desc_val else f"{asset_type} inventariado en {muni_canonical}, {dept_canonical}."
             full_desc = desc_val if desc_val else f"{asset_type} ubicado en {muni_canonical}, bajo inventario y administración territorial."
 
+            # Image curation: assign tropical regional images deterministically
+            type_pool = IMAGE_POOLS.get(asset_type, IMAGE_POOLS["Finca"])
+            feat_img = type_pool[idx_count % len(type_pool)]
+            img_list = [feat_img]
+
             batch_params.append((
-                code, slug, title, short_desc, full_desc,
+                code, slug, title, short_desc, full_desc, opp_analysis,
                 asset_type, modality, True, id_act, registry_folio,
                 sale_price_cop, monthly_rent_cop, estimated_value_cop,
                 avaluo_com, renta_est, occupancy_status, last_visit,
                 area_m2, area_ha, built_m2,
                 dept_canonical, muni_canonical, vereda_val if vereda_val else None, vereda_val if vereda_val else None, address_str,
                 lat, lng, registry_folio, cadastral_id, legal_status,
-                'published', 'Disponible', False, False
+                'published', 'Disponible', False, False, img_list, feat_img
             ))
 
         insert_sql = """
             INSERT INTO public.properties (
-                code, slug, title, short_description, description,
+                code, slug, title, short_description, description, opportunity_analysis,
                 asset_type, modality, is_sae, sae_id_activo, folio_matricula,
                 sale_price_cop, monthly_rent_cop, estimated_value_cop,
                 commercial_appraisal_cop, monthly_rent_estimate_cop, occupancy_status, last_visit_date,
                 land_area_m2, land_area_ha, built_area_m2,
                 department, municipality, sector_vereda, vereda, address,
                 latitude, longitude, matricula_inmobiliaria, cedula_catastral, legal_status,
-                editorial_status, availability, is_featured, is_investment_opportunity, updated_at
+                editorial_status, availability, is_featured, is_investment_opportunity, images, featured_image, updated_at
             ) VALUES %s
             ON CONFLICT (code) DO UPDATE SET
                 title = EXCLUDED.title,
                 short_description = EXCLUDED.short_description,
                 description = EXCLUDED.description,
+                opportunity_analysis = EXCLUDED.opportunity_analysis,
                 asset_type = EXCLUDED.asset_type,
                 modality = EXCLUDED.modality,
                 sale_price_cop = EXCLUDED.sale_price_cop,
@@ -786,9 +890,11 @@ def main():
                 address = EXCLUDED.address,
                 editorial_status = 'published',
                 availability = 'Disponible',
+                images = EXCLUDED.images,
+                featured_image = EXCLUDED.featured_image,
                 updated_at = NOW();
         """
-        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"
         execute_values(cur, insert_sql, batch_params, template=template)
         print(f" -> Se procesaron e insertaron con UPSERT {len(batch_params)} predios estratégicos desde Excel.", flush=True)
     else:
@@ -810,6 +916,9 @@ def main():
     cur.execute("SELECT COUNT(*) FROM public.properties WHERE sale_price_cop > 0 OR estimated_value_cop > 0;")
     cnt_sale = cur.fetchone()[0]
 
+    cur.execute("SELECT COUNT(*) FROM public.properties WHERE sale_price_cop IS NULL AND estimated_value_cop IS NULL AND monthly_rent_cop IS NULL;")
+    cnt_no_price = cur.fetchone()[0]
+
     cur.execute("SELECT asset_type, count(*) FROM public.properties GROUP BY asset_type ORDER BY count(*) DESC;")
     by_asset_type = cur.fetchall()
 
@@ -820,13 +929,14 @@ def main():
     by_occupancy = cur.fetchall()
 
     print("\n==================================================")
-    print(" MÉTRICAS FINALES DE INGESTIÓN EN PRODUCCIÓN SUPABASE")
+    print(" MÉTRICAS FINALES DEL MOTOR DE VALORACIÓN CONTEXTUAL")
     print("==================================================")
     print(f" Total registros persistidos en public.properties: {total}")
     print(f" Total visibles públicamente: {public_visible}")
     print(f" Predios con Avalúo Comercial (>0): {cnt_avaluo}")
     print(f" Predios con Canon de Renta (>0): {cnt_renta}")
-    print(f" Predios con Valor de Referencia Comercial asignado (>0): {cnt_sale}")
+    print(f" Predios con Valoración Comercial asignada (>0): {cnt_sale}")
+    print(f" Predios Sin Datos Físicos (Bajo Solicitud / En Estudio): {cnt_no_price}")
     
     print("\n Desglose por Estado de Ocupación:")
     for occ, cnt in by_occupancy:

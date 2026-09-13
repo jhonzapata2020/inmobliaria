@@ -235,7 +235,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   ? formatCurrency(property.salePriceCop || property.estimatedValueCop)
                   : (property.monthlyRentCop || property.monthlyRentEstimateCop)
                   ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
-                  : 'Regulada SAE'}
+                  : 'Valoración Bajo Solicitud / En Estudio Técnico'}
               </span>
               {!property.salePriceCop && property.estimatedValueCop && property.estimatedValueCop > 0 && (
                 <span className="text-[10px] text-[#0F766E] font-mono bg-[#EEF4EF] px-1.5 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-0.5 font-bold">

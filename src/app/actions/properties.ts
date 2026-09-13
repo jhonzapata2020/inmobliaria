@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient, createAdminClient } from '../../lib/supabase/server';
 import { mapDbToProperty } from '../../lib/supabase/mappers';
 import { Property, PropertyFilterState } from '../../types/property';
-import { requireAdmin } from '../../lib/auth/requireAdmin';
+import { requireAdmin, INVENTORY_ROLES } from '../../lib/auth/requireAdmin';
 import { ActionResponse } from '../../types/action-response';
 
 export type { ActionResponse };
@@ -126,7 +126,7 @@ export async function getPropertyBySlug(slugOrId: string): Promise<Property | nu
 
 export async function getAdminPropertyBySlug(slugOrId: string): Promise<ActionResponse<Property | null>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(INVENTORY_ROLES);
     if (!auth.authorized) {
       return {
         success: false,
@@ -165,7 +165,7 @@ export async function getAdminPropertyBySlug(slugOrId: string): Promise<ActionRe
 
 export async function getAllPropertiesAdmin(): Promise<ActionResponse<Property[]>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(INVENTORY_ROLES);
     if (!auth.authorized) {
       return {
         success: false,
@@ -195,7 +195,7 @@ export async function getAllPropertiesAdmin(): Promise<ActionResponse<Property[]
 
 export async function upsertPropertyAction(formData: Partial<Property>): Promise<ActionResponse<Property>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(INVENTORY_ROLES);
     if (!auth.authorized) {
       return {
         success: false,
@@ -302,7 +302,7 @@ export async function upsertPropertyAction(formData: Partial<Property>): Promise
 
 export async function deletePropertyAction(id: string): Promise<ActionResponse<void>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(INVENTORY_ROLES);
     if (!auth.authorized) {
       return {
         success: false,

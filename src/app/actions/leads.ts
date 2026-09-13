@@ -4,12 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '../../lib/supabase/server';
 import { mapDbToLead } from '../../lib/supabase/mappers';
 import { Lead, CRMStage } from '../../types/crm';
-import { requireAdmin } from '../../lib/auth/requireAdmin';
+import { requireAdmin, CRM_ROLES } from '../../lib/auth/requireAdmin';
 import { ActionResponse } from '../../types/action-response';
 
 export async function getLeadsAction(): Promise<ActionResponse<Lead[]>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(CRM_ROLES);
     if (!auth.authorized) {
       return {
         success: false,
@@ -39,7 +39,7 @@ export async function getLeadsAction(): Promise<ActionResponse<Lead[]>> {
 
 export async function updateLeadStageAction(leadId: string, newStage: CRMStage): Promise<ActionResponse<void>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(CRM_ROLES);
     if (!auth.authorized) {
       return {
         success: false,
@@ -73,7 +73,7 @@ export async function updateLeadStageAction(leadId: string, newStage: CRMStage):
 
 export async function createLeadAction(leadData: Partial<Lead>): Promise<ActionResponse<Lead>> {
   try {
-    const auth = await requireAdmin();
+    const auth = await requireAdmin(CRM_ROLES);
     if (!auth.authorized) {
       return {
         success: false,

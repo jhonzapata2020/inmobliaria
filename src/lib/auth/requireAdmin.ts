@@ -4,9 +4,10 @@ export type AdminCheckResult =
   | { authorized: true; user: any; role: string }
   | { authorized: false; reason: 'UNAUTHENTICATED' | 'FORBIDDEN'; message: string };
 
-const AUTHORIZED_ROLES = ['admin', 'inventory_manager', 'legal', 'sales'];
+export const INVENTORY_ROLES = ['admin', 'inventory_manager', 'legal'];
+export const CRM_ROLES = ['admin', 'inventory_manager', 'legal', 'sales'];
 
-export async function requireAdmin(): Promise<AdminCheckResult> {
+export async function requireAdmin(allowedRoles: string[] = INVENTORY_ROLES): Promise<AdminCheckResult> {
   try {
     const supabase = await createClient();
     const {
@@ -18,30 +19,34 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
       return {
         authorized: false,
         reason: 'UNAUTHENTICATED',
-        message: 'Sesión no iniciada. Por favor inicie sesión como administrador.'
+        message: 'Sesión no iniciada. Por favor inicie sesión como usuario autorizado.'
       };
     }
 
-    // Try fetching role from public.profiles table
+    // Query public.profiles table for role and is_active
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, is_active')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     let userRole = profile?.role;
-    let isActive = profile?.is_active ?? true;
+    let isActive = profile?.is_active;
 
-    // Fallback to app_metadata or user_metadata if profile table record is not present
+    // Server-managed fallback ONLY to app_metadata (never user_metadata)
     if (!userRole) {
-      userRole = user.app_metadata?.role || user.user_metadata?.role || 'admin';
+      userRole = user.app_metadata?.role;
+      if (userRole) {
+        isActive = true;
+      }
     }
 
-    if (!isActive || !AUTHORIZED_ROLES.includes(userRole)) {
+    // Reject explicitly if missing, inactive, or role not in allowedRoles
+    if (!userRole || isActive !== true || !allowedRoles.includes(userRole)) {
       return {
         authorized: false,
         reason: 'FORBIDDEN',
-        message: 'No posee permisos administrativos suficientes para realizar esta acción.'
+        message: 'No posee permisos suficientes o su perfil de usuario no se encuentra activo.'
       };
     }
 
@@ -50,12 +55,12 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
       user,
       role: userRole
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Unexpected error in requireAdmin:', err);
     return {
       authorized: false,
       reason: 'UNAUTHENTICATED',
-      message: 'Error de verificación de credenciales.'
+      message: 'Error inesperado durante la verificación de credenciales.'
     };
   }
 }

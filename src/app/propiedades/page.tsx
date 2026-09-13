@@ -29,11 +29,13 @@ function PropiedadesCatalogContent() {
     maxPrice: searchParams.get('maxPrice') || '',
     minArea: searchParams.get('minArea') || '',
     maxArea: searchParams.get('maxArea') || '',
+    minAreaHa: searchParams.get('minAreaHa') || '',
+    maxAreaHa: searchParams.get('maxAreaHa') || '',
     legalStatus: searchParams.get('legalStatus') || '',
     potentialUse: searchParams.get('potentialUse') || '',
     availability: '',
     isInvestmentOpportunity: searchParams.get('isInvestmentOpportunity') === 'true',
-    sortBy: 'recent'
+    sortBy: searchParams.get('sortBy') || 'recent'
   });
 
   const showOnlyFavorites = searchParams.get('favorites') === 'true';
@@ -77,8 +79,11 @@ function PropiedadesCatalogContent() {
     if (filters.maxPrice) params.set('maxPrice', String(filters.maxPrice));
     if (filters.minArea) params.set('minArea', String(filters.minArea));
     if (filters.maxArea) params.set('maxArea', String(filters.maxArea));
+    if (filters.minAreaHa) params.set('minAreaHa', String(filters.minAreaHa));
+    if (filters.maxAreaHa) params.set('maxAreaHa', String(filters.maxAreaHa));
     if (filters.legalStatus) params.set('legalStatus', filters.legalStatus);
     if (filters.isInvestmentOpportunity) params.set('isInvestmentOpportunity', 'true');
+    if (filters.sortBy && filters.sortBy !== 'recent') params.set('sortBy', filters.sortBy);
     if (showOnlyFavorites) params.set('favorites', 'true');
 
     const queryString = params.toString();
@@ -97,6 +102,8 @@ function PropiedadesCatalogContent() {
       maxPrice: '',
       minArea: '',
       maxArea: '',
+      minAreaHa: '',
+      maxAreaHa: '',
       legalStatus: '',
       potentialUse: '',
       availability: '',

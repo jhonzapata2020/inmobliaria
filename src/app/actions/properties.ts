@@ -94,6 +94,20 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         }
       }
 
+      if (filters.minAreaHa) {
+        const aMinHa = Number(filters.minAreaHa);
+        if (!isNaN(aMinHa) && aMinHa > 0) {
+          query = query.gte('land_area_ha', aMinHa);
+        }
+      }
+
+      if (filters.maxAreaHa) {
+        const aMaxHa = Number(filters.maxAreaHa);
+        if (!isNaN(aMaxHa) && aMaxHa > 0) {
+          query = query.lte('land_area_ha', aMaxHa);
+        }
+      }
+
       if (filters.legalStatus && filters.legalStatus !== 'all') {
         query = query.ilike('legal_status', `%${filters.legalStatus}%`);
       }
@@ -111,8 +125,10 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         query = query.order('sale_price_cop', { ascending: true, nullsFirst: false });
       } else if (filters.sortBy === 'price-desc') {
         query = query.order('sale_price_cop', { ascending: false, nullsFirst: false });
-      } else if (filters.sortBy === 'area-desc') {
-        query = query.order('land_area_m2', { ascending: false, nullsFirst: false });
+      } else if (filters.sortBy === 'area-desc' || filters.sortBy === 'area_desc') {
+        query = query.order('land_area_ha', { ascending: false, nullsFirst: false });
+      } else if (filters.sortBy === 'area-asc' || filters.sortBy === 'area_asc') {
+        query = query.order('land_area_ha', { ascending: true, nullsFirst: false });
       } else {
         query = query.order('created_at', { ascending: false });
       }

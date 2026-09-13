@@ -129,5 +129,5 @@ export interface PropertyFilterState {
   potentialUse?: string;
   availability?: string;
   isInvestmentOpportunity?: boolean;
-  sortBy?: 'recent' | 'price-asc' | 'price-desc' | 'area-desc' | 'featured' | string;
+  sortBy?: 'recent' | 'price-asc' | 'price-desc' | 'area-desc' | 'area-asc' | 'area_desc' | 'area_asc' | 'featured' | string;
 }

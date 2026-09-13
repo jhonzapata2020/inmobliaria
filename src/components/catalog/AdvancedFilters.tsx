@@ -43,6 +43,8 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     filters.maxPrice,
     filters.minArea,
     filters.maxArea,
+    filters.minAreaHa,
+    filters.maxAreaHa,
     filters.legalStatus,
     filters.potentialUse,
     filters.availability,
@@ -155,7 +157,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
       </div>
 
       {/* Primary Filter Grid (Desktop View) */}
-      <div className="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs pt-2 border-t border-[#E5E1D8]">
+      <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-[#E5E1D8]">
         
         {/* Modality */}
         <div>
@@ -228,11 +230,33 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           </select>
         </div>
 
+        {/* Extensión (Hectáreas) */}
+        <div>
+          <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Extensión (Ha)</label>
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              placeholder="Mín"
+              value={filters.minAreaHa || ''}
+              onChange={(e) => updateField('minAreaHa', e.target.value)}
+              className="w-1/2 bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-2 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F] text-xs"
+            />
+            <span className="text-[#929087] font-bold text-xs">-</span>
+            <input
+              type="number"
+              placeholder="Máx"
+              value={filters.maxAreaHa || ''}
+              onChange={(e) => updateField('maxAreaHa', e.target.value)}
+              className="w-1/2 bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-2 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F] text-xs"
+            />
+          </div>
+        </div>
+
         {/* Sort By */}
         <div>
           <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Ordenar por</label>
           <select
-            value={filters.sortBy}
+            value={filters.sortBy || 'recent'}
             onChange={(e) => updateField('sortBy', e.target.value as any)}
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F] font-semibold"
           >
@@ -240,7 +264,8 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <option value="featured">Destacadas primero</option>
             <option value="price-asc">Precio: Menor a Mayor</option>
             <option value="price-desc">Precio: Mayor a Menor</option>
-            <option value="area-desc">Mayor Área Total</option>
+            <option value="area_desc">Mayor extensión (Ha)</option>
+            <option value="area_asc">Menor extensión (Ha)</option>
           </select>
         </div>
       </div>
@@ -271,6 +296,21 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <span className="px-2.5 py-1 bg-[#F8F7F2] text-[#C9795B] rounded-lg border border-[#E5E1D8] flex items-center gap-1 font-medium">
               Jurídico: {filters.legalStatus}
               <X className="w-3 h-3 cursor-pointer hover:text-rose-600" onClick={() => updateField('legalStatus', '')} />
+            </span>
+          )}
+          {(filters.minAreaHa || filters.maxAreaHa) && (
+            <span className="px-2.5 py-1 bg-[#F8F7F2] text-[#1E3A2F] rounded-lg border border-[#E5E1D8] flex items-center gap-1 font-medium">
+              Área: {filters.minAreaHa ? `>= ${filters.minAreaHa} Ha` : ''} {filters.minAreaHa && filters.maxAreaHa ? '-' : ''} {filters.maxAreaHa ? `<= ${filters.maxAreaHa} Ha` : ''}
+              <X
+                className="w-3 h-3 cursor-pointer hover:text-rose-600"
+                onClick={() => {
+                  onFilterChange({
+                    ...filters,
+                    minAreaHa: '',
+                    maxAreaHa: '',
+                  });
+                }}
+              />
             </span>
           )}
         </div>
@@ -337,6 +377,43 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   <option value="Chigorodó">Chigorodó</option>
                   <option value="Acandí">Acandí</option>
                   <option value="Unguía">Unguía</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Extensión (Hectáreas)</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    placeholder="Mín Ha"
+                    value={filters.minAreaHa || ''}
+                    onChange={(e) => updateField('minAreaHa', e.target.value)}
+                    className="w-1/2 bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
+                  />
+                  <span className="text-[#929087] font-bold">-</span>
+                  <input
+                    type="number"
+                    placeholder="Máx Ha"
+                    value={filters.maxAreaHa || ''}
+                    onChange={(e) => updateField('maxAreaHa', e.target.value)}
+                    className="w-1/2 bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Ordenar por</label>
+                <select
+                  value={filters.sortBy || 'recent'}
+                  onChange={(e) => updateField('sortBy', e.target.value as any)}
+                  className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
+                >
+                  <option value="recent">Más recientes primero</option>
+                  <option value="featured">Destacadas primero</option>
+                  <option value="price-asc">Precio: Menor a Mayor</option>
+                  <option value="price-desc">Precio: Mayor a Menor</option>
+                  <option value="area_desc">Mayor extensión (Ha)</option>
+                  <option value="area_asc">Menor extensión (Ha)</option>
                 </select>
               </div>
             </div>

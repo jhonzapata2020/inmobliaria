@@ -20,7 +20,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { Property } from '../../types/property';
-import { formatCurrency, formatArea, getLegalStatusBadge } from '../../lib/formatters';
+import { formatCurrency, formatArea } from '../../lib/formatters';
 import { PropertyFormModal } from '../../components/admin/PropertyFormModal';
 import { useDossier } from '../../context/DossierContext';
 import { getAllPropertiesAdmin, upsertPropertyAction } from '../../app/actions/properties';
@@ -41,11 +41,17 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getAllPropertiesAdmin();
-      setProperties(data || []);
-    } catch (err: any) {
+      const res = await getAllPropertiesAdmin();
+      if (res.success) {
+        setProperties(res.data);
+      } else {
+        setError(res.message || 'No se pudieron cargar los predios desde la base de datos Supabase.');
+        setProperties([]);
+      }
+    } catch (err: unknown) {
       console.error('Error loading admin properties:', err);
       setError('No se pudieron cargar los predios desde la base de datos Supabase.');
+      setProperties([]);
     } finally {
       setLoading(false);
     }
@@ -101,14 +107,15 @@ export default function AdminDashboardPage() {
 
   const handleSaveProperty = async (savedProp: Property) => {
     const res = await upsertPropertyAction(savedProp);
-    if (res.success && res.data) {
-      if (properties.some((p) => p.id === res.data!.id)) {
-        setProperties(properties.map((p) => (p.id === res.data!.id ? res.data! : p)));
+    if (res.success) {
+      const updatedItem = res.data;
+      if (properties.some((p) => p.id === updatedItem.id)) {
+        setProperties(properties.map((p) => (p.id === updatedItem.id ? updatedItem : p)));
       } else {
-        setProperties([res.data!, ...properties]);
+        setProperties([updatedItem, ...properties]);
       }
     } else {
-      alert(res.error || 'Error al guardar la propiedad en Supabase');
+      alert(res.message || 'Error al guardar la propiedad en Supabase');
     }
   };
 
@@ -131,7 +138,7 @@ export default function AdminDashboardPage() {
 
         <button
           onClick={handleCreate}
-          className="px-4.5 py-2.5 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition-all"
+          className="px-4.5 py-2.5 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 text-emerald-300" /> Registrar Nuevo Predio
         </button>
@@ -146,7 +153,7 @@ export default function AdminDashboardPage() {
           </div>
           <button
             onClick={fetchProperties}
-            className="px-3 py-1 bg-rose-600 text-white rounded-lg hover:bg-rose-700 flex items-center gap-1 font-bold"
+            className="px-3 py-1 bg-rose-600 text-white rounded-lg hover:bg-rose-700 flex items-center gap-1 font-bold cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Reintentar
           </button>
@@ -265,7 +272,7 @@ export default function AdminDashboardPage() {
             <button
               key={pill}
               onClick={() => setLegalFilter(pill)}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 ${
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
                 legalFilter === pill
                   ? 'bg-[#1E3A2F] text-white shadow-2xs'
                   : 'text-stone-600 hover:bg-[#F8F7F4] hover:text-[#1C1917]'
@@ -337,7 +344,7 @@ export default function AdminDashboardPage() {
                     {/* Acciones */}
                     <td className="p-4 text-right space-x-2">
                       <Link
-                        href={`/propiedades/${prop.id}`}
+                        href={`/propiedades/${prop.slug || prop.id}`}
                         className="p-2 text-stone-500 hover:text-[#1E3A2F] hover:bg-[#F8F7F4] rounded-lg inline-block transition-colors"
                         title="Ver Ficha 360°"
                       >
@@ -345,7 +352,7 @@ export default function AdminDashboardPage() {
                       </Link>
                       <button
                         onClick={() => handleEdit(prop)}
-                        className="p-2 text-[#1E3A2F] hover:bg-[#1E3A2F]/10 rounded-lg inline-block font-bold transition-colors"
+                        className="p-2 text-[#1E3A2F] hover:bg-[#1E3A2F]/10 rounded-lg inline-block font-bold transition-colors cursor-pointer"
                         title="Editar Registro"
                       >
                         <Edit className="w-4 h-4" />
@@ -426,7 +433,7 @@ export default function AdminDashboardPage() {
                 {/* Interactive POS Button */}
                 <button
                   onClick={() => (inDossier ? removeFromDossier(prop.id) : addToDossier(prop))}
-                  className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs ${
+                  className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer ${
                     inDossier
                       ? 'bg-[#1E3A2F] text-white shadow-sm'
                       : 'bg-[#F8F7F4] text-[#1E3A2F] border border-[#E5E7EB] hover:bg-[#1E3A2F] hover:text-white'

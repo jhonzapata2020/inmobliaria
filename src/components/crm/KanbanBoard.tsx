@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Plus, 
   Search, 
   TrendingUp, 
   Calendar, 
@@ -37,11 +36,17 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
     setLoading(true);
     setFetchError(null);
     try {
-      const dbLeads = await getLeadsAction();
-      setLeads(dbLeads || []);
-    } catch (err: any) {
+      const res = await getLeadsAction();
+      if (res.success) {
+        setLeads(res.data);
+      } else {
+        setFetchError(res.message || 'Error al cargar la información del CRM desde la base de datos Supabase.');
+        setLeads([]);
+      }
+    } catch (err: unknown) {
       console.error('Error loading CRM leads:', err);
       setFetchError('Error al cargar la información del CRM desde la base de datos Supabase.');
+      setLeads([]);
     } finally {
       setLoading(false);
     }
@@ -97,7 +102,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
     const res = await updateLeadStageAction(leadId, newStage);
     if (!res.success) {
       setLeads(previousLeads);
-      setActionError(res.error || 'No se pudo actualizar la etapa del cliente. Operación revertida.');
+      setActionError(res.message || 'No se pudo actualizar la etapa del cliente. Operación revertida.');
     }
   };
 
@@ -136,7 +141,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
           </div>
           <button
             onClick={loadLeads}
-            className="px-3 py-1 bg-rose-700 text-white rounded-lg hover:bg-rose-600 flex items-center gap-1 font-bold"
+            className="px-3 py-1 bg-rose-700 text-white rounded-lg hover:bg-rose-600 flex items-center gap-1 font-bold cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Reintentar
           </button>
@@ -149,7 +154,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{actionError}</span>
           </div>
-          <button onClick={() => setActionError(null)} className="text-slate-400 hover:text-white font-bold">
+          <button onClick={() => setActionError(null)} className="text-slate-400 hover:text-white font-bold cursor-pointer">
             ✕
           </button>
         </div>
@@ -318,7 +323,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
                           <button
                             onClick={() => moveLead(lead.id, 'prev')}
                             disabled={stages.indexOf(lead.stage) === 0}
-                            className="p-1 text-slate-500 hover:text-white disabled:opacity-30"
+                            className="p-1 text-slate-500 hover:text-white disabled:opacity-30 cursor-pointer"
                             title="Mover a etapa anterior"
                           >
                             <ChevronLeft className="w-4 h-4" />
@@ -329,7 +334,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ initialLeads }) => {
                           <button
                             onClick={() => moveLead(lead.id, 'next')}
                             disabled={stages.indexOf(lead.stage) === stages.length - 1}
-                            className="p-1 text-slate-500 hover:text-emerald-400 disabled:opacity-30"
+                            className="p-1 text-slate-500 hover:text-emerald-400 disabled:opacity-30 cursor-pointer"
                             title="Avanzar etapa"
                           >
                             <ChevronRight className="w-4 h-4" />

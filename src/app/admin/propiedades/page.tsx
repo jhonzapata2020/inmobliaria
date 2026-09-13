@@ -8,8 +8,7 @@ import {
   Edit, 
   Copy, 
   Trash2, 
-  Eye, 
-  Building
+  Eye
 } from 'lucide-react';
 import { Property } from '../../../types/property';
 import { formatCurrency, formatArea } from '../../../lib/formatters';
@@ -28,10 +27,16 @@ export default function AdminPropiedadesPage() {
   const loadAdminProperties = async () => {
     setLoading(true);
     try {
-      const data = await getAllPropertiesAdmin();
-      setProperties(data);
+      const res = await getAllPropertiesAdmin();
+      if (res.success) {
+        setProperties(res.data);
+      } else {
+        console.error('Failed to load admin properties:', res.message);
+        setProperties([]);
+      }
     } catch (err) {
       console.error('Failed to load admin properties:', err);
+      setProperties([]);
     } finally {
       setLoading(false);
     }
@@ -66,7 +71,7 @@ export default function AdminPropiedadesPage() {
     if (res.success) {
       await loadAdminProperties();
     } else {
-      alert(`Error al duplicar el predio: ${res.error}`);
+      alert(`Error al duplicar el predio: ${res.message}`);
     }
   };
 
@@ -76,7 +81,7 @@ export default function AdminPropiedadesPage() {
       if (res.success) {
         await loadAdminProperties();
       } else {
-        alert(`Error al eliminar: ${res.error}`);
+        alert(`Error al eliminar: ${res.message}`);
       }
     }
   };
@@ -87,7 +92,7 @@ export default function AdminPropiedadesPage() {
       await loadAdminProperties();
       setModalOpen(false);
     } else {
-      alert(`Error al guardar en Supabase: ${res.error}`);
+      alert(`Error al guardar en Supabase: ${res.message}`);
     }
   };
 

@@ -5,10 +5,19 @@ import { createAdminClient } from '../../lib/supabase/server';
 import { mapDbToLead } from '../../lib/supabase/mappers';
 import { Lead, CRMStage } from '../../types/crm';
 import { requireAdmin } from '../../lib/auth/requireAdmin';
+import { ActionResponse } from '../../types/action-response';
 
-export async function getLeadsAction(): Promise<Lead[]> {
+export async function getLeadsAction(): Promise<ActionResponse<Lead[]>> {
   try {
-    await requireAdmin();
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('crm_leads')
@@ -17,19 +26,28 @@ export async function getLeadsAction(): Promise<Lead[]> {
 
     if (error) {
       console.error('Error fetching leads:', error);
-      return [];
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
     }
 
-    return (data || []).map(mapDbToLead);
-  } catch (err) {
+    return { success: true, data: (data || []).map(mapDbToLead) };
+  } catch (err: unknown) {
     console.error('Unexpected error in getLeadsAction:', err);
-    return [];
+    const message = err instanceof Error ? err.message : 'Error inesperado al obtener los clientes prospecto';
+    return { success: false, error: 'DATABASE_ERROR', message };
   }
 }
 
-export async function updateLeadStageAction(leadId: string, newStage: CRMStage): Promise<{ success: boolean; error?: string }> {
+export async function updateLeadStageAction(leadId: string, newStage: CRMStage): Promise<ActionResponse<void>> {
   try {
-    await requireAdmin();
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
     const supabase = createAdminClient();
     const { error } = await supabase
       .from('crm_leads')
@@ -41,20 +59,29 @@ export async function updateLeadStageAction(leadId: string, newStage: CRMStage):
 
     if (error) {
       console.error('Error updating lead stage:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
     }
 
     revalidatePath('/admin/crm');
-    return { success: true };
-  } catch (err: any) {
+    return { success: true, data: undefined };
+  } catch (err: unknown) {
     console.error('Unexpected error in updateLeadStageAction:', err);
-    return { success: false, error: err?.message || 'Error inesperado al actualizar la etapa del cliente' };
+    const message = err instanceof Error ? err.message : 'Error inesperado al actualizar la etapa del cliente';
+    return { success: false, error: 'DATABASE_ERROR', message };
   }
 }
 
-export async function createLeadAction(leadData: Partial<Lead>): Promise<{ success: boolean; data?: Lead; error?: string }> {
+export async function createLeadAction(leadData: Partial<Lead>): Promise<ActionResponse<Lead>> {
   try {
-    await requireAdmin();
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
     const supabase = createAdminClient();
     const payload = {
       client_name: leadData.clientName || 'Cliente Prospecto',
@@ -83,13 +110,14 @@ export async function createLeadAction(leadData: Partial<Lead>): Promise<{ succe
 
     if (error) {
       console.error('Error creating lead:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
     }
 
     revalidatePath('/admin/crm');
     return { success: true, data: mapDbToLead(data) };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Unexpected error in createLeadAction:', err);
-    return { success: false, error: err?.message || 'Error inesperado al registrar el cliente prospecto' };
+    const message = err instanceof Error ? err.message : 'Error inesperado al registrar el cliente prospecto';
+    return { success: false, error: 'DATABASE_ERROR', message };
   }
 }

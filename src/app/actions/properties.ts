@@ -1,18 +1,37 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createAdminClient } from '../../lib/supabase/server';
+import { createClient, createAdminClient } from '../../lib/supabase/server';
 import { mapDbToProperty } from '../../lib/supabase/mappers';
 import { Property, PropertyFilterState } from '../../types/property';
 import { requireAdmin } from '../../lib/auth/requireAdmin';
+import { ActionResponse } from '../../types/action-response';
+
+export type { ActionResponse };
+
+function sanitizePublicProperty(prop: Property): Property {
+  if (prop.isConfidentialCoords) {
+    return {
+      ...prop,
+      latitude: Number(prop.latitude.toFixed(2)),
+      longitude: Number(prop.longitude.toFixed(2)),
+      matriculaInmobiliaria: 'Bajo solicitud',
+      cedulaCatastral: 'Bajo solicitud',
+      saeIdActivo: prop.saeIdActivo ? 'Bajo solicitud' : undefined,
+      folioMatricula: prop.folioMatricula ? 'Bajo solicitud' : undefined,
+    };
+  }
+  return prop;
+}
 
 export async function getPublishedProperties(filters?: PropertyFilterState): Promise<Property[]> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await createClient();
     let query = supabase
       .from('properties')
       .select('*')
-      .eq('editorial_status', 'published');
+      .eq('editorial_status', 'published')
+      .neq('availability', 'Archivado');
 
     if (filters) {
       if (filters.modality && filters.modality !== 'all' && filters.modality !== 'Todas') {
@@ -61,59 +80,35 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       return [];
     }
 
-    return (data || []).map((item) => {
-      const prop = mapDbToProperty(item);
-      if (prop.isConfidentialCoords) {
-        prop.latitude = Number(prop.latitude.toFixed(2));
-        prop.longitude = Number(prop.longitude.toFixed(2));
-      }
-      return prop;
-    });
+    return (data || []).map((item) => sanitizePublicProperty(mapDbToProperty(item)));
   } catch (err) {
     console.error('Unexpected error in getPublishedProperties:', err);
     return [];
   }
 }
 
-export async function getAllPropertiesAdmin(): Promise<Property[]> {
-  try {
-    await requireAdmin();
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from('properties')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching admin properties:', error);
-      return [];
-    }
-
-    return (data || []).map(mapDbToProperty);
-  } catch (err) {
-    console.error('Unexpected error in getAllPropertiesAdmin:', err);
-    return [];
-  }
-}
-
 export async function getPropertyBySlug(slugOrId: string): Promise<Property | null> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await createClient();
     
     // First try by slug
     let { data, error } = await supabase
       .from('properties')
       .select('*')
+      .eq('editorial_status', 'published')
+      .neq('availability', 'Archivado')
       .eq('slug', slugOrId)
-      .single();
+      .maybeSingle();
 
     if (!data) {
       // Try by id or code
       const res = await supabase
         .from('properties')
         .select('*')
+        .eq('editorial_status', 'published')
+        .neq('availability', 'Archivado')
         .or(`id.eq.${slugOrId},code.eq.${slugOrId}`)
-        .single();
+        .maybeSingle();
       data = res.data;
       error = res.error;
     }
@@ -122,22 +117,93 @@ export async function getPropertyBySlug(slugOrId: string): Promise<Property | nu
       return null;
     }
 
-    const prop = mapDbToProperty(data);
-    if (prop.isConfidentialCoords) {
-      prop.latitude = Number(prop.latitude.toFixed(2));
-      prop.longitude = Number(prop.longitude.toFixed(2));
-    }
-
-    return prop;
+    return sanitizePublicProperty(mapDbToProperty(data));
   } catch (err) {
     console.error('Unexpected error in getPropertyBySlug:', err);
     return null;
   }
 }
 
-export async function upsertPropertyAction(formData: Partial<Property>): Promise<{ success: boolean; data?: Property; error?: string }> {
+export async function getAdminPropertyBySlug(slugOrId: string): Promise<ActionResponse<Property | null>> {
   try {
-    await requireAdmin();
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
+    const supabase = createAdminClient();
+    let { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('slug', slugOrId)
+      .maybeSingle();
+
+    if (!data) {
+      const res = await supabase
+        .from('properties')
+        .select('*')
+        .or(`id.eq.${slugOrId},code.eq.${slugOrId}`)
+        .maybeSingle();
+      data = res.data;
+      error = res.error;
+    }
+
+    if (error) {
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
+    }
+
+    return { success: true, data: data ? mapDbToProperty(data) : null };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error inesperado al obtener la propiedad';
+    return { success: false, error: 'DATABASE_ERROR', message };
+  }
+}
+
+export async function getAllPropertiesAdmin(): Promise<ActionResponse<Property[]>> {
+  try {
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching admin properties:', error);
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
+    }
+
+    return { success: true, data: (data || []).map(mapDbToProperty) };
+  } catch (err: unknown) {
+    console.error('Unexpected error in getAllPropertiesAdmin:', err);
+    const message = err instanceof Error ? err.message : 'Error inesperado al obtener propiedades administrativas';
+    return { success: false, error: 'DATABASE_ERROR', message };
+  }
+}
+
+export async function upsertPropertyAction(formData: Partial<Property>): Promise<ActionResponse<Property>> {
+  try {
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
     const supabase = createAdminClient();
 
     const code = formData.code || `DAR-${Date.now().toString().slice(-6)}`;
@@ -218,7 +284,7 @@ export async function upsertPropertyAction(formData: Partial<Property>): Promise
 
     if (error) {
       console.error('Error upserting property:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
     }
 
     revalidatePath('/propiedades');
@@ -227,15 +293,24 @@ export async function upsertPropertyAction(formData: Partial<Property>): Promise
     if (slug) revalidatePath(`/propiedades/${slug}`);
 
     return { success: true, data: mapDbToProperty(data) };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Unexpected error in upsertPropertyAction:', err);
-    return { success: false, error: err?.message || 'Error inesperado al guardar la propiedad' };
+    const message = err instanceof Error ? err.message : 'Error inesperado al guardar la propiedad';
+    return { success: false, error: 'DATABASE_ERROR', message };
   }
 }
 
-export async function deletePropertyAction(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deletePropertyAction(id: string): Promise<ActionResponse<void>> {
   try {
-    await requireAdmin();
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: auth.reason === 'UNAUTHENTICATED' ? 'UNAUTHORIZED' : 'FORBIDDEN',
+        message: auth.message,
+      };
+    }
+
     const supabase = createAdminClient();
     const { error } = await supabase
       .from('properties')
@@ -244,16 +319,17 @@ export async function deletePropertyAction(id: string): Promise<{ success: boole
 
     if (error) {
       console.error('Error deleting property:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
     }
 
     revalidatePath('/propiedades');
     revalidatePath('/admin/inventario');
     revalidatePath('/admin/propiedades');
 
-    return { success: true };
-  } catch (err: any) {
+    return { success: true, data: undefined };
+  } catch (err: unknown) {
     console.error('Unexpected error in deletePropertyAction:', err);
-    return { success: false, error: err?.message || 'Error inesperado al eliminar la propiedad' };
+    const message = err instanceof Error ? err.message : 'Error inesperado al eliminar la propiedad';
+    return { success: false, error: 'DATABASE_ERROR', message };
   }
 }

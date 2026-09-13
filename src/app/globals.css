@@ -57,13 +57,44 @@
   background: #1E3A2F;
 }
 
-/* Print Styles for Executive Dossier */
+/* Strict Print Isolation for Executive Dossier */
 @media print {
-  body {
+  /* Hide all website DOM elements by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Exclusively render the dossier printable area and its children */
+  #dossier-printable-area,
+  #dossier-printable-area * {
+    visibility: visible;
+  }
+
+  /* Position printable container at origin of paper */
+  #dossier-printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 10mm;
     background: white !important;
     color: black !important;
+    box-shadow: none !important;
+    border: none !important;
   }
-  header, footer, button {
+
+  /* Hide interactive controls and buttons during print */
+  .no-print,
+  button,
+  .dossier-close-btn,
+  .dossier-actions {
     display: none !important;
+  }
+
+  /* Prevent property cards from breaking across page splits */
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }

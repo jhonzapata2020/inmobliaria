@@ -53,7 +53,7 @@ export const ExecutiveDossierModal: React.FC = () => {
       <div className="bg-white text-[#242321] w-full max-w-4xl rounded-2xl shadow-2xl border border-[#E5E1D8] flex flex-col my-auto overflow-hidden">
         
         {/* Modal Top Action Bar */}
-        <div className="p-4 bg-[#F8F7F2] border-b border-[#E5E1D8] flex items-center justify-between print:hidden">
+        <div className="p-4 bg-[#F8F7F2] border-b border-[#E5E1D8] flex items-center justify-between no-print print:hidden">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[#1E3A2F] bg-[#EEF4EF] border border-[#E5E1D8] px-2.5 py-1 rounded-md font-bold">
               DOSSIER OFICIAL • ACTIVOS DARIÉN
@@ -63,7 +63,7 @@ export const ExecutiveDossierModal: React.FC = () => {
             <button
               onClick={handlePrint}
               disabled={downloading}
-              className="px-4 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md transition-all"
+              className="px-4 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md transition-all no-print"
             >
               {downloading ? (
                 <span>Generando Documento...</span>
@@ -76,7 +76,7 @@ export const ExecutiveDossierModal: React.FC = () => {
             </button>
             <button
               onClick={() => setIsExecutiveModalOpen(false)}
-              className="p-2 rounded-xl text-[#6B6A63] hover:text-[#242321] hover:bg-[#E5E1D8] transition-colors"
+              className="p-2 rounded-xl text-[#6B6A63] hover:text-[#242321] hover:bg-[#E5E1D8] transition-colors no-print"
             >
               <X className="w-5 h-5" />
             </button>
@@ -84,7 +84,7 @@ export const ExecutiveDossierModal: React.FC = () => {
         </div>
 
         {/* Dossier Document Container */}
-        <div className="p-6 sm:p-10 bg-white text-[#242321] overflow-y-auto space-y-8 print:p-0 print:bg-white print:text-black">
+        <div id="dossier-printable-area" className="p-6 sm:p-10 bg-white text-[#242321] overflow-y-auto space-y-8 print:p-0 print:bg-white print:text-black">
           
           {/* Header Letterhead */}
           <div className="border-b-2 border-[#1E3A2F] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -97,14 +97,14 @@ export const ExecutiveDossierModal: React.FC = () => {
                   ACTIVOS & INVERSIONES DARIÉN S.A.S.
                 </h1>
                 <p className="text-xs text-[#1E3A2F] font-mono font-semibold">
-                  NIT 901.884.210-4 • PORTAFOLIO EJECUTIVO DE ACTIVOS
+                  NIT 901.884.210-4 • DOSSIER EJECUTIVO DE ACTIVOS INMOBILIARIOS
                 </p>
               </div>
             </div>
             <div className="text-left sm:text-right font-mono text-xs text-[#6B6A63] space-y-1">
               <p><strong className="text-[#242321]">Ref:</strong> DOS-{Math.floor(100000 + Math.random() * 900000)}</p>
-              <p><strong className="text-[#242321]">Fecha:</strong> {currentDate}</p>
-              <p><strong className="text-[#242321]">Carácter:</strong> Confidencial / Comercial</p>
+              <p><strong className="text-[#242321]">Fecha de Emisión:</strong> {currentDate}</p>
+              <p><strong className="text-[#242321]">Activos Consolidados:</strong> {summary.propertyCount} {summary.propertyCount === 1 ? 'predio' : 'predios'}</p>
             </div>
           </div>
 
@@ -237,7 +237,7 @@ export const ExecutiveDossierModal: React.FC = () => {
               return (
                 <div 
                   key={prop.id}
-                  className="bg-[#F8F7F2] rounded-2xl border border-[#E5E1D8] p-6 space-y-4 print:border-slate-300 print:bg-white"
+                  className="bg-[#F8F7F2] rounded-2xl border border-[#E5E1D8] p-6 space-y-4 break-inside-avoid print:border-slate-300 print:bg-white"
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div>

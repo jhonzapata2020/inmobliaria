@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Ruler, 
@@ -13,25 +13,47 @@ import {
   Plus, 
   Check, 
   FileSpreadsheet, 
-  TrendingUp, 
   ShieldCheck, 
   MapPin,
-  ChevronRight
+  AlertTriangle,
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
-import { INITIAL_PROPERTIES } from '../../data/mockProperties';
-import { Property, LegalStatus } from '../../types/property';
+import { Property } from '../../types/property';
 import { formatCurrency, formatArea, getLegalStatusBadge } from '../../lib/formatters';
 import { PropertyFormModal } from '../../components/admin/PropertyFormModal';
 import { useDossier } from '../../context/DossierContext';
+import { getAllPropertiesAdmin, upsertPropertyAction } from '../../app/actions/properties';
 
 export default function AdminDashboardPage() {
-  const [properties, setProperties] = useState<Property[]>(INITIAL_PROPERTIES);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [legalFilter, setLegalFilter] = useState<string>('Todos');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
 
   const { addToDossier, isInDossier, removeFromDossier, summary } = useDossier();
+
+  const fetchProperties = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getAllPropertiesAdmin();
+      setProperties(data || []);
+    } catch (err: any) {
+      console.error('Error loading admin properties:', err);
+      setError('No se pudieron cargar los predios desde la base de datos Supabase.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
 
   // Metrics Calculations
   const totalHectaresInCustody = useMemo(() => {
@@ -77,11 +99,16 @@ export default function AdminDashboardPage() {
     setModalOpen(true);
   };
 
-  const handleSaveProperty = (savedProp: Property) => {
-    if (properties.some((p) => p.id === savedProp.id)) {
-      setProperties(properties.map((p) => (p.id === savedProp.id ? savedProp : p)));
+  const handleSaveProperty = async (savedProp: Property) => {
+    const res = await upsertPropertyAction(savedProp);
+    if (res.success && res.data) {
+      if (properties.some((p) => p.id === res.data!.id)) {
+        setProperties(properties.map((p) => (p.id === res.data!.id ? res.data! : p)));
+      } else {
+        setProperties([res.data!, ...properties]);
+      }
     } else {
-      setProperties([savedProp, ...properties]);
+      alert(res.error || 'Error al guardar la propiedad en Supabase');
     }
   };
 
@@ -110,7 +137,23 @@ export default function AdminDashboardPage() {
         </button>
       </div>
 
-      {/* 2. TARJETAS DE MÉTRICAS SUPERIORES (Estilo Blanco/Arena con Bordes de 1px) */}
+      {/* Error Alert Banner */}
+      {error && (
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl flex justify-between items-center text-xs font-mono">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={fetchProperties}
+            className="px-3 py-1 bg-rose-600 text-white rounded-lg hover:bg-rose-700 flex items-center gap-1 font-bold"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Reintentar
+          </button>
+        </div>
+      )}
+
+      {/* 2. TARJETAS DE MÉTRICAS SUPERIORES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Card 1: Total Hectáreas en Custodia */}
@@ -124,14 +167,15 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div className="text-2xl font-bold font-mono text-[#1C1917]">
-            {totalHectaresInCustody.toFixed(1)} <span className="text-xs font-normal text-stone-500">Ha</span>
+            {loading ? '...' : `${totalHectaresInCustody.toFixed(1)} `}
+            <span className="text-xs font-normal text-stone-500">Ha</span>
           </div>
           <div className="text-[11px] font-mono text-[#1E3A2F] font-semibold pt-1 border-t border-[#F8F7F4] flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5" /> Urabá & Darién Chocoano
           </div>
         </div>
 
-        {/* Card 2: Predios Disponibles (Venta/Arriendo) */}
+        {/* Card 2: Predios Disponibles */}
         <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs space-y-2">
           <div className="flex justify-between items-start">
             <span className="text-[11px] font-mono text-stone-500 font-bold uppercase tracking-wider">
@@ -142,10 +186,10 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div className="text-2xl font-bold font-mono text-[#1C1917]">
-            {availableCount} <span className="text-xs font-normal text-stone-500">Activos</span>
+            {loading ? '...' : availableCount} <span className="text-xs font-normal text-stone-500">Activos</span>
           </div>
           <div className="text-[11px] font-mono text-stone-600 pt-1 border-t border-[#F8F7F4]">
-            <strong>8 Venta</strong> • <strong>2 Arriendo</strong>
+            Publicados en inventario activo
           </div>
         </div>
 
@@ -160,7 +204,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div className="text-2xl font-bold font-mono text-[#1C1917]">
-            {saeInProcessCount} <span className="text-xs font-normal text-stone-500">Predios</span>
+            {loading ? '...' : saeInProcessCount} <span className="text-xs font-normal text-stone-500">Predios</span>
           </div>
           <div className="text-[11px] font-mono text-[#1E3A2F] font-semibold pt-1 border-t border-[#F8F7F4]">
             Estudio Técnico & Protocolo Activo
@@ -178,7 +222,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div className="text-xl font-bold font-mono text-[#1C1917]">
-            {formatCurrency(totalMonthlyEstimatedRent)}
+            {loading ? '...' : formatCurrency(totalMonthlyEstimatedRent)}
           </div>
           <div className="text-[11px] font-mono text-stone-600 pt-1 border-t border-[#F8F7F4]">
             Recaudo programado
@@ -202,7 +246,6 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            {/* Matrícula / Search Input */}
             <div className="relative flex-1 md:w-72">
               <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -233,23 +276,31 @@ export default function AdminDashboardPage() {
           ))}
         </div>
 
-        {/* Table */}
+        {/* Table Content */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-[#F8F7F4] text-stone-600 uppercase text-[10px] tracking-wider border-b border-[#E5E7EB]">
-              <tr>
-                <th className="p-4">Código / Matrícula</th>
-                <th className="p-4">Nombre del Predio</th>
-                <th className="p-4">Municipio</th>
-                <th className="p-4">Área (ha / m²)</th>
-                <th className="p-4">Estado Legal</th>
-                <th className="p-4 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E5E7EB]">
-              {filteredProperties.map((prop) => {
-                const legalBadge = getLegalStatusBadge(prop.legalStatus);
-                return (
+          {loading ? (
+            <div className="py-12 flex items-center justify-center gap-2 text-stone-500 font-mono text-xs">
+              <Loader2 className="w-5 h-5 animate-spin text-[#1E3A2F]" />
+              <span>Cargando inventario desde Supabase PostgreSQL...</span>
+            </div>
+          ) : filteredProperties.length === 0 ? (
+            <div className="py-12 text-center text-stone-500 font-mono text-xs">
+              No se encontraron predios registrados en la base de datos para los criterios seleccionados.
+            </div>
+          ) : (
+            <table className="w-full text-left text-xs font-mono">
+              <thead className="bg-[#F8F7F4] text-stone-600 uppercase text-[10px] tracking-wider border-b border-[#E5E7EB]">
+                <tr>
+                  <th className="p-4">Código / Matrícula</th>
+                  <th className="p-4">Nombre del Predio</th>
+                  <th className="p-4">Municipio</th>
+                  <th className="p-4">Área (ha / m²)</th>
+                  <th className="p-4">Estado Legal</th>
+                  <th className="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E5E7EB]">
+                {filteredProperties.map((prop) => (
                   <tr key={prop.id} className="hover:bg-[#F8F7F4]/80 transition-colors">
                     
                     {/* Código / Matrícula */}
@@ -257,7 +308,7 @@ export default function AdminDashboardPage() {
                       <span className="font-bold text-[#1E3A2F] bg-[#1E3A2F]/10 px-2 py-0.5 rounded border border-[#1E3A2F]/20 inline-block text-[11px]">
                         {prop.code}
                       </span>
-                      <div className="text-[11px] text-stone-500 font-mono">{prop.matriculaInmobiliaria}</div>
+                      <div className="text-[11px] text-stone-500 font-mono">{prop.matriculaInmobiliaria || 'Sin matrícula'}</div>
                     </td>
 
                     {/* Nombre del Predio */}
@@ -302,69 +353,15 @@ export default function AdminDashboardPage() {
                     </td>
 
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
       </div>
 
-      {/* 4. BARRAS DE PROGRESO: CONSOLIDADO DE ESTADO DEL PORTAFOLIO */}
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 space-y-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#E5E7EB] pb-3">
-          <div>
-            <h3 className="font-serif text-lg font-bold text-[#1C1917]">
-              Consolidado del Estado del Portafolio
-            </h3>
-            <p className="text-xs text-stone-500 font-mono">
-              Proporción de predios saneados vs. bienes en custodia institucional SAE.
-            </p>
-          </div>
-          <span className="text-xs font-mono font-bold text-[#1E3A2F] bg-[#1E3A2F]/10 px-3 py-1 rounded-lg border border-[#1E3A2F]/20">
-            Total {properties.length} Predios Validados
-          </span>
-        </div>
-
-        <div className="space-y-4 text-xs font-mono pt-2">
-          
-          {/* Progress 1: Predios Saneados 100% */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-[#1C1917] font-bold">
-              <span>Predios Saneados 100% (Listos para negociación)</span>
-              <span>60% (6 Activos)</span>
-            </div>
-            <div className="w-full h-3 bg-[#F8F7F4] rounded-full overflow-hidden border border-[#E5E7EB]">
-              <div className="h-full bg-[#1E3A2F] rounded-full" style={{ width: '60%' }}></div>
-            </div>
-          </div>
-
-          {/* Progress 2: Predios en Inspección / Custodia SAE */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-stone-700 font-bold">
-              <span>Predios en Inspección & Custodia Especial SAE</span>
-              <span>30% (3 Activos)</span>
-            </div>
-            <div className="w-full h-3 bg-[#F8F7F4] rounded-full overflow-hidden border border-[#E5E7EB]">
-              <div className="h-full bg-stone-500 rounded-full" style={{ width: '30%' }}></div>
-            </div>
-          </div>
-
-          {/* Progress 3: Predios Comercializados / Arrendados */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-stone-700 font-bold">
-              <span>Predios Comercializados / En Arriendo Activo</span>
-              <span>10% (1 Activo)</span>
-            </div>
-            <div className="w-full h-3 bg-[#F8F7F4] rounded-full overflow-hidden border border-[#E5E7EB]">
-              <div className="h-full bg-emerald-700 rounded-full" style={{ width: '10%' }}></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* 5. TARJETAS DE FOTOS INFERIORES: EFECTO SELECCIÓN RÁPIDA / POS DOSSIER */}
+      {/* 4. SELECCIÓN RÁPIDA DE INMUEBLES PARA DOSSIER (POS) */}
       <div className="space-y-4">
         <div className="flex justify-between items-center border-b border-[#E5E7EB] pb-3">
           <div>
@@ -395,7 +392,7 @@ export default function AdminDashboardPage() {
                   {/* Photo Container */}
                   <div className="h-44 w-full rounded-xl overflow-hidden bg-slate-100 relative">
                     <img
-                      src={prop.images[0]}
+                      src={prop.images?.[0] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop'}
                       alt={prop.title}
                       className="w-full h-full object-cover"
                     />

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '../../lib/supabase/server';
 import { mapDbToProperty } from '../../lib/supabase/mappers';
 import { Property, PropertyFilterState } from '../../types/property';
+import { requireAdmin } from '../../lib/auth/requireAdmin';
 
 export async function getPublishedProperties(filters?: PropertyFilterState): Promise<Property[]> {
   try {
@@ -60,7 +61,14 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       return [];
     }
 
-    return (data || []).map(mapDbToProperty);
+    return (data || []).map((item) => {
+      const prop = mapDbToProperty(item);
+      if (prop.isConfidentialCoords) {
+        prop.latitude = Number(prop.latitude.toFixed(2));
+        prop.longitude = Number(prop.longitude.toFixed(2));
+      }
+      return prop;
+    });
   } catch (err) {
     console.error('Unexpected error in getPublishedProperties:', err);
     return [];
@@ -69,6 +77,7 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
 
 export async function getAllPropertiesAdmin(): Promise<Property[]> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('properties')
@@ -113,7 +122,13 @@ export async function getPropertyBySlug(slugOrId: string): Promise<Property | nu
       return null;
     }
 
-    return mapDbToProperty(data);
+    const prop = mapDbToProperty(data);
+    if (prop.isConfidentialCoords) {
+      prop.latitude = Number(prop.latitude.toFixed(2));
+      prop.longitude = Number(prop.longitude.toFixed(2));
+    }
+
+    return prop;
   } catch (err) {
     console.error('Unexpected error in getPropertyBySlug:', err);
     return null;
@@ -122,6 +137,7 @@ export async function getPropertyBySlug(slugOrId: string): Promise<Property | nu
 
 export async function upsertPropertyAction(formData: Partial<Property>): Promise<{ success: boolean; data?: Property; error?: string }> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
 
     const code = formData.code || `DAR-${Date.now().toString().slice(-6)}`;
@@ -211,14 +227,15 @@ export async function upsertPropertyAction(formData: Partial<Property>): Promise
     if (slug) revalidatePath(`/propiedades/${slug}`);
 
     return { success: true, data: mapDbToProperty(data) };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Unexpected error in upsertPropertyAction:', err);
-    return { success: false, error: 'Error inesperado al guardar la propiedad' };
+    return { success: false, error: err?.message || 'Error inesperado al guardar la propiedad' };
   }
 }
 
 export async function deletePropertyAction(id: string): Promise<{ success: boolean; error?: string }> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
     const { error } = await supabase
       .from('properties')
@@ -235,8 +252,8 @@ export async function deletePropertyAction(id: string): Promise<{ success: boole
     revalidatePath('/admin/propiedades');
 
     return { success: true };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Unexpected error in deletePropertyAction:', err);
-    return { success: false, error: 'Error inesperado al eliminar la propiedad' };
+    return { success: false, error: err?.message || 'Error inesperado al eliminar la propiedad' };
   }
 }

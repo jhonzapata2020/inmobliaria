@@ -4,9 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '../../lib/supabase/server';
 import { mapDbToLead } from '../../lib/supabase/mappers';
 import { Lead, CRMStage } from '../../types/crm';
+import { requireAdmin } from '../../lib/auth/requireAdmin';
 
 export async function getLeadsAction(): Promise<Lead[]> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('crm_leads')
@@ -27,6 +29,7 @@ export async function getLeadsAction(): Promise<Lead[]> {
 
 export async function updateLeadStageAction(leadId: string, newStage: CRMStage): Promise<{ success: boolean; error?: string }> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
     const { error } = await supabase
       .from('crm_leads')
@@ -43,14 +46,15 @@ export async function updateLeadStageAction(leadId: string, newStage: CRMStage):
 
     revalidatePath('/admin/crm');
     return { success: true };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Unexpected error in updateLeadStageAction:', err);
-    return { success: false, error: 'Error inesperado al actualizar la etapa del cliente' };
+    return { success: false, error: err?.message || 'Error inesperado al actualizar la etapa del cliente' };
   }
 }
 
 export async function createLeadAction(leadData: Partial<Lead>): Promise<{ success: boolean; data?: Lead; error?: string }> {
   try {
+    await requireAdmin();
     const supabase = createAdminClient();
     const payload = {
       client_name: leadData.clientName || 'Cliente Prospecto',
@@ -84,8 +88,8 @@ export async function createLeadAction(leadData: Partial<Lead>): Promise<{ succe
 
     revalidatePath('/admin/crm');
     return { success: true, data: mapDbToLead(data) };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Unexpected error in createLeadAction:', err);
-    return { success: false, error: 'Error inesperado al registrar el cliente prospecto' };
+    return { success: false, error: err?.message || 'Error inesperado al registrar el cliente prospecto' };
   }
 }

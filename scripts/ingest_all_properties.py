@@ -29,6 +29,9 @@ STRATEGIC_WHITELIST_MAP = {
     'SAN PEDRO DE URABA': ('San Pedro de Urabá', 'Antioquia'),
     'SAN JUAN DE URABA': ('San Juan de Urabá', 'Antioquia'),
     
+    # Córdoba Strategic Municipalities
+    'LOS CORDOBAS': ('Los Córdobas', 'Córdoba'),
+
     # Chocó Strategic Municipalities
     'ACANDI': ('Acandí', 'Chocó'),
     'UNGUIA': ('Unguía', 'Chocó'),
@@ -124,13 +127,6 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
     return "Finca"
 
 def format_title(asset_type, dir_val, desc_val, id_act, muni_name):
-    """
-    Format property title nicely for Urban vs Rural assets.
-    Urban assets (Casa, Local, Bodega, Apartamento, Edificio, Oficina, Lote):
-    - "Casa - CL 107 B # 107-26", "Local Comercial - Carrera 100"
-    Rural assets (Finca):
-    - "Finca El Reposo - Vereda ..." or "Finca - Predio 528835"
-    """
     is_urban = asset_type in ["Casa", "Apartamento", "Local", "Bodega", "Edificio", "Oficina", "Lote"]
     
     clean_dir = sanitize_text(dir_val)
@@ -218,7 +214,7 @@ def main():
             "code": "DAR-SAE-002",
             "slug": "finca-betania-turbo",
             "title": "Finca Ganadera Betania",
-            "short_description": "Predio rural highly productivo con vocación pecuaria y agropecuaria en Turbo.",
+            "short_description": "Predio rural altamente productivo con vocación pecuaria y agropecuaria en Turbo.",
             "description": "Predio rural altamente productivo con vocación pecuaria y agropecuaria. Excelente conexión vial hacia los ejes logísticos de Urabá y cercanía al puerto.",
             "opportunity_analysis": "Ubicación estratégica cercana al eje portuario de Turbo.",
             "asset_type": "Finca",
@@ -417,6 +413,74 @@ def main():
             "availability": "Disponible",
             "is_featured": False,
             "is_investment_opportunity": True
+        },
+        {
+            "code": "DAR-COR-011",
+            "slug": "lote-comercial-eds-troncal-ruta-74-los-cordobas",
+            "title": "Lote Comercial & EDS - Troncal Ruta 74",
+            "short_description": "Lote plano de 2 Ha sobre la Ruta Nacional 74. Ideal para Estación de Servicio (EDS), parador logístico de transporte pesado o centro de acopio.",
+            "description": "Excelente lote comercial de 2 Hectáreas (20.000 m2) ubicado sobre el corredor vial de la Ruta Nacional 74 en Los Córdobas, Córdoba. Topografía 100% plana a ras de calzada, con frente amplio sobre la vía pavimentada. Ideal para desarrollos logísticos, estaciones de servicio (EDS), estaciones de descanso o centros de distribución agroindustrial.",
+            "opportunity_analysis": "Frente a carretera troncal pavimentada de alto tráfico vehicular entre Urabá y Córdoba. Topografía plana a ras de calzada con visual despejada.",
+            "asset_type": "Lote",
+            "modality": "Venta",
+            "sale_price_cop": 500000000,
+            "estimated_value_cop": 500000000,
+            "commercial_appraisal_cop": 500000000,
+            "land_area_ha": 2.0,
+            "land_area_m2": 20000,
+            "built_area_m2": 0,
+            "department": "Córdoba",
+            "municipality": "Los Córdobas",
+            "sector_vereda": "Sector Tienda La Victoria / Proveedora La 3",
+            "address": "Sector Tienda La Victoria / Proveedora La 3, Ruta Nacional 74",
+            "latitude": 8.886922,
+            "longitude": -76.391691,
+            "legal_status": "Saneado 100%",
+            "editorial_status": "published",
+            "availability": "Disponible",
+            "is_featured": True,
+            "is_investment_opportunity": True,
+            "topography": "Plana 100% a ras de calzada",
+            "access_roads": "Acceso directo sobre vía troncal pavimentada.",
+            "public_services": ["Energía eléctrica", "Cobertura celular 4G"],
+            "images": [
+                "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"
+            ],
+            "featured_image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"
+        },
+        {
+            "code": "DAR-SJU-012",
+            "slug": "lote-costero-comercial-playa-ruta-90-san-juan-uraba",
+            "title": "Lote Costero & Comercial con Playa - Ruta 90",
+            "short_description": "Predio mixto de 4 Ha con 100 m sobre Ruta 90 y 100 m lineales de orilla de playa natural sobre el Mar Caribe.",
+            "description": "Ubicación privilegiada de 4 Hectáreas (40.000 m2) en San Juan de Urabá con doble vocación: frente de 100 metros sobre la Ruta Nacional 90 y salida directa de 100 metros a orilla de playa en el Mar Caribe. Configuración excepcional para proyecto ecoturístico, parador comercial de servicio o inversión patrimonial de alta valorización.",
+            "opportunity_analysis": "Potencial dual: frente vial apto para Estación de Servicio o parador comercial 24h, y zona posterior costera apta para complejo ecoturístico o cabañas.",
+            "asset_type": "Lote",
+            "modality": "Venta",
+            "sale_price_cop": 1000000000,
+            "estimated_value_cop": 1000000000,
+            "commercial_appraisal_cop": 1000000000,
+            "land_area_ha": 4.0,
+            "land_area_m2": 40000,
+            "built_area_m2": 0,
+            "department": "Antioquia",
+            "municipality": "San Juan de Urabá",
+            "sector_vereda": "Vereda Montebello / El Hoyito",
+            "address": "Vereda Montebello / El Hoyito, Ruta Nacional 90",
+            "latitude": 8.804340,
+            "longitude": -76.500693,
+            "legal_status": "Saneado 100%",
+            "editorial_status": "published",
+            "availability": "Disponible",
+            "is_featured": True,
+            "is_investment_opportunity": True,
+            "topography": "Plana con suave declive costero",
+            "access_roads": "Frente principal sobre Ruta Nacional 90.",
+            "public_services": ["Energía eléctrica", "Cobertura celular 4G"],
+            "images": [
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop"
+            ],
+            "featured_image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop"
         }
     ]
 
@@ -569,7 +633,8 @@ def main():
         desc_col = find_col(df_raw, 'DESCRIPCION')
         vereda_col = find_col(df_raw, 'VEREDA')
         folio_col = find_col(df_raw, 'FOLIO DE MATRICULA')
-        catastral_col = find_col(df_raw, 'CEDULA CATASTRAL')
+        catastral_id_col = find_col(df_raw, 'CEDULA CATASTRAL')
+        catastral_val_col = find_col(df_raw, 'AVALUO CATASTRAL')
         legal_col = find_col(df_raw, 'ESTADO LEGAL')
         area_m2_col = find_col(df_raw, 'AREA TERRENO')
         built_m2_col = find_col(df_raw, 'AREA CONSTRUIDA')
@@ -613,13 +678,14 @@ def main():
             built_m2 = sanitize_num(row.get(built_m2_col))
 
             avaluo_com = sanitize_num(row.get(avaluo_col))
+            avaluo_cat = sanitize_num(row.get(catastral_val_col)) if catastral_val_col else None
             renta_est = sanitize_num(row.get(renta_col))
             occupancy_status = sanitize_text(row.get(ocupacion_col), "Desocupado")
             last_visit = parse_date(row.get(visita_col))
 
             venta_raw = strip_accents(str(row.get(venta_col)))
 
-            # Financial Assignment Logic
+            # Financial Assignment Logic (Market Reference Policy)
             sale_price_cop = None
             monthly_rent_cop = None
             estimated_value_cop = None
@@ -633,14 +699,38 @@ def main():
                 modality = "Venta"
             elif renta_est and renta_est > 0:
                 monthly_rent_cop = renta_est
-                # Rent capitalization estimate: round(rent / 0.006, -6)
                 estimated_value_cop = round(renta_est / 0.006, -6)
                 if "NO" in venta_raw:
                     modality = "Arriendo"
                 else:
                     modality = "Venta"
+                    sale_price_cop = estimated_value_cop
+            elif avaluo_cat and avaluo_cat > 0:
+                estimated_value_cop = round(avaluo_cat * 1.8, -6)
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+            elif area_ha and area_ha >= 1.0:
+                # Rural property with 1+ Hectares: $45M COP / Ha market reference
+                estimated_value_cop = round(area_ha * 45000000, -6)
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+            elif built_m2 and built_m2 > 0:
+                # Built area estimation: $2.5M COP / m2
+                estimated_value_cop = round(built_m2 * 2500000, -6)
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+            elif area_m2 and area_m2 > 0:
+                # Urban lot area estimation: $350k COP / m2
+                estimated_value_cop = round(area_m2 * 350000, -6)
+                sale_price_cop = estimated_value_cop
+                modality = "Venta"
+            else:
+                # Fallback opportunity reference
+                estimated_value_cop = 250000000
+                sale_price_cop = 250000000
+                modality = "Venta"
 
-            cadastral_id = sanitize_text(row.get(catastral_col), "")
+            cadastral_id = sanitize_text(row.get(catastral_id_col), "")
             registry_folio = sanitize_text(row.get(folio_col), "")
             legal_status = sanitize_text(row.get(legal_col), "Saneado")
 
@@ -717,7 +807,7 @@ def main():
     cur.execute("SELECT COUNT(*) FROM public.properties WHERE monthly_rent_estimate_cop > 0 OR monthly_rent_cop > 0;")
     cnt_renta = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM public.properties WHERE sale_price_cop > 0;")
+    cur.execute("SELECT COUNT(*) FROM public.properties WHERE sale_price_cop > 0 OR estimated_value_cop > 0;")
     cnt_sale = cur.fetchone()[0]
 
     cur.execute("SELECT asset_type, count(*) FROM public.properties GROUP BY asset_type ORDER BY count(*) DESC;")
@@ -736,7 +826,7 @@ def main():
     print(f" Total visibles públicamente: {public_visible}")
     print(f" Predios con Avalúo Comercial (>0): {cnt_avaluo}")
     print(f" Predios con Canon de Renta (>0): {cnt_renta}")
-    print(f" Predios con Precio de Venta asignado: {cnt_sale}")
+    print(f" Predios con Valor de Referencia Comercial asignado (>0): {cnt_sale}")
     
     print("\n Desglose por Estado de Ocupación:")
     for occ, cnt in by_occupancy:

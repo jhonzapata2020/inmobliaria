@@ -210,8 +210,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <option value="Apartadó">Apartadó (Antioquia)</option>
             <option value="Carepa">Carepa (Antioquia)</option>
             <option value="Chigorodó">Chigorodó (Antioquia)</option>
+            <option value="Arboletes">Arboletes (Antioquia)</option>
+            <option value="Mutatá">Mutatá (Antioquia)</option>
+            <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
+            <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
+            <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
             <option value="Acandí">Acandí (Chocó)</option>
             <option value="Unguía">Unguía (Chocó)</option>
+            <option value="Bahía Solano">Bahía Solano (Chocó)</option>
           </select>
         </div>
 
@@ -375,8 +381,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   <option value="Apartadó">Apartadó</option>
                   <option value="Carepa">Carepa</option>
                   <option value="Chigorodó">Chigorodó</option>
+                  <option value="Arboletes">Arboletes</option>
+                  <option value="Mutatá">Mutatá</option>
+                  <option value="San Pedro de Urabá">San Pedro de Urabá</option>
+                  <option value="San Juan de Urabá">San Juan de Urabá</option>
+                  <option value="Los Córdobas">Los Córdobas</option>
                   <option value="Acandí">Acandí</option>
                   <option value="Unguía">Unguía</option>
+                  <option value="Bahía Solano">Bahía Solano</option>
                 </select>
               </div>
 

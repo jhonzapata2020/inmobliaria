@@ -302,10 +302,12 @@ export const ExecutiveDossierModal: React.FC = () => {
                     </div>
 
                     <div className="text-left sm:text-right font-mono">
-                      <div className="text-xs text-[#6B6A63]">Valor / Canon Comercial</div>
+                      <div className="text-xs text-[#6B6A63]">
+                        {prop.code.startsWith('DAR-EXCEL-') ? 'Ref. Comercial / Valor Estimado' : 'Valor / Canon Comercial'}
+                      </div>
                       <div className="text-lg font-bold text-[#1E3A2F] font-serif">
-                        {prop.salePriceCop
-                          ? formatCurrency(prop.salePriceCop)
+                        {prop.salePriceCop || prop.estimatedValueCop
+                          ? formatCurrency(prop.salePriceCop || prop.estimatedValueCop)
                           : (prop.monthlyRentCop || prop.monthlyRentEstimateCop)
                           ? `Renta: ${formatCurrency(prop.monthlyRentCop || prop.monthlyRentEstimateCop)}/mes`
                           : 'Regulada SAE'}

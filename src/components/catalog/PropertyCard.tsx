@@ -225,12 +225,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         <div className="pt-3 border-t border-[#E5E1D8] space-y-3">
           <div className="flex justify-between items-baseline">
             <span className="text-xs text-[#6B6A63] font-mono">
-              {property.salePriceCop ? 'Precio Venta:' : (property.monthlyRentCop || property.monthlyRentEstimateCop) ? 'Renta Mensual:' : 'Valor Comercial:'}
+              {property.code.startsWith('DAR-EXCEL-') 
+                ? (property.modality === 'Arriendo' ? 'Renta Estimada:' : 'Ref. Comercial:')
+                : (property.salePriceCop ? 'Precio Venta:' : (property.monthlyRentCop || property.monthlyRentEstimateCop) ? 'Renta Mensual:' : 'Valor Comercial:')}
             </span>
             <div className="text-right">
               <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono block">
-                {property.salePriceCop
-                  ? formatCurrency(property.salePriceCop)
+                {property.salePriceCop || property.estimatedValueCop
+                  ? formatCurrency(property.salePriceCop || property.estimatedValueCop)
                   : (property.monthlyRentCop || property.monthlyRentEstimateCop)
                   ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
                   : 'Regulada SAE'}

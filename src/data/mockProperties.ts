@@ -219,7 +219,7 @@ export const INITIAL_PROPERTIES: Property[] = [
     salePriceCop: 7300000000,
     images: [
       'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200&auto=format&fit=crop'
     ],
     featuredImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
     latitude: 8.5132,
@@ -437,7 +437,7 @@ export const INITIAL_PROPERTIES: Property[] = [
     images: [
       'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1524813686514-a57563d77965?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80'
     ],
     documentsAvailable: [
       { name: 'Pre-estudio Jurídico de Títulos', type: 'PDF', size: '1.4 MB' }

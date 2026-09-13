@@ -49,7 +49,8 @@ export default function PropertyDetailPage() {
         setProperty(data);
 
         if (data) {
-          const allProps = await getPublishedProperties();
+          const res = await getPublishedProperties();
+          const allProps = res.success ? res.data : [];
           const similar = allProps.filter(
             (p) => p.id !== data.id && (p.assetType === data.assetType || p.municipality === data.municipality)
           ).slice(0, 3);

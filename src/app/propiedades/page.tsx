@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { LayoutGrid, Map, Layers } from 'lucide-react';
+import { LayoutGrid, Map, Layers, AlertTriangle, RefreshCw, Loader2 } from 'lucide-react';
 import { PropertyFilterState, Property } from '../../types/property';
 import { PropertyCard } from '../../components/catalog/PropertyCard';
 import { AdvancedFilters } from '../../components/catalog/AdvancedFilters';
@@ -16,6 +16,7 @@ function PropiedadesCatalogContent() {
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initial filters from query params
   const [filters, setFilters] = useState<PropertyFilterState>({
@@ -40,18 +41,27 @@ function PropiedadesCatalogContent() {
 
   const [viewMode, setViewMode] = useState<'grid' | 'split' | 'map'>('grid');
 
-  useEffect(() => {
-    async function loadProperties() {
-      setLoading(true);
-      try {
-        const data = await getPublishedProperties(filters);
-        setProperties(data);
-      } catch (err) {
-        console.error('Failed to load published properties:', err);
-      } finally {
-        setLoading(false);
+  const loadProperties = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getPublishedProperties(filters);
+      if (res.success) {
+        setProperties(res.data);
+      } else {
+        setError(res.error || 'No pudimos conectar con el inventario inmobiliario.');
+        setProperties([]);
       }
+    } catch (err) {
+      console.error('Failed to load published properties:', err);
+      setError('No pudimos conectar con el inventario inmobiliario. Verifica la configuración de la base de datos o inténtalo nuevamente.');
+      setProperties([]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadProperties();
   }, [filters]);
 
@@ -114,7 +124,15 @@ function PropiedadesCatalogContent() {
               {showOnlyFavorites ? 'Mis Propiedades Favoritas' : 'Catálogo Visual de Propiedades'}
             </h1>
             <p className="text-xs text-[#6B6A63] font-mono mt-1">
-              Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el portafolio
+              {loading ? (
+                <span>Consultando inventario...</span>
+              ) : error ? (
+                <span className="text-rose-700 font-bold">Error de conexión al inventario</span>
+              ) : (
+                <span>
+                  Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el portafolio
+                </span>
+              )}
             </p>
           </div>
 
@@ -122,7 +140,7 @@ function PropiedadesCatalogContent() {
           <div className="flex items-center gap-1 bg-white border border-[#E5E1D8] p-1 rounded-xl text-xs font-mono shadow-sm">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
                 viewMode === 'grid' ? 'bg-[#1E3A2F] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
               }`}
             >
@@ -130,7 +148,7 @@ function PropiedadesCatalogContent() {
             </button>
             <button
               onClick={() => setViewMode('split')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
                 viewMode === 'split' ? 'bg-[#0F766E] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
               }`}
             >
@@ -138,7 +156,7 @@ function PropiedadesCatalogContent() {
             </button>
             <button
               onClick={() => setViewMode('map')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
                 viewMode === 'map' ? 'bg-[#C6A15B] text-[#242321] font-bold shadow' : 'text-[#6B6A63] hover:text-[#242321]'
               }`}
             >
@@ -155,12 +173,32 @@ function PropiedadesCatalogContent() {
           totalResults={filteredProperties.length}
         />
 
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="p-5 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-mono shadow-sm">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+              <div>
+                <strong className="font-bold text-sm block">No pudimos conectar con el inventario inmobiliario.</strong>
+                <span className="text-rose-700">Verifica la configuración de la base de datos o inténtalo nuevamente ({error}).</span>
+              </div>
+            </div>
+            <button
+              onClick={loadProperties}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
+            >
+              <RefreshCw className="w-4 h-4" /> Reintentar
+            </button>
+          </div>
+        )}
+
         {/* Loading Indicator */}
         {loading ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] text-xs font-mono text-[#6B6A63] shadow-sm">
-            Consultando base de datos persistente en Supabase...
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] text-xs font-mono text-[#6B6A63] shadow-sm flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-[#1E3A2F]" />
+            <span>Consultando el inventario inmobiliario...</span>
           </div>
-        ) : (
+        ) : !error && (
           <>
             {/* VIEW MODE 1: GRID VIEW */}
             {viewMode === 'grid' && (
@@ -170,7 +208,7 @@ function PropiedadesCatalogContent() {
                     <p className="text-[#6B6A63] text-sm font-semibold">No se encontraron propiedades con los filtros aplicados.</p>
                     <button
                       onClick={handleResetFilters}
-                      className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921]"
+                      className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921] cursor-pointer"
                     >
                       Limpiar Filtros
                     </button>

@@ -16,8 +16,12 @@ export default function MapaPage() {
   useEffect(() => {
     async function loadProperties() {
       try {
-        const data = await getPublishedProperties();
-        setProperties(data);
+        const res = await getPublishedProperties();
+        if (res.success) {
+          setProperties(res.data);
+        } else {
+          console.error('Failed to load map properties:', res.error);
+        }
       } catch (err) {
         console.error('Failed to load map properties:', err);
       } finally {

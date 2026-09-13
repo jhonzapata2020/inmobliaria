@@ -14,7 +14,8 @@ export default function InversionPage() {
   useEffect(() => {
     async function loadInvestmentProperties() {
       try {
-        const allProps = await getPublishedProperties();
+        const res = await getPublishedProperties();
+        const allProps = res.success ? res.data : [];
         const filtered = allProps.filter((p) => p.isInvestmentOpportunity || p.modality === 'Inversión');
         setInvestmentProperties(filtered.length > 0 ? filtered : allProps.slice(0, 4));
       } catch (err) {

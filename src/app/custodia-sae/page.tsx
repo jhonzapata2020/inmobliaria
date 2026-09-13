@@ -14,7 +14,8 @@ export default function CustodiaSaePage() {
   useEffect(() => {
     async function loadSaeProperties() {
       try {
-        const allProps = await getPublishedProperties();
+        const res = await getPublishedProperties();
+        const allProps = res.success ? res.data : [];
         const filtered = allProps.filter((p) => p.modality === 'Custodia SAE' || p.isSae || p.assetType === 'Activo Especial');
         setSaeProperties(filtered);
       } catch (err) {

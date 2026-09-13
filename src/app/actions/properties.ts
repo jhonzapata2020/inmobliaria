@@ -9,6 +9,17 @@ import { ActionResponse } from '../../types/action-response';
 
 export type { ActionResponse };
 
+export type PublicPropertiesResult =
+  | {
+      success: true;
+      data: Property[];
+    }
+  | {
+      success: false;
+      error: string;
+      code: 'DATABASE_ERROR' | 'CONFIGURATION_ERROR' | 'UNKNOWN_ERROR';
+    };
+
 function sanitizePublicProperty(prop: Property): Property {
   if (prop.isConfidentialCoords) {
     return {
@@ -24,7 +35,7 @@ function sanitizePublicProperty(prop: Property): Property {
   return prop;
 }
 
-export async function getPublishedProperties(filters?: PropertyFilterState): Promise<Property[]> {
+export async function getPublishedProperties(filters?: PropertyFilterState): Promise<PublicPropertiesResult> {
   try {
     const supabase = await createClient();
     let query = supabase
@@ -51,12 +62,44 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         query = query.ilike('department', `%${filters.department}%`);
       }
 
+      if (filters.minPrice) {
+        const pMin = Number(filters.minPrice);
+        if (!isNaN(pMin) && pMin > 0) {
+          query = query.or(`sale_price_cop.gte.${pMin},monthly_rent_cop.gte.${pMin},estimated_value_cop.gte.${pMin}`);
+        }
+      }
+
+      if (filters.maxPrice) {
+        const pMax = Number(filters.maxPrice);
+        if (!isNaN(pMax) && pMax > 0) {
+          query = query.or(`sale_price_cop.lte.${pMax},monthly_rent_cop.lte.${pMax},estimated_value_cop.lte.${pMax}`);
+        }
+      }
+
+      if (filters.minArea) {
+        const aMin = Number(filters.minArea);
+        if (!isNaN(aMin) && aMin > 0) {
+          query = query.gte('land_area_m2', aMin);
+        }
+      }
+
+      if (filters.maxArea) {
+        const aMax = Number(filters.maxArea);
+        if (!isNaN(aMax) && aMax > 0) {
+          query = query.lte('land_area_m2', aMax);
+        }
+      }
+
+      if (filters.legalStatus && filters.legalStatus !== 'all') {
+        query = query.ilike('legal_status', `%${filters.legalStatus}%`);
+      }
+
       if (filters.isInvestmentOpportunity) {
         query = query.eq('is_investment_opportunity', true);
       }
 
       if (filters.searchQuery) {
-        const q = `%${filters.searchQuery}%`;
+        const q = `%${filters.searchQuery.trim()}%`;
         query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q}`);
       }
 
@@ -77,13 +120,26 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
 
     if (error) {
       console.error('Error fetching published properties:', error);
-      return [];
+      return {
+        success: false,
+        error: error.message || 'Error al consultar la base de datos de propiedades',
+        code: 'DATABASE_ERROR',
+      };
     }
 
-    return (data || []).map((item) => sanitizePublicProperty(mapDbToProperty(item)));
-  } catch (err) {
+    const properties = (data || []).map((item) => sanitizePublicProperty(mapDbToProperty(item)));
+    return {
+      success: true,
+      data: properties,
+    };
+  } catch (err: unknown) {
     console.error('Unexpected error in getPublishedProperties:', err);
-    return [];
+    const message = err instanceof Error ? err.message : 'Error de conexión o de servidor';
+    return {
+      success: false,
+      error: message,
+      code: 'UNKNOWN_ERROR',
+    };
   }
 }
 

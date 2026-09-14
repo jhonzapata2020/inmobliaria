@@ -38,7 +38,58 @@ STRATEGIC_WHITELIST_MAP = {
     'UNGUA': ('Unguía', 'Chocó'),
     'RIOSUCIO': ('Riosucio', 'Chocó'),
     'BAHIA SOLANO': ('Bahía Solano', 'Chocó'),
-    'JURADO': ('Juradó', 'Chocó')
+    'JURADO': ('Juradó', 'Chocó'),
+
+    # La Guajira Strategic Municipalities
+    'RIOHACHA': ('Riohacha', 'La Guajira'),
+    'MAICAO': ('Maicao', 'La Guajira'),
+    'DIBULLA': ('Dibulla', 'La Guajira'),
+    'VILLANUEVA': ('Villanueva', 'La Guajira'),
+    'SAN JUAN DEL CESAR': ('San Juan del Cesar', 'La Guajira'),
+    'BARRANCAS': ('Barrancas', 'La Guajira'),
+    'FONSECA': ('Fonseca', 'La Guajira'),
+    'ALBANIA': ('Albania', 'La Guajira'),
+    'URIBIA': ('Uribia', 'La Guajira'),
+    'MANAURE': ('Manaure', 'La Guajira'),
+    'URUMITA': ('Urumita', 'La Guajira'),
+    'HATONUEVO': ('Hatonuevo', 'La Guajira'),
+    'EL MOLINO': ('El Molino', 'La Guajira'),
+    'DISTRACCION': ('Distracción', 'La Guajira'),
+    'LA JAGUA DEL PILAR': ('La Jagua del Pilar', 'La Guajira'),
+    'GUAJIRA': ('Riohacha', 'La Guajira')
+}
+
+MUNICIPALITY_COORDINATES = {
+    'Turbo': (8.0934, -76.7289),
+    'Necoclí': (8.4256, -76.7861),
+    'Apartadó': (7.8847, -76.6269),
+    'Carepa': (7.7570, -76.6547),
+    'Chigorodó': (7.6672, -76.6811),
+    'Arboletes': (8.8517, -76.4267),
+    'Mutatá': (7.2436, -76.4358),
+    'San Pedro de Urabá': (8.2778, -76.3764),
+    'San Juan de Urabá': (8.7592, -76.5297),
+    'Los Córdobas': (8.8942, -76.3539),
+    'Acandí': (8.5114, -77.2778),
+    'Unguía': (8.0431, -77.0944),
+    'Riosucio': (7.4419, -77.1147),
+    'Bahía Solano': (6.2269, -77.4044),
+    'Juradó': (7.1069, -77.7667),
+    'Riohacha': (11.5444, -72.9072),
+    'Maicao': (11.3775, -72.2433),
+    'Dibulla': (11.2728, -73.3094),
+    'Villanueva': (10.6047, -72.9806),
+    'San Juan del Cesar': (10.7711, -73.0031),
+    'Barrancas': (10.9578, -72.7886),
+    'Fonseca': (10.8864, -72.8483),
+    'Albania': (11.1614, -72.5928),
+    'Uribia': (11.7139, -72.2661),
+    'Manaure': (11.7750, -72.4444),
+    'Urumita': (10.5636, -73.0125),
+    'Hatonuevo': (11.0664, -72.7072),
+    'El Molino': (10.6528, -72.9239),
+    'Distracción': (10.8986, -72.8878),
+    'La Jagua del Pilar': (10.5103, -73.0728)
 }
 
 RUIN_TERMS = ['AMENAZA DE RUINA', 'MAL ESTADO', 'INHABITABLE', 'DEMOLICION', 'SOLO MEJORAS DETERIORADAS', 'RUINA', 'DETERIORADO']
@@ -847,8 +898,9 @@ def main():
             legal_status = sanitize_text(row.get(legal_col), "Saneado")
 
             # Deterministic Coordinate Dispersion per municipality
-            lat = 8.0 + (idx_count * 0.0005)
-            lng = -76.7 - (idx_count * 0.0005)
+            base_lat, base_lng = MUNICIPALITY_COORDINATES.get(muni_canonical, (8.5, -76.7))
+            lat = round(base_lat + ((idx_count % 37) * 0.0015 - 0.027), 6)
+            lng = round(base_lng + (((idx_count * 13) % 41) * 0.0015 - 0.030), 6)
 
             address_str = dir_val if dir_val else (f"Vereda {vereda_val}" if vereda_val else f"Sector {muni_canonical}")
 

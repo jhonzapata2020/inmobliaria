@@ -89,6 +89,26 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
     isInvestmentOpportunity: Boolean(row.is_investment_opportunity),
     createdDate: row.created_at ? new Date(String(row.created_at)).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
     updatedDate: row.updated_at ? new Date(String(row.updated_at)).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+
+    createdBy: row.created_by ? String(row.created_by) : undefined,
+    commissionAgreement: row.commission_agreement ? String(row.commission_agreement) : 'split_50_50',
+    contactNotes: row.contact_notes ? String(row.contact_notes) : undefined,
+  };
+}
+
+export function mapDbToProfile(row: Record<string, unknown>): import('../../types/property').UserProfile {
+  return {
+    id: String(row.id || ''),
+    email: row.email ? String(row.email) : undefined,
+    fullName: row.full_name ? String(row.full_name) : undefined,
+    role: String(row.role || 'broker'),
+    userType: (row.user_type as any) || (row.role === 'admin' ? 'admin' : 'broker'),
+    phone: row.phone ? String(row.phone) : undefined,
+    companyName: row.company_name ? String(row.company_name) : undefined,
+    isVerified: Boolean(row.is_verified),
+    isActive: row.is_active !== false,
+    createdAt: row.created_at ? String(row.created_at) : undefined,
+    updatedAt: row.updated_at ? String(row.updated_at) : undefined,
   };
 }
 

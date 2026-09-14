@@ -95,11 +95,11 @@ export const Navbar: React.FC = () => {
           
           {/* Desktop Partner Access (Portal Socios) */}
           <Link
-            href="/admin"
+            href="/portal-socios"
             className="hidden md:flex text-[#6B6A63] hover:text-[#1E3A2F] text-xs font-semibold items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[#F8F7F2] transition-colors"
-            title="Acceso Asesores & Panel Interno"
+            title="Portal de Socios, Propietarios y Corredores Aliados"
           >
-            <Lock className="w-3.5 h-3.5 text-[#6B6A63]" />
+            <Lock className="w-3.5 h-3.5 text-[#1E3A2F]" />
             <span>Portal Socios</span>
           </Link>
 

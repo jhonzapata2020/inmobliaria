@@ -367,6 +367,9 @@ export async function upsertPropertyAction(formData: Partial<Property>): Promise
       availability: formData.availability || 'Disponible',
       is_featured: formData.isFeatured ?? false,
       is_investment_opportunity: formData.isInvestmentOpportunity ?? false,
+      created_by: formData.createdBy || null,
+      commission_agreement: formData.commissionAgreement || 'split_50_50',
+      contact_notes: formData.contactNotes || null,
       updated_at: new Date().toISOString(),
     };
 

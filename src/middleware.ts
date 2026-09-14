@@ -43,9 +43,18 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Protect /socios routes
+  if (pathname.startsWith('/socios')) {
+    if (!user) {
+      const loginUrl = new URL('/portal-socios/login', request.url);
+      loginUrl.searchParams.set('redirectedFrom', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/socios/:path*'],
 };

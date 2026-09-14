@@ -22,7 +22,7 @@ export type LegalStatus =
   | 'Información disponible bajo solicitud'
   | string;
 
-export type AvailabilityStatus = 'Disponible' | 'En negociación' | 'Reservado' | 'Adjudicado';
+export type AvailabilityStatus = 'Disponible' | 'En negociación' | 'Reservado' | 'Adjudicado' | 'Archivado';
 export type EditorialStatus = 'draft' | 'review' | 'published' | 'archived';
 
 export interface DocumentItem {
@@ -105,6 +105,27 @@ export interface Property {
   isInvestmentOpportunity: boolean;
   createdDate: string;
   updatedDate: string;
+
+  // Partner & Origin Metadata
+  createdBy?: string;
+  commissionAgreement?: 'split_50_50' | 'direct_owner' | 'custom' | string;
+  contactNotes?: string;
+}
+
+export type UserType = 'owner' | 'broker' | 'investor' | 'admin';
+
+export interface UserProfile {
+  id: string;
+  email?: string;
+  fullName?: string;
+  role: string;
+  userType: UserType;
+  phone?: string;
+  companyName?: string;
+  isVerified: boolean;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type PotentialUse =

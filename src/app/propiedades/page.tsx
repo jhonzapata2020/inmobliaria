@@ -120,151 +120,153 @@ function PropiedadesCatalogContent() {
   }, [properties, showOnlyFavorites, favoriteIds]);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F2] pb-20 print:hidden no-print">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        
-        {/* Page Title Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold tracking-wider">
-              Marketplace Inmobiliario Premium
-            </span>
-            <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#242321] mt-1">
-              {showOnlyFavorites ? 'Mis Propiedades Favoritas' : 'Catálogo Visual de Propiedades'}
-            </h1>
-            <p className="text-xs text-[#6B6A63] font-mono mt-1">
-              {loading ? (
-                <span>Consultando inventario...</span>
-              ) : error ? (
-                <span className="text-rose-700 font-bold">Error de conexión al inventario</span>
-              ) : (
-                <span>
-                  Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el portafolio
-                </span>
-              )}
-            </p>
-          </div>
-
-          {/* View Mode Switcher */}
-          <div className="flex items-center gap-1 bg-white border border-[#E5E1D8] p-1 rounded-xl text-xs font-mono shadow-sm">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
-                viewMode === 'grid' ? 'bg-[#1E3A2F] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" /> Grid
-            </button>
-            <button
-              onClick={() => setViewMode('split')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
-                viewMode === 'split' ? 'bg-[#0F766E] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" /> Lista & Mapa
-            </button>
-            <button
-              onClick={() => setViewMode('map')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
-                viewMode === 'map' ? 'bg-[#C6A15B] text-[#242321] font-bold shadow' : 'text-[#6B6A63] hover:text-[#242321]'
-              }`}
-            >
-              <Map className="w-3.5 h-3.5" /> Mapa Full
-            </button>
-          </div>
-        </div>
-
-        {/* Advanced Filters Panel */}
-        <AdvancedFilters
-          filters={filters}
-          onFilterChange={setFilters}
-          onResetFilters={handleResetFilters}
-          totalResults={filteredProperties.length}
-          onOpenInventoryReport={() => setIsInventoryReportOpen(true)}
-        />
-
-        {/* Error Alert Banner */}
-        {error && (
-          <div className="p-5 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-mono shadow-sm">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
-              <div>
-                <strong className="font-bold text-sm block">No pudimos conectar con el inventario inmobiliario.</strong>
-                <span className="text-rose-700">Verifica la configuración de la base de datos o inténtalo nuevamente ({error}).</span>
-              </div>
-            </div>
-            <button
-              onClick={loadProperties}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
-            >
-              <RefreshCw className="w-4 h-4" /> Reintentar
-            </button>
-          </div>
-        )}
-
-        {/* Loading Indicator */}
-        {loading ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] text-xs font-mono text-[#6B6A63] shadow-sm flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-6 h-6 animate-spin text-[#1E3A2F]" />
-            <span>Consultando el inventario inmobiliario...</span>
-          </div>
-        ) : !error && (
-          <>
-            {/* VIEW MODE 1: GRID VIEW */}
-            {viewMode === 'grid' && (
-              <>
-                {filteredProperties.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] space-y-4 shadow-sm">
-                    <p className="text-[#6B6A63] text-sm font-semibold">No se encontraron propiedades con los filtros aplicados.</p>
-                    <button
-                      onClick={handleResetFilters}
-                      className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921] cursor-pointer"
-                    >
-                      Limpiar Filtros
-                    </button>
-                  </div>
+    <>
+      <div className="min-h-screen bg-[#F8F7F2] pb-20 print:hidden no-print">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          
+          {/* Page Title Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold tracking-wider">
+                Marketplace Inmobiliario Premium
+              </span>
+              <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#242321] mt-1">
+                {showOnlyFavorites ? 'Mis Propiedades Favoritas' : 'Catálogo Visual de Propiedades'}
+              </h1>
+              <p className="text-xs text-[#6B6A63] font-mono mt-1">
+                {loading ? (
+                  <span>Consultando inventario...</span>
+                ) : error ? (
+                  <span className="text-rose-700 font-bold">Error de conexión al inventario</span>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <span>
+                    Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el portafolio
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-1 bg-white border border-[#E5E1D8] p-1 rounded-xl text-xs font-mono shadow-sm">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-[#1E3A2F] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" /> Grid
+              </button>
+              <button
+                onClick={() => setViewMode('split')}
+                className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
+                  viewMode === 'split' ? 'bg-[#0F766E] text-white shadow' : 'text-[#6B6A63] hover:text-[#242321]'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" /> Lista & Mapa
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-semibold cursor-pointer ${
+                  viewMode === 'map' ? 'bg-[#C6A15B] text-[#242321] font-bold shadow' : 'text-[#6B6A63] hover:text-[#242321]'
+                }`}
+              >
+                <Map className="w-3.5 h-3.5" /> Mapa Full
+              </button>
+            </div>
+          </div>
+
+          {/* Advanced Filters Panel Panel */}
+          <AdvancedFilters
+            filters={filters}
+            onFilterChange={setFilters}
+            onResetFilters={handleResetFilters}
+            totalResults={filteredProperties.length}
+            onOpenInventoryReport={() => setIsInventoryReportOpen(true)}
+          />
+
+          {/* Error Alert Banner */}
+          {error && (
+            <div className="p-5 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-mono shadow-sm">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+                <div>
+                  <strong className="font-bold text-sm block">No pudimos conectar con el inventario inmobiliario.</strong>
+                  <span className="text-rose-700">Verifica la configuración de la base de datos o inténtalo nuevamente ({error}).</span>
+                </div>
+              </div>
+              <button
+                onClick={loadProperties}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
+              >
+                <RefreshCw className="w-4 h-4" /> Reintentar
+              </button>
+            </div>
+          )}
+
+          {/* Loading Indicator */}
+          {loading ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] text-xs font-mono text-[#6B6A63] shadow-sm flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-6 h-6 animate-spin text-[#1E3A2F]" />
+              <span>Consultando el inventario inmobiliario...</span>
+            </div>
+          ) : !error && (
+            <>
+              {/* VIEW MODE 1: GRID VIEW */}
+              {viewMode === 'grid' && (
+                <>
+                  {filteredProperties.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E1D8] space-y-4 shadow-sm">
+                      <p className="text-[#6B6A63] text-sm font-semibold">No se encontraron propiedades con los filtros aplicados.</p>
+                      <button
+                        onClick={handleResetFilters}
+                        className="px-5 py-2.5 bg-[#1E3A2F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#152921] cursor-pointer"
+                      >
+                        Limpiar Filtros
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredProperties.map((property) => (
+                        <PropertyCard key={property.id} property={property} />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* VIEW MODE 2: SPLIT LIST & MAP */}
+              {viewMode === 'split' && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  <div className="lg:col-span-6 space-y-4 max-h-[800px] overflow-y-auto pr-2">
                     {filteredProperties.map((property) => (
                       <PropertyCard key={property.id} property={property} />
                     ))}
                   </div>
-                )}
-              </>
-            )}
-
-            {/* VIEW MODE 2: SPLIT LIST & MAP */}
-            {viewMode === 'split' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div className="lg:col-span-6 space-y-4 max-h-[800px] overflow-y-auto pr-2">
-                  {filteredProperties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
-                  ))}
+                  <div className="lg:col-span-6 sticky top-24">
+                    <PropertyMap properties={filteredProperties} height="780px" />
+                  </div>
                 </div>
-                <div className="lg:col-span-6 sticky top-24">
-                  <PropertyMap properties={filteredProperties} height="780px" />
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* VIEW MODE 3: FULL MAP */}
-            {viewMode === 'map' && (
-              <div className="space-y-4">
-                <PropertyMap properties={filteredProperties} height="700px" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {filteredProperties.map((p) => (
-                    <div key={p.id} className="p-3 bg-white rounded-xl border border-[#E5E1D8] text-xs shadow-sm">
-                      <span className="font-mono text-[#1E3A2F] font-bold">{p.code}</span>
-                      <h4 className="font-bold text-[#242321] truncate">{p.title}</h4>
-                      <p className="text-[#6B6A63]">{p.municipality}</p>
-                    </div>
-                  ))}
+              {/* VIEW MODE 3: FULL MAP */}
+              {viewMode === 'map' && (
+                <div className="space-y-4">
+                  <PropertyMap properties={filteredProperties} height="700px" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {filteredProperties.map((p) => (
+                      <div key={p.id} className="p-3 bg-white rounded-xl border border-[#E5E1D8] text-xs shadow-sm">
+                        <span className="font-mono text-[#1E3A2F] font-bold">{p.code}</span>
+                        <h4 className="font-bold text-[#242321] truncate">{p.title}</h4>
+                        <p className="text-[#6B6A63]">{p.municipality}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
 
+        </div>
       </div>
 
       {/* Executive Inventory Tabular Report Modal */}
@@ -274,7 +276,7 @@ function PropiedadesCatalogContent() {
         properties={filteredProperties}
         filters={filters}
       />
-    </div>
+    </>
   );
 }
 

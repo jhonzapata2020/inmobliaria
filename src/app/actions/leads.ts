@@ -121,3 +121,63 @@ export async function createLeadAction(leadData: Partial<Lead>): Promise<ActionR
     return { success: false, error: 'DATABASE_ERROR', message };
   }
 }
+
+export interface PropertyConsignmentInput {
+  clientName: string;
+  phone: string;
+  email?: string;
+  municipality: string;
+  extensionArea?: string;
+  expectedPriceCop?: number;
+  comments?: string;
+}
+
+export async function submitConsignmentLeadAction(
+  input: PropertyConsignmentInput
+): Promise<ActionResponse<{ id: string }>> {
+  try {
+    const supabase = createAdminClient();
+
+    const noteEntry = {
+      id: `note-${Date.now()}`,
+      author: 'Portal Público - Consignación Propietario',
+      date: new Date().toISOString().split('T')[0],
+      text: `Radicación de predio en ${input.municipality}. Extensión: ${input.extensionArea || 'No especificada'}. Expectativa: ${input.expectedPriceCop ? '$' + input.expectedPriceCop.toLocaleString('es-CO') + ' COP' : 'A convenir'}. ${input.comments || ''}`.trim()
+    };
+
+    const payload = {
+      client_name: input.clientName,
+      company_name: 'Propietario Consignante',
+      phone: input.phone,
+      email: input.email || '',
+      property_of_interest_title: `Consignación de predio en ${input.municipality} (${input.extensionArea || 'Área por confirmar'})`,
+      potential_value: input.expectedPriceCop || null,
+      stage: 'Nuevo',
+      priority: 'Alta',
+      assigned_agent: 'Mesa Comercial Urabá',
+      tags: ['Consignación Directa', 'Propietario', input.municipality],
+      notes: [noteEntry],
+      activities: [],
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('crm_leads')
+      .insert(payload)
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error inserting consignment lead:', error);
+      return { success: false, error: 'DATABASE_ERROR', message: error.message };
+    }
+
+    revalidatePath('/admin/crm');
+    return { success: true, data: { id: data.id } };
+  } catch (err: unknown) {
+    console.error('Unexpected error in submitConsignmentLeadAction:', err);
+    const message = err instanceof Error ? err.message : 'Error al registrar la consignación.';
+    return { success: false, error: 'DATABASE_ERROR', message };
+  }
+}
+

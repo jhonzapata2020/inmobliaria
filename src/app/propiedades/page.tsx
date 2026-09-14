@@ -7,6 +7,7 @@ import { PropertyFilterState, Property } from '../../types/property';
 import { PropertyCard } from '../../components/catalog/PropertyCard';
 import { AdvancedFilters } from '../../components/catalog/AdvancedFilters';
 import { PropertyMap } from '../../components/map/PropertyMap';
+import { ExecutiveInventoryReportModal } from '../../components/dossier/ExecutiveInventoryReportModal';
 import { useFavorites } from '../../context/FavoritesContext';
 import { getPublishedProperties } from '../actions/properties';
 
@@ -17,6 +18,7 @@ function PropiedadesCatalogContent() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInventoryReportOpen, setIsInventoryReportOpen] = useState(false);
 
   // Initial filters from query params
   const [filters, setFilters] = useState<PropertyFilterState>({
@@ -178,6 +180,7 @@ function PropiedadesCatalogContent() {
           onFilterChange={setFilters}
           onResetFilters={handleResetFilters}
           totalResults={filteredProperties.length}
+          onOpenInventoryReport={() => setIsInventoryReportOpen(true)}
         />
 
         {/* Error Alert Banner */}
@@ -263,6 +266,14 @@ function PropiedadesCatalogContent() {
         )}
 
       </div>
+
+      {/* Executive Inventory Tabular Report Modal */}
+      <ExecutiveInventoryReportModal
+        isOpen={isInventoryReportOpen}
+        onClose={() => setIsInventoryReportOpen(false)}
+        properties={filteredProperties}
+        filters={filters}
+      />
     </div>
   );
 }

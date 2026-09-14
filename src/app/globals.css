@@ -135,4 +135,19 @@
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+
+  /* Table Print Optimization */
+  @page {
+    size: letter landscape;
+    margin: 10mm;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 }

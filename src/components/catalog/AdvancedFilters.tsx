@@ -7,7 +7,8 @@ import {
   Search, 
   X, 
   Sparkles,
-  Check
+  Check,
+  FileSpreadsheet
 } from 'lucide-react';
 import { PropertyFilterState } from '../../types/property';
 
@@ -16,13 +17,15 @@ interface AdvancedFiltersProps {
   onFilterChange: (newFilters: PropertyFilterState) => void;
   onResetFilters: () => void;
   totalResults: number;
+  onOpenInventoryReport?: () => void;
 }
 
 export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   filters,
   onFilterChange,
   onResetFilters,
-  totalResults
+  totalResults,
+  onOpenInventoryReport
 }) => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
@@ -114,11 +117,23 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Executive Inventory Report Button */}
+          {onOpenInventoryReport && (
+            <button
+              onClick={onOpenInventoryReport}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg shadow-sm transition cursor-pointer shrink-0"
+              title="Ver e imprimir informe tabular consolidado en PDF"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>Informe Ejecutivo PDF</span>
+            </button>
+          )}
+
           {/* Investment Opportunity Toggle */}
           <button
             onClick={() => updateField('isInvestmentOpportunity', !filters.isInvestmentOpportunity)}
-            className={`px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+            className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer ${
               filters.isInvestmentOpportunity
                 ? 'bg-[#C6A15B]/20 text-[#C6A15B] border-[#C6A15B]/60 shadow-sm'
                 : 'bg-[#F8F7F2] border-[#E5E1D8] text-[#6B6A63] hover:text-[#242321]'
@@ -132,7 +147,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           {activeFiltersCount > 0 && (
             <button
               onClick={onResetFilters}
-              className="px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#F1EFE8] text-[#6B6A63] hover:text-rose-600 hover:bg-[#E5E1D8] flex items-center gap-1.5 transition-colors border border-[#E5E1D8]"
+              className="px-3 py-2 rounded-lg text-xs font-semibold bg-[#F1EFE8] text-[#6B6A63] hover:text-rose-600 hover:bg-[#E5E1D8] flex items-center gap-1.5 transition-colors border border-[#E5E1D8] cursor-pointer"
               title="Limpiar todos los filtros"
             >
               <RotateCcw className="w-3.5 h-3.5" />

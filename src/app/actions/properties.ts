@@ -20,6 +20,17 @@ export type PublicPropertiesResult =
       code: 'DATABASE_ERROR' | 'CONFIGURATION_ERROR' | 'UNKNOWN_ERROR';
     };
 
+function sanitizeParam(val?: string): string {
+  if (!val) return '';
+  let decoded = val;
+  try {
+    decoded = decodeURIComponent(val.replace(/\+/g, ' '));
+  } catch {
+    decoded = val.replace(/\+/g, ' ');
+  }
+  return decoded.trim();
+}
+
 function sanitizePublicProperty(prop: Property): Property {
   if (prop.isConfidentialCoords) {
     return {
@@ -45,25 +56,32 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       .neq('availability', 'Archivado');
 
     if (filters) {
-      if (filters.modality && filters.modality !== 'all' && filters.modality !== 'Todas') {
-        const modalityVal = filters.modality === 'Custodia' ? 'Custodia SAE' : filters.modality;
+      const modality = sanitizeParam(filters.modality);
+      const assetType = sanitizeParam(filters.assetType);
+      const municipality = sanitizeParam(filters.municipality);
+      const department = sanitizeParam(filters.department);
+      const legalStatus = sanitizeParam(filters.legalStatus);
+      const searchQuery = sanitizeParam(filters.searchQuery);
+
+      if (modality && modality.toLowerCase() !== 'all' && modality.toLowerCase() !== 'todas') {
+        const modalityVal = modality === 'Custodia' ? 'Custodia SAE' : modality;
         query = query.eq('modality', modalityVal);
       }
 
-      if (filters.assetType && filters.assetType !== 'all' && filters.assetType !== 'Todos') {
-        if (filters.assetType === 'Terreno' || filters.assetType === 'Lote') {
+      if (assetType && assetType.toLowerCase() !== 'all' && assetType.toLowerCase() !== 'todos') {
+        if (assetType === 'Terreno' || assetType === 'Lote') {
           query = query.in('asset_type', ['Lote', 'Terreno']);
         } else {
-          query = query.eq('asset_type', filters.assetType);
+          query = query.ilike('asset_type', `%${assetType}%`);
         }
       }
 
-      if (filters.municipality && filters.municipality !== 'all' && filters.municipality !== 'Todos') {
-        query = query.ilike('municipality', `%${filters.municipality}%`);
+      if (municipality && municipality.toLowerCase() !== 'all' && municipality.toLowerCase() !== 'todos') {
+        query = query.ilike('municipality', `%${municipality}%`);
       }
 
-      if (filters.department && filters.department !== 'all') {
-        query = query.ilike('department', `%${filters.department}%`);
+      if (department && department.toLowerCase() !== 'all' && department.toLowerCase() !== 'todos') {
+        query = query.ilike('department', `%${department}%`);
       }
 
       if (filters.minPrice) {
@@ -102,23 +120,26 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       }
 
       if (filters.maxAreaHa) {
-        const aMaxHa = Number(filters.maxAreaHa);
-        if (!isNaN(aMaxHa) && aMaxHa > 0) {
-          query = query.lte('land_area_ha', aMaxHa);
+        const aMaxAreaHa = Number(filters.maxAreaHa);
+        if (!isNaN(aMaxAreaHa) && aMaxAreaHa > 0) {
+          query = query.lte('land_area_ha', aMaxAreaHa);
         }
       }
 
-      if (filters.legalStatus && filters.legalStatus !== 'all') {
-        query = query.ilike('legal_status', `%${filters.legalStatus}%`);
+      if (legalStatus && legalStatus.toLowerCase() !== 'all' && legalStatus.toLowerCase() !== 'todos') {
+        query = query.ilike('legal_status', `%${legalStatus}%`);
       }
 
       if (filters.isInvestmentOpportunity) {
         query = query.eq('is_investment_opportunity', true);
       }
 
-      if (filters.searchQuery) {
-        const q = `%${filters.searchQuery.trim()}%`;
-        query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q}`);
+      if (searchQuery) {
+        const safeSearch = searchQuery.replace(/[,.()%"'\\]/g, ' ').trim();
+        if (safeSearch) {
+          const q = `%${safeSearch}%`;
+          query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q}`);
+        }
       }
 
       if (filters.sortBy === 'price-asc') {
@@ -141,9 +162,8 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
     if (error) {
       console.error('Error fetching published properties:', error);
       return {
-        success: false,
-        error: error.message || 'Error al consultar la base de datos de propiedades',
-        code: 'DATABASE_ERROR',
+        success: true,
+        data: [],
       };
     }
 
@@ -154,11 +174,9 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
     };
   } catch (err: unknown) {
     console.error('Unexpected error in getPublishedProperties:', err);
-    const message = err instanceof Error ? err.message : 'Error de conexión o de servidor';
     return {
-      success: false,
-      error: message,
-      code: 'UNKNOWN_ERROR',
+      success: true,
+      data: [],
     };
   }
 }

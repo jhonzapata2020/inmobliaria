@@ -120,7 +120,7 @@ function PropiedadesCatalogContent() {
   }, [properties, showOnlyFavorites, favoriteIds]);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F2] pb-20">
+    <div className="min-h-screen bg-[#F8F7F2] pb-20 print:hidden no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         {/* Page Title Header */}

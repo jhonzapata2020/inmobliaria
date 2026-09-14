@@ -57,31 +57,38 @@
   background: #1E3A2F;
 }
 
-/* Strict Print Isolation for Executive Dossier */
+/* Strict Print Isolation for Executive Dossier & Tabular Inventory Report */
 @media print {
-  /* Collapse main page content, navigation, headers and footers to 0px height */
-  main,
+  /* 1. Configurar orientación horizontal para tablas de múltiples columnas */
+  @page {
+    size: letter landscape;
+    margin: 12mm 10mm 12mm 10mm;
+  }
+
+  /* 2. Ocultar todos los elementos de la interfaz */
+  nav,
   header,
   footer,
-  nav,
   aside,
+  button,
   .no-print,
   [data-radix-portal] {
     display: none !important;
   }
 
-  /* Reset body and html layout */
+  /* 3. Desbloquear el contenedor del reporte y neutralizar scrolls */
   html, body {
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
     background: white !important;
     color: black !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
-  /* Modal Backdrop & Container Print Reset */
+  /* Si el modal está activo, desactivar posiciones fixed/overflow que rompen print */
+  .fixed.inset-0,
   .executive-dossier-backdrop {
     position: static !important;
     background: transparent !important;
@@ -106,23 +113,28 @@
     min-height: 0 !important;
   }
 
-  /* The printable container */
+  #reporte-tabular-imprimible,
   #dossier-printable-area {
-    display: block !important;
     position: static !important;
+    display: block !important;
     width: 100% !important;
     max-width: 100% !important;
     max-height: none !important;
+    height: auto !important;
     overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
     padding: 0 !important;
     margin: 0 !important;
     background: white !important;
     color: black !important;
-    box-shadow: none !important;
-    border: none !important;
   }
 
-  /* Hide interactive form controls inside the dossier during print */
+  /* Hide interactive form controls inside report during print */
+  #reporte-tabular-imprimible form,
+  #reporte-tabular-imprimible select,
+  #reporte-tabular-imprimible button,
+  #reporte-tabular-imprimible .no-print,
   #dossier-printable-area form,
   #dossier-printable-area select,
   #dossier-printable-area button,
@@ -130,24 +142,29 @@
     display: none !important;
   }
 
-  /* Prevent property cards from breaking across page splits */
-  .break-inside-avoid {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-  }
-
-  /* Table Print Optimization */
-  @page {
-    size: letter landscape;
-    margin: 10mm;
+  /* 4. Estructura de tabla para impresión continua */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
   }
 
   thead {
-    display: table-header-group !important;
+    display: table-header-group !important; /* Repetir cabecera en cada página */
   }
 
   tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  td, th {
+    padding: 6px 8px !important;
+    font-size: 9pt !important;
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }

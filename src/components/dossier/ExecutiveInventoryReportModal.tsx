@@ -109,7 +109,7 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
         {/* Printable Report Body */}
         <div 
-          id="dossier-printable-area" 
+          id="reporte-tabular-imprimible" 
           className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 print:p-0 print:overflow-visible print:bg-white"
         >
           {/* Institutional Header */}

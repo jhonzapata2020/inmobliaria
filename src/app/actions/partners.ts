@@ -10,9 +10,10 @@ export interface RegisterPartnerInput {
   email: string;
   password: string;
   fullName: string;
-  userType: UserType; // 'owner' | 'broker'
+  userType: UserType; // 'owner' | 'broker' | 'broker_group'
   phone?: string;
   companyName?: string;
+  municipalityBase?: string;
 }
 
 export interface PartnerPropertyInput {
@@ -28,6 +29,10 @@ export interface PartnerPropertyInput {
   potentialUse?: string;
   salePriceCop?: number;
   commissionAgreement?: string;
+  netPriceOwnerCop?: number;
+  groupCommissionCop?: number;
+  fixedFeeCop?: number;
+  linderosNotes?: string;
   images?: string[];
   contactNotes: string; // Titular contact info & private notes
 }
@@ -69,10 +74,11 @@ export async function registerPartnerAction(input: RegisterPartnerInput): Promis
       id: userId,
       email: input.email,
       full_name: input.fullName,
-      role: 'broker',
+      role: input.userType === 'owner' ? 'owner' : 'broker',
       user_type: input.userType,
       phone: input.phone || null,
       company_name: input.companyName || null,
+      municipality_base: input.municipalityBase || null,
       is_verified: false,
       is_active: true,
       updated_at: new Date().toISOString(),
@@ -241,6 +247,10 @@ export async function submitPartnerPropertyAction(
       featured_image: input.images?.[0] || '',
       created_by: user.id,
       commission_agreement: input.commissionAgreement || 'split_50_50',
+      net_price_owner_cop: input.netPriceOwnerCop || null,
+      group_commission_cop: input.groupCommissionCop || null,
+      fixed_fee_cop: input.fixedFeeCop || null,
+      linderos_notes: input.linderosNotes || null,
       contact_notes: input.contactNotes,
       updated_at: new Date().toISOString(),
     };

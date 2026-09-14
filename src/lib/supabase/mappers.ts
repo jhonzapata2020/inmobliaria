@@ -92,6 +92,10 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
 
     createdBy: row.created_by ? String(row.created_by) : undefined,
     commissionAgreement: row.commission_agreement ? String(row.commission_agreement) : 'split_50_50',
+    netPriceOwnerCop: parseNum(row.net_price_owner_cop),
+    groupCommissionCop: parseNum(row.group_commission_cop),
+    fixedFeeCop: parseNum(row.fixed_fee_cop),
+    linderosNotes: row.linderos_notes ? String(row.linderos_notes) : undefined,
     contactNotes: row.contact_notes ? String(row.contact_notes) : undefined,
   };
 }
@@ -105,6 +109,7 @@ export function mapDbToProfile(row: Record<string, unknown>): import('../../type
     userType: (row.user_type as any) || (row.role === 'admin' ? 'admin' : 'broker'),
     phone: row.phone ? String(row.phone) : undefined,
     companyName: row.company_name ? String(row.company_name) : undefined,
+    municipalityBase: row.municipality_base ? String(row.municipality_base) : undefined,
     isVerified: Boolean(row.is_verified),
     isActive: row.is_active !== false,
     createdAt: row.created_at ? String(row.created_at) : undefined,

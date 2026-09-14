@@ -9,12 +9,37 @@ import {
   ShieldCheck, 
   ArrowRight, 
   AlertCircle, 
-  Lock, 
   Handshake, 
-  Building
+  Building,
+  Users,
+  MapPin
 } from 'lucide-react';
 import { registerPartnerAction } from '../../actions/partners';
 import { UserType } from '../../../types/property';
+
+const MUNICIPALITIES_LIST = [
+  'Turbo',
+  'Necoclí',
+  'Apartadó',
+  'Carepa',
+  'Chigorodó',
+  'Arboletes',
+  'San Pedro de Urabá',
+  'San Juan de Urabá',
+  'Mutatá',
+  'Montería',
+  'Los Córdobas',
+  'Tierralta',
+  'Valencia',
+  'Planeta Rica',
+  'Sahagún',
+  'Cereté',
+  'Lorica',
+  'Unguía',
+  'Acandí',
+  'Riosucio',
+  'Otro Municipio'
+];
 
 function PartnerRegisterForm() {
   const router = useRouter();
@@ -29,6 +54,7 @@ function PartnerRegisterForm() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [municipalityBase, setMunicipalityBase] = useState('Turbo');
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -44,6 +70,12 @@ function PartnerRegisterForm() {
       return;
     }
 
+    if (!phone.trim()) {
+      setErrorMsg('El teléfono móvil / WhatsApp es obligatorio para la verificación comercial.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await registerPartnerAction({
         email,
@@ -52,6 +84,7 @@ function PartnerRegisterForm() {
         userType,
         phone,
         companyName,
+        municipalityBase,
       });
 
       if (!res.success) {
@@ -83,38 +116,56 @@ function PartnerRegisterForm() {
               REGISTRO DE SOCIO O ALIANZA
             </h1>
             <p className="text-xs font-mono text-[#1E3A2F] font-bold uppercase tracking-wider mt-0.5">
-              Activos & Inversiones Darién S.A.S.
+              Red Comercial Urabá & Córdobas — Darién S.A.S.
             </p>
           </div>
         </div>
 
         {/* User Type Selector */}
-        <div className="grid grid-cols-2 gap-3 p-1.5 bg-[#F8F7F4] border border-[#E5E1D8] rounded-2xl">
-          <button
-            type="button"
-            onClick={() => setUserType('broker')}
-            className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1 ${
-              userType === 'broker'
-                ? 'bg-[#1E3A2F] text-white shadow-sm'
-                : 'text-stone-600 hover:text-[#1C1917]'
-            }`}
-          >
-            <Handshake className="w-4 h-4 text-emerald-300" />
-            <span>Corredor / Comisionista</span>
-          </button>
+        <div className="space-y-1.5">
+          <label className="block text-stone-600 font-mono font-bold text-[11px] uppercase">
+            Rol / Perfil Comercial *
+          </label>
+          <div className="grid grid-cols-3 gap-2 p-1.5 bg-[#F8F7F4] border border-[#E5E1D8] rounded-2xl">
+            <button
+              type="button"
+              onClick={() => setUserType('owner')}
+              className={`py-2.5 px-2 rounded-xl text-[11px] font-bold transition-all flex flex-col items-center gap-1 ${
+                userType === 'owner'
+                  ? 'bg-[#1E3A2F] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-[#1C1917]'
+              }`}
+            >
+              <Building className="w-4 h-4 text-emerald-300" />
+              <span className="text-center leading-tight">Propietario Titular</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setUserType('owner')}
-            className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1 ${
-              userType === 'owner'
-                ? 'bg-[#1E3A2F] text-white shadow-sm'
-                : 'text-stone-600 hover:text-[#1C1917]'
-            }`}
-          >
-            <Building className="w-4 h-4 text-emerald-300" />
-            <span>Propietario Directo</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setUserType('broker')}
+              className={`py-2.5 px-2 rounded-xl text-[11px] font-bold transition-all flex flex-col items-center gap-1 ${
+                userType === 'broker'
+                  ? 'bg-[#1E3A2F] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-[#1C1917]'
+              }`}
+            >
+              <Handshake className="w-4 h-4 text-emerald-300" />
+              <span className="text-center leading-tight">Corredor Independiente</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setUserType('broker_group')}
+              className={`py-2.5 px-2 rounded-xl text-[11px] font-bold transition-all flex flex-col items-center gap-1 ${
+                userType === 'broker_group'
+                  ? 'bg-[#1E3A2F] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-[#1C1917]'
+              }`}
+            >
+              <Users className="w-4 h-4 text-emerald-300" />
+              <span className="text-center leading-tight">Grupo de Corretaje Zonal</span>
+            </button>
+          </div>
         </div>
 
         {/* Error Notification */}
@@ -129,7 +180,7 @@ function PartnerRegisterForm() {
         <form onSubmit={handleRegister} className="space-y-4 text-xs">
           <div>
             <label className="block text-stone-600 font-mono font-bold mb-1 uppercase">
-              Nombre Completo *
+              Nombre y Apellidos *
             </label>
             <input
               type="text"
@@ -171,17 +222,36 @@ function PartnerRegisterForm() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-stone-600 font-mono font-bold mb-1 uppercase">
-              Empresa / Inmobiliaria (Opcional)
-            </label>
-            <input
-              type="text"
-              placeholder="Ej. Inversiones Urabá S.A.S. / Independiente"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full bg-[#F8F7F4] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#1C1917] font-medium focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F]"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-stone-600 font-mono font-bold mb-1 uppercase">
+                Municipio Base *
+              </label>
+              <select
+                value={municipalityBase}
+                onChange={(e) => setMunicipalityBase(e.target.value)}
+                className="w-full bg-[#F8F7F4] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#1C1917] font-medium focus:outline-none focus:border-[#1E3A2F]"
+              >
+                {MUNICIPALITIES_LIST.map((muni) => (
+                  <option key={muni} value={muni}>
+                    {muni}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-stone-600 font-mono font-bold mb-1 uppercase">
+                Empresa / Grupo (Opcional)
+              </label>
+              <input
+                type="text"
+                placeholder="Ej. Inmobiliaria Urabá / Red Zonal"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full bg-[#F8F7F4] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-[#1C1917] font-medium focus:outline-none focus:border-[#1E3A2F]"
+              />
+            </div>
           </div>
 
           <div>
@@ -199,13 +269,13 @@ function PartnerRegisterForm() {
           </div>
 
           {/* Business guarantee notice */}
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-1">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-900 font-mono uppercase">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
               <span>Garantía Comercial Darién S.A.S.</span>
             </div>
             <p className="text-[11px] text-emerald-800 leading-tight">
-              Tus captaciones están protegidas bajo el acuerdo de corretaje compartido 50/50 de Activos & Inversiones Darién S.A.S.
+              Tus radicación de predios está respaldada bajo acuerdos contractuales claros y esquemas flexibles de comisión protegida.
             </p>
           </div>
 
@@ -215,11 +285,11 @@ function PartnerRegisterForm() {
             className="w-full py-3.5 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50 mt-2"
           >
             {loading ? (
-              <span>Creando cuenta de socio...</span>
+              <span>Registrando socio y creando cuenta...</span>
             ) : (
               <>
                 <UserCheck className="w-4 h-4" />
-                <span>Completar Registro</span>
+                <span>Completar Registro e Ingresar</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -249,7 +319,7 @@ export default function PartnerRegisterPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center text-xs font-mono text-[#1E3A2F]">
-          Cargando formulario...
+          Cargando formulario de registro...
         </div>
       }
     >

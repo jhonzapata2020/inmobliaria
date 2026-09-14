@@ -108,11 +108,15 @@ export interface Property {
 
   // Partner & Origin Metadata
   createdBy?: string;
-  commissionAgreement?: 'split_50_50' | 'direct_owner' | 'custom' | string;
+  commissionAgreement?: 'split_50_50' | 'net_price_group_commission' | 'fixed_fee' | 'direct_owner' | 'custom' | string;
+  netPriceOwnerCop?: number;
+  groupCommissionCop?: number;
+  fixedFeeCop?: number;
+  linderosNotes?: string;
   contactNotes?: string;
 }
 
-export type UserType = 'owner' | 'broker' | 'investor' | 'admin';
+export type UserType = 'owner' | 'broker' | 'broker_group' | 'investor' | 'admin';
 
 export interface UserProfile {
   id: string;
@@ -122,6 +126,7 @@ export interface UserProfile {
   userType: UserType;
   phone?: string;
   companyName?: string;
+  municipalityBase?: string;
   isVerified: boolean;
   isActive: boolean;
   createdAt?: string;

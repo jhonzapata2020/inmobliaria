@@ -16,7 +16,9 @@ import {
   MapPin,
   Tag,
   Eye,
-  RefreshCw
+  RefreshCw,
+  Users,
+  Briefcase
 } from 'lucide-react';
 import { getPartnerProfileAction, getPartnerPropertiesAction } from '../../actions/partners';
 import { UserProfile, Property } from '../../../types/property';
@@ -81,7 +83,19 @@ export default function PartnerDashboardPage() {
   const totalCaptaciones = properties.length;
   const pendingCount = properties.filter((p) => p.editorialStatus === 'review' || (p.editorialStatus as string) === 'pending_review').length;
   const publishedCount = properties.filter((p) => p.editorialStatus === 'published').length;
+  const inNegotiationCount = properties.filter((p) => p.availability === 'En negociación').length;
   const archivedCount = properties.filter((p) => p.editorialStatus === 'archived' || p.availability === 'Archivado').length;
+
+  const getUserTypeBadgeLabel = (userType: string) => {
+    switch (userType) {
+      case 'owner':
+        return 'Propietario Titular';
+      case 'broker_group':
+        return 'Grupo de Corretaje Zonal';
+      default:
+        return 'Corredor Independiente (50/50)';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F7F4] font-sans text-[#1C1917]">
@@ -107,10 +121,10 @@ export default function PartnerDashboardPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/socios/nuevo-activo"
-              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+              className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Captar Nuevo Activo</span>
+              <span>+ Radicar Nuevo Inmueble</span>
             </Link>
 
             <button
@@ -135,6 +149,8 @@ export default function PartnerDashboardPage() {
               <div className="w-14 h-14 rounded-2xl bg-[#1E3A2F] text-white flex items-center justify-center shrink-0">
                 {profile.userType === 'owner' ? (
                   <Building className="w-7 h-7 text-emerald-300" />
+                ) : profile.userType === 'broker_group' ? (
+                  <Users className="w-7 h-7 text-emerald-300" />
                 ) : (
                   <Handshake className="w-7 h-7 text-emerald-300" />
                 )}
@@ -149,12 +165,12 @@ export default function PartnerDashboardPage() {
                       ? 'bg-amber-100 text-amber-900 border border-amber-300' 
                       : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                   }`}>
-                    {profile.userType === 'owner' ? 'Propietario Directo' : 'Corredor Aliado (50/50)'}
+                    {getUserTypeBadgeLabel(profile.userType)}
                   </span>
                   {profile.isVerified ? (
                     <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Verificado</span>
+                      <span>Socio Verificado</span>
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-stone-100 text-stone-600 border border-stone-200">
@@ -165,8 +181,9 @@ export default function PartnerDashboardPage() {
 
                 <div className="text-xs text-stone-600 font-mono space-x-3">
                   <span>{profile.email}</span>
-                  {profile.phone && <span>• Tel: {profile.phone}</span>}
-                  {profile.companyName && <span>• Empresa: {profile.companyName}</span>}
+                  {profile.phone && <span>• WhatsApp: {profile.phone}</span>}
+                  {profile.municipalityBase && <span>• Base: {profile.municipalityBase}</span>}
+                  {profile.companyName && <span>• Grupo: {profile.companyName}</span>}
                 </div>
               </div>
             </div>
@@ -177,7 +194,7 @@ export default function PartnerDashboardPage() {
                 className="px-5 py-3 rounded-2xl bg-[#1E3A2F] hover:bg-[#152921] text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-[0.98]"
               >
                 <PlusCircle className="w-4.5 h-4.5 text-emerald-300" />
-                <span>Registrar Captación</span>
+                <span>+ Radicar Nuevo Inmueble</span>
               </Link>
             </div>
           </div>
@@ -187,9 +204,9 @@ export default function PartnerDashboardPage() {
         <div className="p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl flex items-start gap-3 text-xs text-emerald-900">
           <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <span className="font-mono font-bold uppercase block">Acuerdo de Corretaje Compartido 50/50</span>
+            <span className="font-mono font-bold uppercase block">Red Comercial Protegida — Urabá & Córdobas</span>
             <p className="text-emerald-800 leading-relaxed">
-              Tus captaciones están protegidas bajo el acuerdo de corretaje compartido 50/50 de Activos & Inversiones Darién S.A.S. Los datos del titular original permanecen encriptados y solo son accesibles por el departamento administrativo para la moderación y firma contractual.
+              Tus predios radicados cuentan con respaldos contractuales claros de comisión compartida. Los datos privados del titular permanecen encriptados y solo son accesibles por la administración para el proceso de moderación y cierre de negocios.
             </p>
           </div>
         </div>
@@ -197,36 +214,36 @@ export default function PartnerDashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-[#E5E1D8] rounded-2xl p-5 shadow-sm space-y-2">
-            <span className="text-xs font-mono font-bold text-stone-500 uppercase block">Total Captaciones</span>
+            <span className="text-xs font-mono font-bold text-stone-500 uppercase block">Total Predios Radicados</span>
             <div className="text-2xl font-serif font-bold text-[#1C1917]">{totalCaptaciones}</div>
-            <p className="text-[11px] text-stone-500 font-mono">Activos ingresados al portal</p>
+            <p className="text-[11px] text-stone-500 font-mono">Inmuebles ingresados al sistema</p>
           </div>
 
           <div className="bg-white border border-amber-200 rounded-2xl p-5 shadow-sm space-y-2 bg-amber-50/40">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-amber-800 uppercase">En Moderación</span>
+              <span className="text-xs font-mono font-bold text-amber-800 uppercase">En Revisión</span>
               <Clock className="w-4 h-4 text-amber-600" />
             </div>
             <div className="text-2xl font-serif font-bold text-amber-900">{pendingCount}</div>
-            <p className="text-[11px] text-amber-700 font-mono">En proceso de revisión jurídica</p>
+            <p className="text-[11px] text-amber-700 font-mono">En moderación técnica/jurídica</p>
           </div>
 
           <div className="bg-white border border-emerald-200 rounded-2xl p-5 shadow-sm space-y-2 bg-emerald-50/40">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-emerald-800 uppercase">Publicados</span>
+              <span className="text-xs font-mono font-bold text-emerald-800 uppercase">Publicado en Catálogo</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-2xl font-serif font-bold text-emerald-900">{publishedCount}</div>
-            <p className="text-[11px] text-emerald-700 font-mono">Visibles en catálogo público</p>
+            <p className="text-[11px] text-emerald-700 font-mono">Activos visibles públicamente</p>
           </div>
 
-          <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-2">
+          <div className="bg-white border border-blue-200 rounded-2xl p-5 shadow-sm space-y-2 bg-blue-50/40">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-stone-500 uppercase">Archivados</span>
-              <AlertCircle className="w-4 h-4 text-stone-400" />
+              <span className="text-xs font-mono font-bold text-blue-800 uppercase">En Negociación</span>
+              <Briefcase className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-2xl font-serif font-bold text-stone-700">{archivedCount}</div>
-            <p className="text-[11px] text-stone-500 font-mono">Cerrados o no disponibles</p>
+            <div className="text-2xl font-serif font-bold text-blue-900">{inNegotiationCount}</div>
+            <p className="text-[11px] text-blue-700 font-mono">Con ofertas de inversionistas</p>
           </div>
         </div>
 
@@ -235,19 +252,19 @@ export default function PartnerDashboardPage() {
           <div className="p-6 border-b border-[#E5E1D8] flex items-center justify-between gap-4">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#1C1917]">
-                Mis Captaciones Inmobiliarias
+                Mis Predios Radicados
               </h2>
               <p className="text-xs text-stone-500 font-mono">
-                Gestión de inmuebles registrados para moderación comercial
+                Inventario de captaciones enviadas a moderación comercial
               </p>
             </div>
 
             <Link
               href="/socios/nuevo-activo"
-              className="px-4 py-2 rounded-xl bg-[#1E3A2F] text-white text-xs font-bold hover:bg-[#152921] transition-all inline-flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-xl bg-[#1E3A2F] text-white text-xs font-bold hover:bg-[#152921] transition-all inline-flex items-center gap-2"
             >
               <PlusCircle className="w-4 h-4 text-emerald-300" />
-              <span>Nuevo Activo</span>
+              <span>+ Radicar Nuevo Inmueble</span>
             </Link>
           </div>
 
@@ -258,10 +275,10 @@ export default function PartnerDashboardPage() {
               </div>
               <div className="space-y-1">
                 <h3 className="font-serif font-bold text-stone-800 text-base">
-                  Aún no has registrado captaciones
+                  Aún no has radicado predios en el portal
                 </h3>
                 <p className="text-xs text-stone-500 max-w-sm mx-auto">
-                  Comienza ingresando fincas, terrenos o predios para iniciar el proceso de evaluación técnica y comisión compartida.
+                  Comienza ingresando fincas, terrenos o activos para iniciar el proceso de revisión jurídica y publicación comercial.
                 </p>
               </div>
               <Link
@@ -269,7 +286,7 @@ export default function PartnerDashboardPage() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-sm"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Registrar Mi Primera Captación</span>
+                <span>+ Radicar Mi Primer Inmueble</span>
               </Link>
             </div>
           ) : (
@@ -277,11 +294,11 @@ export default function PartnerDashboardPage() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-[#F8F7F4] text-stone-600 font-mono uppercase font-bold text-[11px] border-b border-[#E5E1D8]">
                   <tr>
-                    <th className="px-6 py-3.5">Código / Título</th>
+                    <th className="px-6 py-3.5">Código / Predio</th>
                     <th className="px-6 py-3.5">Ubicación</th>
                     <th className="px-6 py-3.5">Tipo / Extensión</th>
-                    <th className="px-6 py-3.5">Precio Sugerido</th>
-                    <th className="px-6 py-3.5">Estado Moderación</th>
+                    <th className="px-6 py-3.5">Precio Sugerido / Neto</th>
+                    <th className="px-6 py-3.5">Estado</th>
                     <th className="px-6 py-3.5 text-right">Acciones</th>
                   </tr>
                 </thead>
@@ -289,6 +306,7 @@ export default function PartnerDashboardPage() {
                   {properties.map((prop) => {
                     const isPublished = prop.editorialStatus === 'published';
                     const isPending = prop.editorialStatus === 'review' || (prop.editorialStatus as string) === 'pending_review';
+                    const isInNegotiation = prop.availability === 'En negociación';
 
                     return (
                       <tr key={prop.id} className="hover:bg-stone-50 transition-colors">
@@ -321,15 +339,20 @@ export default function PartnerDashboardPage() {
                         </td>
 
                         <td className="px-6 py-4">
-                          {isPublished ? (
+                          {isInNegotiation ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-blue-100 text-blue-900 border border-blue-300">
+                              <Briefcase className="w-3.5 h-3.5 text-blue-700" />
+                              <span>En Negociación</span>
+                            </span>
+                          ) : isPublished ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-                              <span>Publicado</span>
+                              <span>Publicado en Catálogo</span>
                             </span>
                           ) : isPending ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
                               <Clock className="w-3.5 h-3.5 text-amber-700" />
-                              <span>En Moderación</span>
+                              <span>En Revisión</span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-stone-100 text-stone-700 border border-stone-300">

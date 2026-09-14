@@ -18,6 +18,21 @@ import { registerPartnerAction } from '../../actions/partners';
 import { UserType } from '../../../types/property';
 
 const MUNICIPALITIES_LIST = [
+  'Riohacha (La Guajira)',
+  'Dibulla (La Guajira)',
+  'Maicao (La Guajira)',
+  'San Juan del Cesar (La Guajira)',
+  'Uribia (La Guajira)',
+  'Manaure (La Guajira)',
+  'Fonseca (La Guajira)',
+  'Barrancas (La Guajira)',
+  'Albania (La Guajira)',
+  'Hatonuevo (La Guajira)',
+  'Villanueva (La Guajira)',
+  'El Molino (La Guajira)',
+  'Distracción (La Guajira)',
+  'La Jagua del Pilar (La Guajira)',
+  'Urumita (La Guajira)',
   'Turbo',
   'Necoclí',
   'Apartadó',
@@ -27,17 +42,11 @@ const MUNICIPALITIES_LIST = [
   'San Pedro de Urabá',
   'San Juan de Urabá',
   'Mutatá',
-  'Montería',
   'Los Córdobas',
+  'Montería',
   'Tierralta',
-  'Valencia',
-  'Planeta Rica',
-  'Sahagún',
-  'Cereté',
-  'Lorica',
-  'Unguía',
   'Acandí',
-  'Riosucio',
+  'Unguía',
   'Otro Municipio'
 ];
 

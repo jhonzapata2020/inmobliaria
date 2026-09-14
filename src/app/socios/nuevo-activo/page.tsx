@@ -292,6 +292,7 @@ ${privateNotes || 'Sin notas adicionales'}
                     onChange={(e) => setDepartment(e.target.value)}
                     className="w-full bg-[#F8F7F4] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-stone-900 font-medium focus:outline-none focus:border-[#1E3A2F]"
                   >
+                    <option value="La Guajira">La Guajira</option>
                     <option value="Antioquia">Antioquia</option>
                     <option value="Córdoba">Córdoba</option>
                     <option value="Chocó">Chocó</option>
@@ -307,7 +308,7 @@ ${privateNotes || 'Sin notas adicionales'}
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Turbo, Necoclí, Apartadó, Los Córdobas"
+                    placeholder="Ej. Riohacha, Dibulla, Maicao, San Juan del Cesar, Turbo"
                     value={municipality}
                     onChange={(e) => setMunicipality(e.target.value)}
                     className="w-full bg-[#F8F7F4] border border-[#E5E1D8] rounded-xl px-3.5 py-3 text-stone-900 font-medium focus:outline-none focus:border-[#1E3A2F]"

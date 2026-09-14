@@ -238,8 +238,11 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"
                   >
                     <option value="Antioquia">Antioquia</option>
-                    <option value="Chocó">Chocó</option>
                     <option value="Córdoba">Córdoba</option>
+                    <option value="Chocó">Chocó</option>
+                    <option value="La Guajira">La Guajira</option>
+                    <option value="Sucre">Sucre</option>
+                    <option value="Bolívar">Bolívar</option>
                   </select>
                 </div>
                 <div>

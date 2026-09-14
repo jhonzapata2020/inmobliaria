@@ -220,19 +220,44 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
           >
             <option value="">Todos los municipios</option>
-            <option value="Necoclí">Necoclí (Antioquia)</option>
-            <option value="Turbo">Turbo (Antioquia)</option>
-            <option value="Apartadó">Apartadó (Antioquia)</option>
-            <option value="Carepa">Carepa (Antioquia)</option>
-            <option value="Chigorodó">Chigorodó (Antioquia)</option>
-            <option value="Arboletes">Arboletes (Antioquia)</option>
-            <option value="Mutatá">Mutatá (Antioquia)</option>
-            <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
-            <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
-            <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
-            <option value="Acandí">Acandí (Chocó)</option>
-            <option value="Unguía">Unguía (Chocó)</option>
-            <option value="Bahía Solano">Bahía Solano (Chocó)</option>
+            <optgroup label="La Guajira">
+              <option value="Riohacha">Riohacha (La Guajira)</option>
+              <option value="Dibulla">Dibulla (La Guajira)</option>
+              <option value="Maicao">Maicao (La Guajira)</option>
+              <option value="San Juan del Cesar">San Juan del Cesar (La Guajira)</option>
+              <option value="Uribia">Uribia (La Guajira)</option>
+              <option value="Manaure">Manaure (La Guajira)</option>
+              <option value="Fonseca">Fonseca (La Guajira)</option>
+              <option value="Barrancas">Barrancas (La Guajira)</option>
+              <option value="Albania">Albania (La Guajira)</option>
+              <option value="Hatonuevo">Hatonuevo (La Guajira)</option>
+              <option value="Villanueva">Villanueva (La Guajira)</option>
+              <option value="El Molino">El Molino (La Guajira)</option>
+              <option value="Distracción">Distracción (La Guajira)</option>
+              <option value="La Jagua del Pilar">La Jagua del Pilar (La Guajira)</option>
+              <option value="Urumita">Urumita (La Guajira)</option>
+            </optgroup>
+            <optgroup label="Antioquia (Urabá)">
+              <option value="Necoclí">Necoclí (Antioquia)</option>
+              <option value="Turbo">Turbo (Antioquia)</option>
+              <option value="Apartadó">Apartadó (Antioquia)</option>
+              <option value="Carepa">Carepa (Antioquia)</option>
+              <option value="Chigorodó">Chigorodó (Antioquia)</option>
+              <option value="Arboletes">Arboletes (Antioquia)</option>
+              <option value="Mutatá">Mutatá (Antioquia)</option>
+              <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
+              <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
+            </optgroup>
+            <optgroup label="Córdoba">
+              <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
+              <option value="Montería">Montería (Córdoba)</option>
+              <option value="Tierralta">Tierralta (Córdoba)</option>
+            </optgroup>
+            <optgroup label="Chocó (Darién)">
+              <option value="Acandí">Acandí (Chocó)</option>
+              <option value="Unguía">Unguía (Chocó)</option>
+              <option value="Bahía Solano">Bahía Solano (Chocó)</option>
+            </optgroup>
           </select>
         </div>
 
@@ -391,19 +416,44 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
                 >
                   <option value="">Todos los municipios</option>
-                  <option value="Necoclí">Necoclí</option>
-                  <option value="Turbo">Turbo</option>
-                  <option value="Apartadó">Apartadó</option>
-                  <option value="Carepa">Carepa</option>
-                  <option value="Chigorodó">Chigorodó</option>
-                  <option value="Arboletes">Arboletes</option>
-                  <option value="Mutatá">Mutatá</option>
-                  <option value="San Pedro de Urabá">San Pedro de Urabá</option>
-                  <option value="San Juan de Urabá">San Juan de Urabá</option>
-                  <option value="Los Córdobas">Los Córdobas</option>
-                  <option value="Acandí">Acandí</option>
-                  <option value="Unguía">Unguía</option>
-                  <option value="Bahía Solano">Bahía Solano</option>
+                  <optgroup label="La Guajira">
+                    <option value="Riohacha">Riohacha (La Guajira)</option>
+                    <option value="Dibulla">Dibulla (La Guajira)</option>
+                    <option value="Maicao">Maicao (La Guajira)</option>
+                    <option value="San Juan del Cesar">San Juan del Cesar (La Guajira)</option>
+                    <option value="Uribia">Uribia (La Guajira)</option>
+                    <option value="Manaure">Manaure (La Guajira)</option>
+                    <option value="Fonseca">Fonseca (La Guajira)</option>
+                    <option value="Barrancas">Barrancas (La Guajira)</option>
+                    <option value="Albania">Albania (La Guajira)</option>
+                    <option value="Hatonuevo">Hatonuevo (La Guajira)</option>
+                    <option value="Villanueva">Villanueva (La Guajira)</option>
+                    <option value="El Molino">El Molino (La Guajira)</option>
+                    <option value="Distracción">Distracción (La Guajira)</option>
+                    <option value="La Jagua del Pilar">La Jagua del Pilar (La Guajira)</option>
+                    <option value="Urumita">Urumita (La Guajira)</option>
+                  </optgroup>
+                  <optgroup label="Antioquia (Urabá)">
+                    <option value="Necoclí">Necoclí (Antioquia)</option>
+                    <option value="Turbo">Turbo (Antioquia)</option>
+                    <option value="Apartadó">Apartadó (Antioquia)</option>
+                    <option value="Carepa">Carepa (Antioquia)</option>
+                    <option value="Chigorodó">Chigorodó (Antioquia)</option>
+                    <option value="Arboletes">Arboletes (Antioquia)</option>
+                    <option value="Mutatá">Mutatá (Antioquia)</option>
+                    <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
+                    <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
+                  </optgroup>
+                  <optgroup label="Córdoba">
+                    <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
+                    <option value="Montería">Montería (Córdoba)</option>
+                    <option value="Tierralta">Tierralta (Córdoba)</option>
+                  </optgroup>
+                  <optgroup label="Chocó (Darién)">
+                    <option value="Acandí">Acandí (Chocó)</option>
+                    <option value="Unguía">Unguía (Chocó)</option>
+                    <option value="Bahía Solano">Bahía Solano (Chocó)</option>
+                  </optgroup>
                 </select>
               </div>
 

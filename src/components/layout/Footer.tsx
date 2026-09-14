@@ -86,12 +86,16 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-1.5 text-xs">
               <li className="flex items-center gap-2 text-[#242321]">
+                <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                Riohacha • Dibulla • Maicao (La Guajira)
+              </li>
+              <li className="flex items-center gap-2 text-[#242321]">
                 <MapPin className="w-3.5 h-3.5 text-[#1E3A2F] shrink-0" />
                 Necoclí • Turbo • Apartadó (Antioquia)
               </li>
               <li className="flex items-center gap-2 text-[#242321]">
                 <MapPin className="w-3.5 h-3.5 text-[#1E3A2F] shrink-0" />
-                Carepa • Chigorodó • Mutatá
+                Carepa • Chigorodó • Los Córdobas
               </li>
               <li className="flex items-center gap-2 text-[#242321]">
                 <MapPin className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
@@ -99,7 +103,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-2 text-[#242321]">
                 <Globe className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
-                Corredores Portuarios & Agroindustriales
+                Troncal del Caribe & Corredores Portuarios
               </li>
             </ul>
           </div>

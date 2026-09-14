@@ -10,7 +10,7 @@ import {
   User
 } from 'lucide-react';
 import { useDossier } from '../../context/DossierContext';
-import { formatCurrency, formatArea, getLegalStatusBadge } from '../../lib/formatters';
+import { formatCurrency, formatArea, getLegalStatusBadge, isPriceToNegotiate } from '../../lib/formatters';
 
 export const ExecutiveDossierModal: React.FC = () => {
   const { 
@@ -306,11 +306,17 @@ export const ExecutiveDossierModal: React.FC = () => {
                         {prop.code.startsWith('DAR-EXCEL-') ? 'Ref. Comercial / Valor Estimado' : 'Valor / Canon Comercial'}
                       </div>
                       <div className="text-lg font-bold text-[#1E3A2F] font-serif">
-                        {prop.salePriceCop || prop.estimatedValueCop
-                          ? formatCurrency(prop.salePriceCop || prop.estimatedValueCop)
-                          : (prop.monthlyRentCop || prop.monthlyRentEstimateCop)
-                          ? `Renta: ${formatCurrency(prop.monthlyRentCop || prop.monthlyRentEstimateCop)}/mes`
-                          : 'Regulada SAE'}
+                        {isPriceToNegotiate(prop) ? (
+                          <span className="text-[#242321] font-sans text-base font-semibold">
+                            Sujeto a negociación / A convenir
+                          </span>
+                        ) : prop.salePriceCop || prop.estimatedValueCop ? (
+                          formatCurrency(prop.salePriceCop || prop.estimatedValueCop)
+                        ) : prop.monthlyRentCop || prop.monthlyRentEstimateCop ? (
+                          `Renta: ${formatCurrency(prop.monthlyRentCop || prop.monthlyRentEstimateCop)}/mes`
+                        ) : (
+                          'Regulada SAE'
+                        )}
                       </div>
                     </div>
                   </div>

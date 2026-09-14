@@ -32,6 +32,82 @@ export function formatArea(areaHa?: number, areaM2?: number): string {
   return 'Sujeto a deslinde';
 }
 
+export function isPriceToNegotiate(property: {
+  assetType?: string;
+  salePriceCop?: number | null;
+  estimatedValueCop?: number | null;
+  landAreaHa?: number | null;
+  landAreaM2?: number | null;
+}): boolean {
+  const assetType = property.assetType || '';
+  const isRuralOrFinca = assetType === 'Finca' || assetType === 'Terreno';
+  if (!isRuralOrFinca) return false;
+
+  const price = property.salePriceCop || property.estimatedValueCop || 0;
+  const areaHa = property.landAreaHa || (property.landAreaM2 ? property.landAreaM2 / 10000 : 0);
+  const areaM2 = property.landAreaM2 || (property.landAreaHa ? property.landAreaHa * 10000 : 0);
+
+  if ((price > 0 && price < 50000000) || (areaM2 > 0 && areaM2 < 5000) || (areaHa > 0 && areaHa < 0.5)) {
+    return true;
+  }
+
+  return false;
+}
+
+export function formatPropertyValuation(property: {
+  assetType?: string;
+  salePriceCop?: number | null;
+  estimatedValueCop?: number | null;
+  monthlyRentCop?: number | null;
+  monthlyRentEstimateCop?: number | null;
+  commercialAppraisalCop?: number | null;
+  landAreaHa?: number | null;
+  landAreaM2?: number | null;
+  modality?: string;
+}): {
+  isNegotiable: boolean;
+  primaryText: string;
+  secondaryText?: string;
+  label: string;
+} {
+  const isNegotiable = isPriceToNegotiate(property);
+  const rent = property.monthlyRentCop || property.monthlyRentEstimateCop;
+  const price = property.salePriceCop || property.estimatedValueCop || property.commercialAppraisalCop;
+  const label = property.modality === 'Arriendo' ? 'Renta Estimada:' : 'Ref. Comercial:';
+
+  if (isNegotiable) {
+    return {
+      isNegotiable: true,
+      primaryText: 'A convenir',
+      secondaryText: rent && rent > 0 ? `Canon ref: ${formatCurrency(rent)}/mes` : undefined,
+      label
+    };
+  }
+
+  if (price && price > 0) {
+    return {
+      isNegotiable: false,
+      primaryText: formatCurrency(price),
+      secondaryText: rent && rent > 0 ? `Canon ref: ${formatCurrency(rent)}/mes` : undefined,
+      label
+    };
+  }
+
+  if (rent && rent > 0) {
+    return {
+      isNegotiable: false,
+      primaryText: `Renta: ${formatCurrency(rent)} / mes`,
+      label
+    };
+  }
+
+  return {
+    isNegotiable: false,
+    primaryText: 'Valoración Bajo Solicitud / En Estudio Técnico',
+    label
+  };
+}
+
 export function getLegalStatusBadge(status: LegalStatus): { label: string; bgClass: string; textClass: string; borderClass: string } {
   switch (status) {
     case 'Saneado':

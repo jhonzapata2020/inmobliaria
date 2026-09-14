@@ -730,12 +730,16 @@ def main():
 
             asset_type = normalize_asset_type(asset_type_raw, dir_val, desc_val)
 
-            # Title composition logic:
-            title = format_title(asset_type, dir_val, desc_val, id_act, muni_canonical)
-
             area_m2 = sanitize_num(row.get(area_m2_col))
             area_ha = area_m2 / 10000.0 if area_m2 else None
             built_m2 = sanitize_num(row.get(built_m2_col))
+
+            # Reclassify micro-properties (< 500 m2) marked as Finca to Lote
+            if asset_type == "Finca" and area_m2 and area_m2 < 500:
+                asset_type = "Lote"
+
+            # Title composition logic:
+            title = format_title(asset_type, dir_val, desc_val, id_act, muni_canonical)
 
             avaluo_com = sanitize_num(row.get(avaluo_col))
             avaluo_cat = sanitize_num(row.get(catastral_val_col)) if catastral_val_col else None

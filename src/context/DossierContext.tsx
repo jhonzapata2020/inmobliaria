@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Property } from '../types/property';
 import { DossierSummary, ClientInfo, DossierType } from '../types/dossier';
+import { isPriceToNegotiate } from '../lib/formatters';
 
 interface DossierContextType {
   selectedProperties: Property[];
@@ -101,10 +102,11 @@ export const DossierProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (p.landAreaHa) totalAreaHa += p.landAreaHa;
       if (p.landAreaM2) totalAreaM2 += p.landAreaM2;
 
+      const isNegotiable = isPriceToNegotiate(p);
       const saleVal = p.salePriceCop || p.commercialAppraisalCop || p.estimatedValueCop || 0;
       const rentVal = p.monthlyRentCop || p.monthlyRentEstimateCop || 0;
 
-      if (saleVal > 0) {
+      if (saleVal > 0 && !isNegotiable) {
         hasSale = true;
         totalSalePrice += saleVal;
       }

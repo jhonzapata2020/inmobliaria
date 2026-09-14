@@ -14,7 +14,7 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import { Property } from '../../../types/property';
-import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge } from '../../../lib/formatters';
+import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge, formatPropertyValuation } from '../../../lib/formatters';
 import { useDossier } from '../../../context/DossierContext';
 import { useFavorites } from '../../../context/FavoritesContext';
 import { PropertyMap } from '../../../components/map/PropertyMap';
@@ -163,21 +163,24 @@ export default function PropertyDetailPage() {
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             {/* Price Tag */}
             <div className="bg-white border border-[#E5E1D8] p-4 rounded-2xl text-left font-mono shadow-sm">
-              <div className="text-xs text-[#6B6A63]">
-                {property.code.startsWith('DAR-EXCEL-') ? 'Ref. Comercial / Valor Estimado' : 'Valor / Canon Comercial'}
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-[#1E3A2F] font-serif">
-                {property.salePriceCop || property.estimatedValueCop
-                  ? formatCurrency(property.salePriceCop || property.estimatedValueCop)
-                  : (property.monthlyRentCop || property.monthlyRentEstimateCop)
-                  ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
-                  : 'Valoración Bajo Solicitud / En Estudio Técnico'}
-              </div>
-              {!property.salePriceCop && property.estimatedValueCop && property.estimatedValueCop > 0 && (
-                <div className="text-xs text-[#0F766E] font-mono bg-[#EEF4EF] px-2 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-1 font-bold">
-                  Capitalización Estimada: ~{formatCurrency(property.estimatedValueCop)}
-                </div>
-              )}
+              {(() => {
+                const val = formatPropertyValuation(property);
+                return (
+                  <>
+                    <div className="text-xs text-[#6B6A63]">
+                      {val.label}
+                    </div>
+                    <div className={`text-xl sm:text-2xl font-bold font-serif ${val.isNegotiable ? 'text-stone-700 font-sans' : 'text-[#1E3A2F]'}`}>
+                      {val.primaryText}
+                    </div>
+                    {val.secondaryText && (
+                      <div className="text-xs text-[#0F766E] font-mono bg-[#EEF4EF] px-2 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-1 font-bold">
+                        {val.secondaryText}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Dossier Toggle CTA */}

@@ -15,7 +15,7 @@ import {
   Building
 } from 'lucide-react';
 import { Property } from '../../types/property';
-import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge } from '../../lib/formatters';
+import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge, formatPropertyValuation } from '../../lib/formatters';
 import { useDossier } from '../../context/DossierContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useCompare } from '../../context/CompareContext';
@@ -223,27 +223,28 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
         {/* Price & Action Buttons */}
         <div className="pt-3 border-t border-[#E5E1D8] space-y-3">
-          <div className="flex justify-between items-baseline">
-            <span className="text-xs text-[#6B6A63] font-mono">
-              {property.code.startsWith('DAR-EXCEL-') 
-                ? (property.modality === 'Arriendo' ? 'Renta Estimada:' : 'Ref. Comercial:')
-                : (property.salePriceCop ? 'Precio Venta:' : (property.monthlyRentCop || property.monthlyRentEstimateCop) ? 'Renta Mensual:' : 'Valor Comercial:')}
-            </span>
-            <div className="text-right">
-              <span className="text-base font-serif font-bold text-[#1E3A2F] font-mono block">
-                {property.salePriceCop || property.estimatedValueCop
-                  ? formatCurrency(property.salePriceCop || property.estimatedValueCop)
-                  : (property.monthlyRentCop || property.monthlyRentEstimateCop)
-                  ? `Renta: ${formatCurrency(property.monthlyRentCop || property.monthlyRentEstimateCop)} / mes`
-                  : 'Valoración Bajo Solicitud / En Estudio Técnico'}
-              </span>
-              {!property.salePriceCop && property.estimatedValueCop && property.estimatedValueCop > 0 && (
-                <span className="text-[10px] text-[#0F766E] font-mono bg-[#EEF4EF] px-1.5 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-0.5 font-bold">
-                  Capitalización: ~{formatCurrency(property.estimatedValueCop)}
+          {(() => {
+            const val = formatPropertyValuation(property);
+            return (
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs text-[#6B6A63] font-mono">
+                  {val.label}
                 </span>
-              )}
-            </div>
-          </div>
+                <div className="text-right">
+                  <span className={`text-base font-serif font-bold font-mono block ${
+                    val.isNegotiable ? 'text-stone-700 font-sans' : 'text-[#1E3A2F]'
+                  }`}>
+                    {val.primaryText}
+                  </span>
+                  {val.secondaryText && (
+                    <span className="text-[10px] text-[#0F766E] font-mono bg-[#EEF4EF] px-1.5 py-0.5 rounded border border-[#0F766E]/20 inline-block mt-0.5 font-bold">
+                      {val.secondaryText}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="grid grid-cols-2 gap-2 pt-1">
             {/* Compare Toggle */}

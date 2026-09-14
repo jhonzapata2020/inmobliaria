@@ -13,7 +13,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { Property, PropertyFilterState } from '../../types/property';
-import { formatCurrency, formatArea } from '../../lib/formatters';
+import { formatCurrency, formatArea, isPriceToNegotiate } from '../../lib/formatters';
 
 interface ExecutiveInventoryReportModalProps {
   isOpen: boolean;
@@ -247,7 +247,18 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
                         {/* Col 6: Valuation / Rent */}
                         <td className="p-2.5 border border-[#E5E1D8] text-right align-top font-mono print:border-gray-300">
-                          {hasValuation ? (
+                          {isPriceToNegotiate(prop) ? (
+                            <div>
+                              <span className="font-semibold text-stone-700 block text-xs font-sans">
+                                A convenir
+                              </span>
+                              {rentDisplay && rentDisplay > 0 && (
+                                <span className="text-[10px] font-semibold text-blue-800 block mt-0.5">
+                                  Canon ref: {formatCurrency(rentDisplay)}/mes
+                                </span>
+                              )}
+                            </div>
+                          ) : hasValuation ? (
                             <>
                               {priceDisplay && priceDisplay > 0 && (
                                 <span className="font-bold text-[#1E3A2F] block text-xs">

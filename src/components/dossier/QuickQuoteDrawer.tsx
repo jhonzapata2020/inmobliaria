@@ -12,7 +12,7 @@ import {
   Ruler
 } from 'lucide-react';
 import { useDossier } from '../../context/DossierContext';
-import { formatCurrency, formatArea, getLegalStatusBadge } from '../../lib/formatters';
+import { formatCurrency, formatArea, getLegalStatusBadge, isPriceToNegotiate } from '../../lib/formatters';
 
 export const QuickQuoteDrawer: React.FC = () => {
   const { 
@@ -136,10 +136,16 @@ export const QuickQuoteDrawer: React.FC = () => {
                         {formatArea(prop.landAreaHa, prop.landAreaM2)}
                       </div>
                       <div className="font-semibold text-[#1E3A2F]">
-                        {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
-                        {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/mes`}
-                        {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
-                        {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
+                        {isPriceToNegotiate(prop) ? (
+                          <span className="text-stone-700">A convenir</span>
+                        ) : (
+                          <>
+                            {prop.modality === 'Venta' && formatCurrency(prop.salePriceCop)}
+                            {prop.modality === 'Arriendo' && `${formatCurrency(prop.monthlyRentCop)}/mes`}
+                            {prop.modality === 'Custodia SAE' && 'Regulada SAE'}
+                            {prop.modality === 'Inversión' && formatCurrency(prop.salePriceCop || prop.estimatedValueCop)}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

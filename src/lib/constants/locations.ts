@@ -8,6 +8,7 @@ export const DEPARTMENTS = [
   'Córdoba',
   'Chocó',
   'La Guajira',
+  'Valle del Cauca',
   'Sucre',
   'Bolívar',
 ] as const;
@@ -17,9 +18,52 @@ export type DepartmentName = typeof DEPARTMENTS[number] | string;
 export interface MunicipalityItem {
   name: string;
   department: string;
-  label: string; // e.g. "Riohacha (La Guajira)"
+  label: string; // e.g. "Cali (Valle del Cauca)"
   coords: LocationCoords;
 }
+
+export const MUNICIPALITIES_VALLE: MunicipalityItem[] = [
+  { name: 'Cali', department: 'Valle del Cauca', label: 'Cali (Valle del Cauca)', coords: { lat: 3.4516, lng: -76.5320 } },
+  { name: 'Palmira', department: 'Valle del Cauca', label: 'Palmira (Valle del Cauca)', coords: { lat: 3.5394, lng: -76.3036 } },
+  { name: 'Guadalajara de Buga', department: 'Valle del Cauca', label: 'Guadalajara de Buga (Valle del Cauca)', coords: { lat: 3.9008, lng: -76.2978 } },
+  { name: 'Buenaventura', department: 'Valle del Cauca', label: 'Buenaventura (Valle del Cauca)', coords: { lat: 3.8801, lng: -77.0312 } },
+  { name: 'Cartago', department: 'Valle del Cauca', label: 'Cartago (Valle del Cauca)', coords: { lat: 4.7464, lng: -75.9117 } },
+  { name: 'Jamundí', department: 'Valle del Cauca', label: 'Jamundí (Valle del Cauca)', coords: { lat: 3.2608, lng: -76.5414 } },
+  { name: 'El Cerrito', department: 'Valle del Cauca', label: 'El Cerrito (Valle del Cauca)', coords: { lat: 3.6853, lng: -76.3131 } },
+  { name: 'Calima', department: 'Valle del Cauca', label: 'Calima (Valle del Cauca)', coords: { lat: 3.8967, lng: -76.4883 } },
+  { name: 'La Unión', department: 'Valle del Cauca', label: 'La Unión (Valle del Cauca)', coords: { lat: 4.5317, lng: -76.1039 } },
+  { name: 'Dagua', department: 'Valle del Cauca', label: 'Dagua (Valle del Cauca)', coords: { lat: 3.6575, lng: -76.6886 } },
+  { name: 'Zarzal', department: 'Valle del Cauca', label: 'Zarzal (Valle del Cauca)', coords: { lat: 4.3986, lng: -76.0722 } },
+  { name: 'Tuluá', department: 'Valle del Cauca', label: 'Tuluá (Valle del Cauca)', coords: { lat: 4.0847, lng: -76.1956 } },
+  { name: 'Roldanillo', department: 'Valle del Cauca', label: 'Roldanillo (Valle del Cauca)', coords: { lat: 4.4144, lng: -76.1558 } },
+  { name: 'Yumbo', department: 'Valle del Cauca', label: 'Yumbo (Valle del Cauca)', coords: { lat: 3.5819, lng: -76.4967 } },
+  { name: 'Bugalagrande', department: 'Valle del Cauca', label: 'Bugalagrande (Valle del Cauca)', coords: { lat: 4.2128, lng: -76.1564 } },
+  { name: 'Yotoco', department: 'Valle del Cauca', label: 'Yotoco (Valle del Cauca)', coords: { lat: 3.8647, lng: -76.3831 } },
+  { name: 'Bolívar', department: 'Valle del Cauca', label: 'Bolívar (Valle del Cauca)', coords: { lat: 4.3411, lng: -76.2417 } },
+  { name: 'Candelaria', department: 'Valle del Cauca', label: 'Candelaria (Valle del Cauca)', coords: { lat: 3.4078, lng: -76.3481 } },
+  { name: 'Sevilla', department: 'Valle del Cauca', label: 'Sevilla (Valle del Cauca)', coords: { lat: 4.2661, lng: -75.9328 } },
+  { name: 'El Dovio', department: 'Valle del Cauca', label: 'El Dovio (Valle del Cauca)', coords: { lat: 4.5089, lng: -76.2367 } },
+  { name: 'Toro', department: 'Valle del Cauca', label: 'Toro (Valle del Cauca)', coords: { lat: 4.6117, lng: -76.0825 } },
+  { name: 'Ansermanuevo', department: 'Valle del Cauca', label: 'Ansermanuevo (Valle del Cauca)', coords: { lat: 4.7967, lng: -75.9961 } },
+  { name: 'Alcalá', department: 'Valle del Cauca', label: 'Alcalá (Valle del Cauca)', coords: { lat: 4.6747, lng: -75.7828 } },
+  { name: 'La Cumbre', department: 'Valle del Cauca', label: 'La Cumbre (Valle del Cauca)', coords: { lat: 3.6486, lng: -76.5683 } },
+  { name: 'Florida', department: 'Valle del Cauca', label: 'Florida (Valle del Cauca)', coords: { lat: 3.3222, lng: -76.2344 } },
+  { name: 'San Pedro', department: 'Valle del Cauca', label: 'San Pedro (Valle del Cauca)', coords: { lat: 3.9964, lng: -76.2289 } },
+  { name: 'Ginebra', department: 'Valle del Cauca', label: 'Ginebra (Valle del Cauca)', coords: { lat: 3.7231, lng: -76.2658 } },
+  { name: 'Pradera', department: 'Valle del Cauca', label: 'Pradera (Valle del Cauca)', coords: { lat: 3.4208, lng: -76.2458 } },
+  { name: 'Restrepo', department: 'Valle del Cauca', label: 'Restrepo (Valle del Cauca)', coords: { lat: 3.8236, lng: -76.5258 } },
+  { name: 'Guacarí', department: 'Valle del Cauca', label: 'Guacarí (Valle del Cauca)', coords: { lat: 3.7661, lng: -76.3328 } },
+  { name: 'La Victoria', department: 'Valle del Cauca', label: 'La Victoria (Valle del Cauca)', coords: { lat: 4.5261, lng: -76.0378 } },
+  { name: 'Andalucía', department: 'Valle del Cauca', label: 'Andalucía (Valle del Cauca)', coords: { lat: 4.1708, lng: -76.1661 } },
+  { name: 'Caicedonia', department: 'Valle del Cauca', label: 'Caicedonia (Valle del Cauca)', coords: { lat: 4.3319, lng: -75.8322 } },
+  { name: 'Riofrío', department: 'Valle del Cauca', label: 'Riofrío (Valle del Cauca)', coords: { lat: 4.1567, lng: -76.2872 } },
+  { name: 'Trujillo', department: 'Valle del Cauca', label: 'Trujillo (Valle del Cauca)', coords: { lat: 4.2117, lng: -76.3214 } },
+  { name: 'Obando', department: 'Valle del Cauca', label: 'Obando (Valle del Cauca)', coords: { lat: 4.5808, lng: -75.9739 } },
+  { name: 'Ulloa', department: 'Valle del Cauca', label: 'Ulloa (Valle del Cauca)', coords: { lat: 4.7042, lng: -75.7408 } },
+  { name: 'Vijes', department: 'Valle del Cauca', label: 'Vijes (Valle del Cauca)', coords: { lat: 3.6967, lng: -76.5369 } },
+  { name: 'Versalles', department: 'Valle del Cauca', label: 'Versalles (Valle del Cauca)', coords: { lat: 4.5778, lng: -76.1978 } },
+  { name: 'El Águila', department: 'Valle del Cauca', label: 'El Águila (Valle del Cauca)', coords: { lat: 4.9128, lng: -76.0408 } },
+];
 
 export const MUNICIPALITIES_LA_GUAJIRA: MunicipalityItem[] = [
   { name: 'Riohacha', department: 'La Guajira', label: 'Riohacha (La Guajira)', coords: { lat: 11.5444, lng: -72.9072 } },

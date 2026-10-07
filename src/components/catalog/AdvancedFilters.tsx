@@ -11,6 +11,13 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import { PropertyFilterState } from '../../types/property';
+import { 
+  MUNICIPALITIES_VALLE,
+  MUNICIPALITIES_LA_GUAJIRA,
+  MUNICIPALITIES_ANTIOQUIA,
+  MUNICIPALITIES_CORDOBA,
+  MUNICIPALITIES_CHOCO 
+} from '../../lib/constants/locations';
 
 interface AdvancedFiltersProps {
   filters: PropertyFilterState;
@@ -220,43 +227,30 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
           >
             <option value="">Todos los municipios</option>
-            <optgroup label="La Guajira">
-              <option value="Riohacha">Riohacha (La Guajira)</option>
-              <option value="Dibulla">Dibulla (La Guajira)</option>
-              <option value="Maicao">Maicao (La Guajira)</option>
-              <option value="San Juan del Cesar">San Juan del Cesar (La Guajira)</option>
-              <option value="Uribia">Uribia (La Guajira)</option>
-              <option value="Manaure">Manaure (La Guajira)</option>
-              <option value="Fonseca">Fonseca (La Guajira)</option>
-              <option value="Barrancas">Barrancas (La Guajira)</option>
-              <option value="Albania">Albania (La Guajira)</option>
-              <option value="Hatonuevo">Hatonuevo (La Guajira)</option>
-              <option value="Villanueva">Villanueva (La Guajira)</option>
-              <option value="El Molino">El Molino (La Guajira)</option>
-              <option value="Distracción">Distracción (La Guajira)</option>
-              <option value="La Jagua del Pilar">La Jagua del Pilar (La Guajira)</option>
-              <option value="Urumita">Urumita (La Guajira)</option>
-            </optgroup>
-            <optgroup label="Antioquia (Urabá)">
-              <option value="Necoclí">Necoclí (Antioquia)</option>
-              <option value="Turbo">Turbo (Antioquia)</option>
-              <option value="Apartadó">Apartadó (Antioquia)</option>
-              <option value="Carepa">Carepa (Antioquia)</option>
-              <option value="Chigorodó">Chigorodó (Antioquia)</option>
-              <option value="Arboletes">Arboletes (Antioquia)</option>
-              <option value="Mutatá">Mutatá (Antioquia)</option>
-              <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
-              <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
+            <optgroup label="Valle del Cauca">
+              {MUNICIPALITIES_VALLE.map((m) => (
+                <option key={`desktop-valle-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
             </optgroup>
             <optgroup label="Córdoba">
-              <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
-              <option value="Montería">Montería (Córdoba)</option>
-              <option value="Tierralta">Tierralta (Córdoba)</option>
+              {MUNICIPALITIES_CORDOBA.map((m) => (
+                <option key={`desktop-cordoba-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="La Guajira">
+              {MUNICIPALITIES_LA_GUAJIRA.map((m) => (
+                <option key={`desktop-guajira-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Antioquia (Urabá)">
+              {MUNICIPALITIES_ANTIOQUIA.map((m) => (
+                <option key={`desktop-antioquia-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
             </optgroup>
             <optgroup label="Chocó (Darién)">
-              <option value="Acandí">Acandí (Chocó)</option>
-              <option value="Unguía">Unguía (Chocó)</option>
-              <option value="Bahía Solano">Bahía Solano (Chocó)</option>
+              {MUNICIPALITIES_CHOCO.map((m) => (
+                <option key={`desktop-choco-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
             </optgroup>
           </select>
         </div>
@@ -416,43 +410,30 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
                 >
                   <option value="">Todos los municipios</option>
-                  <optgroup label="La Guajira">
-                    <option value="Riohacha">Riohacha (La Guajira)</option>
-                    <option value="Dibulla">Dibulla (La Guajira)</option>
-                    <option value="Maicao">Maicao (La Guajira)</option>
-                    <option value="San Juan del Cesar">San Juan del Cesar (La Guajira)</option>
-                    <option value="Uribia">Uribia (La Guajira)</option>
-                    <option value="Manaure">Manaure (La Guajira)</option>
-                    <option value="Fonseca">Fonseca (La Guajira)</option>
-                    <option value="Barrancas">Barrancas (La Guajira)</option>
-                    <option value="Albania">Albania (La Guajira)</option>
-                    <option value="Hatonuevo">Hatonuevo (La Guajira)</option>
-                    <option value="Villanueva">Villanueva (La Guajira)</option>
-                    <option value="El Molino">El Molino (La Guajira)</option>
-                    <option value="Distracción">Distracción (La Guajira)</option>
-                    <option value="La Jagua del Pilar">La Jagua del Pilar (La Guajira)</option>
-                    <option value="Urumita">Urumita (La Guajira)</option>
-                  </optgroup>
-                  <optgroup label="Antioquia (Urabá)">
-                    <option value="Necoclí">Necoclí (Antioquia)</option>
-                    <option value="Turbo">Turbo (Antioquia)</option>
-                    <option value="Apartadó">Apartadó (Antioquia)</option>
-                    <option value="Carepa">Carepa (Antioquia)</option>
-                    <option value="Chigorodó">Chigorodó (Antioquia)</option>
-                    <option value="Arboletes">Arboletes (Antioquia)</option>
-                    <option value="Mutatá">Mutatá (Antioquia)</option>
-                    <option value="San Pedro de Urabá">San Pedro de Urabá (Antioquia)</option>
-                    <option value="San Juan de Urabá">San Juan de Urabá (Antioquia)</option>
+                  <optgroup label="Valle del Cauca">
+                    {MUNICIPALITIES_VALLE.map((m) => (
+                      <option key={`mobile-valle-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
                   </optgroup>
                   <optgroup label="Córdoba">
-                    <option value="Los Córdobas">Los Córdobas (Córdoba)</option>
-                    <option value="Montería">Montería (Córdoba)</option>
-                    <option value="Tierralta">Tierralta (Córdoba)</option>
+                    {MUNICIPALITIES_CORDOBA.map((m) => (
+                      <option key={`mobile-cordoba-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="La Guajira">
+                    {MUNICIPALITIES_LA_GUAJIRA.map((m) => (
+                      <option key={`mobile-guajira-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Antioquia (Urabá)">
+                    {MUNICIPALITIES_ANTIOQUIA.map((m) => (
+                      <option key={`mobile-antioquia-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
                   </optgroup>
                   <optgroup label="Chocó (Darién)">
-                    <option value="Acandí">Acandí (Chocó)</option>
-                    <option value="Unguía">Unguía (Chocó)</option>
-                    <option value="Bahía Solano">Bahía Solano (Chocó)</option>
+                    {MUNICIPALITIES_CHOCO.map((m) => (
+                      <option key={`mobile-choco-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
                   </optgroup>
                 </select>
               </div>

@@ -11,40 +11,12 @@ import {
   ShieldCheck, 
   ArrowLeft,
   Sparkles,
-  Award
 } from 'lucide-react';
 import { submitConsignmentLeadAction } from '../actions/leads';
+import { ALL_MUNICIPALITIES } from '../../lib/constants/locations';
 
 const MUNICIPALITIES_LIST = [
-  'Riohacha (La Guajira)',
-  'Dibulla (La Guajira)',
-  'Maicao (La Guajira)',
-  'San Juan del Cesar (La Guajira)',
-  'Uribia (La Guajira)',
-  'Manaure (La Guajira)',
-  'Fonseca (La Guajira)',
-  'Barrancas (La Guajira)',
-  'Albania (La Guajira)',
-  'Hatonuevo (La Guajira)',
-  'Villanueva (La Guajira)',
-  'El Molino (La Guajira)',
-  'Distracción (La Guajira)',
-  'La Jagua del Pilar (La Guajira)',
-  'Urumita (La Guajira)',
-  'Turbo',
-  'Necoclí',
-  'Apartadó',
-  'Carepa',
-  'Chigorodó',
-  'Arboletes',
-  'San Pedro de Urabá',
-  'San Juan de Urabá',
-  'Mutatá',
-  'Los Córdobas',
-  'Montería',
-  'Tierralta',
-  'Acandí',
-  'Unguía',
+  ...ALL_MUNICIPALITIES.map((m) => m.label),
   'Otro Municipio'
 ];
 

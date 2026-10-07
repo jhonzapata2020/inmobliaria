@@ -52,14 +52,32 @@ export const MUNICIPALITIES_ANTIOQUIA: MunicipalityItem[] = [
 ];
 
 export const MUNICIPALITIES_CORDOBA: MunicipalityItem[] = [
-  { name: 'Los Córdobas', department: 'Córdoba', label: 'Los Córdobas (Córdoba)', coords: { lat: 8.8953, lng: -76.3539 } },
   { name: 'Montería', department: 'Córdoba', label: 'Montería (Córdoba)', coords: { lat: 8.7479, lng: -75.8814 } },
-  { name: 'Tierralta', department: 'Córdoba', label: 'Tierralta (Córdoba)', coords: { lat: 8.1722, lng: -76.0592 } },
-  { name: 'Valencia', department: 'Córdoba', label: 'Valencia (Córdoba)', coords: { lat: 8.2611, lng: -76.1472 } },
-  { name: 'Planeta Rica', department: 'Córdoba', label: 'Planeta Rica (Córdoba)', coords: { lat: 8.4075, lng: -75.5839 } },
-  { name: 'Sahagún', department: 'Córdoba', label: 'Sahagún (Córdoba)', coords: { lat: 8.9469, lng: -75.4439 } },
   { name: 'Cereté', department: 'Córdoba', label: 'Cereté (Córdoba)', coords: { lat: 8.8847, lng: -75.7903 } },
+  { name: 'San Antero', department: 'Córdoba', label: 'San Antero (Córdoba)', coords: { lat: 9.3736, lng: -75.7583 } },
+  { name: 'Valencia', department: 'Córdoba', label: 'Valencia (Córdoba)', coords: { lat: 8.2611, lng: -76.1472 } },
+  { name: 'Ayapel', department: 'Córdoba', label: 'Ayapel (Córdoba)', coords: { lat: 8.3139, lng: -75.1408 } },
+  { name: 'Tierralta', department: 'Córdoba', label: 'Tierralta (Córdoba)', coords: { lat: 8.1722, lng: -76.0592 } },
+  { name: 'Buenavista', department: 'Córdoba', label: 'Buenavista (Córdoba)', coords: { lat: 8.1561, lng: -75.4514 } },
+  { name: 'Sahagún', department: 'Córdoba', label: 'Sahagún (Córdoba)', coords: { lat: 8.9469, lng: -75.4439 } },
+  { name: 'San Bernardo del Viento', department: 'Córdoba', label: 'San Bernardo del Viento (Córdoba)', coords: { lat: 9.3547, lng: -75.9525 } },
+  { name: 'La Apartada', department: 'Córdoba', label: 'La Apartada (Córdoba)', coords: { lat: 8.1014, lng: -75.3675 } },
+  { name: 'Montelíbano', department: 'Córdoba', label: 'Montelíbano (Córdoba)', coords: { lat: 7.9808, lng: -75.4206 } },
+  { name: 'Pueblo Nuevo', department: 'Córdoba', label: 'Pueblo Nuevo (Córdoba)', coords: { lat: 8.5483, lng: -75.5033 } },
+  { name: 'Planeta Rica', department: 'Córdoba', label: 'Planeta Rica (Córdoba)', coords: { lat: 8.4075, lng: -75.5839 } },
+  { name: 'Ciénaga de Oro', department: 'Córdoba', label: 'Ciénaga de Oro (Córdoba)', coords: { lat: 8.8786, lng: -75.6206 } },
   { name: 'Lorica', department: 'Córdoba', label: 'Lorica (Córdoba)', coords: { lat: 9.2392, lng: -75.8142 } },
+  { name: 'Los Córdobas', department: 'Córdoba', label: 'Los Córdobas (Córdoba)', coords: { lat: 8.8953, lng: -76.3539 } },
+  { name: 'San Carlos', department: 'Córdoba', label: 'San Carlos (Córdoba)', coords: { lat: 8.7981, lng: -75.7006 } },
+  { name: 'Puerto Escondido', department: 'Córdoba', label: 'Puerto Escondido (Córdoba)', coords: { lat: 8.9867, lng: -76.2575 } },
+  { name: 'Moñitos', department: 'Córdoba', label: 'Moñitos (Córdoba)', coords: { lat: 9.2475, lng: -76.1347 } },
+  { name: 'San Pelayo', department: 'Córdoba', label: 'San Pelayo (Córdoba)', coords: { lat: 8.9592, lng: -75.8369 } },
+  { name: 'Chinú', department: 'Córdoba', label: 'Chinú (Córdoba)', coords: { lat: 9.1069, lng: -75.3986 } },
+  { name: 'Purísima de la Concepción', department: 'Córdoba', label: 'Purísima de la Concepción (Córdoba)', coords: { lat: 9.2383, lng: -75.7231 } },
+  { name: 'San Andrés de Sotavento', department: 'Córdoba', label: 'San Andrés de Sotavento (Córdoba)', coords: { lat: 9.1444, lng: -75.5083 } },
+  { name: 'Momil', department: 'Córdoba', label: 'Momil (Córdoba)', coords: { lat: 9.2397, lng: -75.6547 } },
+  { name: 'Puerto Libertador', department: 'Córdoba', label: 'Puerto Libertador (Córdoba)', coords: { lat: 7.8864, lng: -75.6708 } },
+  { name: 'Canalete', department: 'Córdoba', label: 'Canalete (Córdoba)', coords: { lat: 8.7892, lng: -76.2425 } },
 ];
 
 export const MUNICIPALITIES_CHOCO: MunicipalityItem[] = [

@@ -84,6 +84,8 @@ export const MUNICIPALITIES_LA_GUAJIRA: MunicipalityItem[] = [
 ];
 
 export const MUNICIPALITIES_ANTIOQUIA: MunicipalityItem[] = [
+  { name: 'Bello', department: 'Antioquia', label: 'Bello (Antioquia)', coords: { lat: 6.3373, lng: -75.5579 } },
+  { name: 'San Pedro de los Milagros', department: 'Antioquia', label: 'San Pedro de los Milagros (Antioquia)', coords: { lat: 6.4608, lng: -75.5564 } },
   { name: 'Turbo', department: 'Antioquia', label: 'Turbo (Antioquia)', coords: { lat: 8.0925, lng: -76.7281 } },
   { name: 'Necoclí', department: 'Antioquia', label: 'Necoclí (Antioquia)', coords: { lat: 8.4258, lng: -76.7864 } },
   { name: 'Apartadó', department: 'Antioquia', label: 'Apartadó (Antioquia)', coords: { lat: 7.8825, lng: -76.6258 } },

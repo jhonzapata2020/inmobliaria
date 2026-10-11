@@ -19,6 +19,9 @@ EXCEL_PATH = "ANTIOQUIA.xlsx"
 # Strategic Whitelist Map: (Normalized Key) -> (Canonical Municipality, Department)
 STRATEGIC_WHITELIST_MAP = {
     # Antioquia Strategic Municipalities
+    'BELLO': ('Bello', 'Antioquia'),
+    'SAN PEDRO DE LOS MILAGROS': ('San Pedro de los Milagros', 'Antioquia'),
+    'SAN PEDRO': ('San Pedro de los Milagros', 'Antioquia'),
     'TURBO': ('Turbo', 'Antioquia'),
     'NECOCLI': ('Necoclí', 'Antioquia'),
     'APARTADO': ('Apartadó', 'Antioquia'),
@@ -173,6 +176,8 @@ MUNICIPALITY_COORDINATES = {
     'Versalles': (4.5778, -76.1978),
     'El Águila': (4.9128, -76.0408),
     'El Cairo': (4.7619, -76.2217),
+    'Bello': (6.3373, -75.5579),
+    'San Pedro de los Milagros': (6.4608, -75.5564),
     'Turbo': (8.0934, -76.7289),
     'Necoclí': (8.4256, -76.7861),
     'Apartadó': (7.8847, -76.6269),

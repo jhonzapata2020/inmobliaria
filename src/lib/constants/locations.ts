@@ -11,6 +11,7 @@ export const DEPARTMENTS = [
   'Valle del Cauca',
   'Sucre',
   'Bolívar',
+  'Atlántico',
 ] as const;
 
 export type DepartmentName = typeof DEPARTMENTS[number] | string;
@@ -133,11 +134,23 @@ export const MUNICIPALITIES_CHOCO: MunicipalityItem[] = [
   { name: 'Bahía Solano', department: 'Chocó', label: 'Bahía Solano (Chocó)', coords: { lat: 6.2239, lng: -77.4039 } },
 ];
 
+export const MUNICIPALITIES_BOLIVAR: MunicipalityItem[] = [
+  { name: 'Cartagena de Indias', department: 'Bolívar', label: 'Cartagena de Indias (Bolívar)', coords: { lat: 10.3910, lng: -75.4794 } },
+  { name: 'Cartagena', department: 'Bolívar', label: 'Cartagena (Bolívar)', coords: { lat: 10.3910, lng: -75.4794 } },
+];
+
+export const MUNICIPALITIES_ATLANTICO: MunicipalityItem[] = [
+  { name: 'Barranquilla', department: 'Atlántico', label: 'Barranquilla (Atlántico)', coords: { lat: 10.9685, lng: -74.7813 } },
+];
+
 export const ALL_MUNICIPALITIES: MunicipalityItem[] = [
+  ...MUNICIPALITIES_VALLE,
   ...MUNICIPALITIES_LA_GUAJIRA,
   ...MUNICIPALITIES_ANTIOQUIA,
   ...MUNICIPALITIES_CORDOBA,
   ...MUNICIPALITIES_CHOCO,
+  ...MUNICIPALITIES_BOLIVAR,
+  ...MUNICIPALITIES_ATLANTICO,
 ];
 
 export function getCoordinatesForMunicipality(municipalityName: string): LocationCoords {
@@ -147,6 +160,13 @@ export function getCoordinatesForMunicipality(municipalityName: string): Locatio
     (m) => m.name.toLowerCase() === cleanName || m.label.toLowerCase().includes(cleanName)
   );
   if (found) return found.coords;
+
+  if (cleanName.includes('cartagena') || cleanName.includes('bolivar')) {
+    return { lat: 10.3910, lng: -75.4794 };
+  }
+  if (cleanName.includes('barranquilla') || cleanName.includes('atlantico')) {
+    return { lat: 10.9685, lng: -74.7813 };
+  }
 
   if (
     cleanName.includes('guajira') ||

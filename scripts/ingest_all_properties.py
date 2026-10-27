@@ -131,7 +131,14 @@ STRATEGIC_WHITELIST_MAP = {
     'VIJES': ('Vijes', 'Valle del Cauca'),
     'VERSALLES': ('Versalles', 'Valle del Cauca'),
     'EL AGUILA': ('El Águila', 'Valle del Cauca'),
-    'EL CAIRO': ('El Cairo', 'Valle del Cauca')
+    'EL CAIRO': ('El Cairo', 'Valle del Cauca'),
+
+    # Bolívar Strategic Municipalities (Cartagena)
+    'CARTAGENA DE INDIAS': ('Cartagena de Indias', 'Bolívar'),
+    'CARTAGENA': ('Cartagena de Indias', 'Bolívar'),
+
+    # Atlántico Strategic Municipalities (Barranquilla)
+    'BARRANQUILLA': ('Barranquilla', 'Atlántico')
 }
 
 MUNICIPALITY_COORDINATES = {
@@ -232,7 +239,10 @@ MUNICIPALITY_COORDINATES = {
     'Hatonuevo': (11.0664, -72.7072),
     'El Molino': (10.6528, -72.9239),
     'Distracción': (10.8986, -72.8878),
-    'La Jagua del Pilar': (10.5103, -73.0728)
+    'La Jagua del Pilar': (10.5103, -73.0728),
+    'Cartagena de Indias': (10.3910, -75.4794),
+    'Cartagena': (10.3910, -75.4794),
+    'Barranquilla': (10.9685, -74.7813)
 }
 
 RUIN_TERMS = ['AMENAZA DE RUINA', 'MAL ESTADO', 'INHABITABLE', 'DEMOLICION', 'SOLO MEJORAS DETERIORADAS', 'RUINA', 'DETERIORADO']
@@ -908,11 +918,19 @@ def main():
         no_data_count = 0
 
         for idx_count, (_, row) in enumerate(dedup_df.iterrows()):
+            muni_norm = strip_accents(row[muni_col])
+            dept_norm = strip_accents(row[dept_col]) if dept_col else ''
+            
+            # Safeguard: Cartagena must be Bolivar, Barranquilla must be Atlantico
+            if 'CARTAGENA' in muni_norm and 'BOLIVAR' not in dept_norm:
+                continue
+            if 'BARRANQUILLA' in muni_norm and 'ATLANTICO' not in dept_norm:
+                continue
+
             id_act = str(row[id_col]).strip()
             code = f"DAR-EXCEL-{id_act}"
             slug = f"predio-excel-{id_act.lower()}"
             
-            muni_norm = strip_accents(row[muni_col])
             muni_canonical, dept_canonical = STRATEGIC_WHITELIST_MAP.get(muni_norm, (str(row[muni_col]).strip().title(), 'Antioquia'))
 
             dir_val = sanitize_text(row.get(dir_col))

@@ -16,7 +16,9 @@ import {
   MUNICIPALITIES_LA_GUAJIRA,
   MUNICIPALITIES_ANTIOQUIA,
   MUNICIPALITIES_CORDOBA,
-  MUNICIPALITIES_CHOCO 
+  MUNICIPALITIES_CHOCO,
+  MUNICIPALITIES_BOLIVAR,
+  MUNICIPALITIES_ATLANTICO
 } from '../../lib/constants/locations';
 
 interface AdvancedFiltersProps {
@@ -227,6 +229,16 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
           >
             <option value="">Todos los municipios</option>
+            <optgroup label="Bolívar (Cartagena)">
+              {MUNICIPALITIES_BOLIVAR.map((m) => (
+                <option key={`desktop-bolivar-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Atlántico (Barranquilla)">
+              {MUNICIPALITIES_ATLANTICO.map((m) => (
+                <option key={`desktop-atlantico-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
             <optgroup label="Valle del Cauca">
               {MUNICIPALITIES_VALLE.map((m) => (
                 <option key={`desktop-valle-${m.name}`} value={m.name}>{m.label}</option>
@@ -410,6 +422,16 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
                 >
                   <option value="">Todos los municipios</option>
+                  <optgroup label="Bolívar (Cartagena)">
+                    {MUNICIPALITIES_BOLIVAR.map((m) => (
+                      <option key={`mobile-bolivar-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Atlántico (Barranquilla)">
+                    {MUNICIPALITIES_ATLANTICO.map((m) => (
+                      <option key={`mobile-atlantico-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
+                  </optgroup>
                   <optgroup label="Valle del Cauca">
                     {MUNICIPALITIES_VALLE.map((m) => (
                       <option key={`mobile-valle-${m.name}`} value={m.name}>{m.label}</option>

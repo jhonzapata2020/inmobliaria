@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { PropertyFilterState } from '../../types/property';
 import { 
+  MUNICIPALITIES_VALLE_ABURRA,
+  POPULAR_BARRIOS_VALLE_ABURRA,
   MUNICIPALITIES_VALLE,
   MUNICIPALITIES_LA_GUAJIRA,
   MUNICIPALITIES_ANTIOQUIA,
@@ -68,7 +70,10 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     { label: 'En Venta', action: () => updateField('modality', filters.modality === 'Venta' ? '' : 'Venta'), isActive: filters.modality === 'Venta' },
     { label: 'En Arriendo', action: () => updateField('modality', filters.modality === 'Arriendo' ? '' : 'Arriendo'), isActive: filters.modality === 'Arriendo' },
     { label: 'Fincas Ganaderas', action: () => updateField('assetType', filters.assetType === 'Finca' ? '' : 'Finca'), isActive: filters.assetType === 'Finca' },
-    { label: 'Tierras Agrícolas', action: () => updateField('assetType', filters.assetType === 'Terreno' ? '' : 'Terreno'), isActive: filters.assetType === 'Terreno' },
+    { label: 'Lotes / Terrenos', action: () => updateField('assetType', filters.assetType === 'Lote' ? '' : 'Lote'), isActive: filters.assetType === 'Lote' },
+    { label: 'Parqueaderos', action: () => updateField('assetType', filters.assetType === 'Parqueadero' ? '' : 'Parqueadero'), isActive: filters.assetType === 'Parqueadero' },
+    { label: 'El Poblado', action: () => updateField('searchQuery', filters.searchQuery === 'Poblado' ? '' : 'Poblado'), isActive: filters.searchQuery === 'Poblado' },
+    { label: 'Conquistadores', action: () => updateField('searchQuery', filters.searchQuery === 'Conquistadores' ? '' : 'Conquistadores'), isActive: filters.searchQuery === 'Conquistadores' },
     { label: 'Bodegas', action: () => updateField('assetType', filters.assetType === 'Bodega' ? '' : 'Bodega'), isActive: filters.assetType === 'Bodega' },
     { label: 'Custodia SAE', action: () => updateField('modality', filters.modality === 'Custodia' ? '' : 'Custodia'), isActive: filters.modality === 'Custodia', isPurple: true },
     { label: 'Alta Valorización', action: () => updateField('isInvestmentOpportunity', !filters.isInvestmentOpportunity), isActive: filters.isInvestmentOpportunity, isGold: true },
@@ -110,7 +115,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           <Search className="w-4 h-4 text-[#6B6A63] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por código (ej. DAR-FIN-001), municipio, título o características..."
+            placeholder="Buscar por barrio (Poblado, Conquistadores, Laureles...), municipio, código..."
             value={filters.searchQuery}
             onChange={(e) => updateField('searchQuery', e.target.value)}
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#242321] placeholder-[#929087] focus:outline-none focus:border-[#1E3A2F] focus:ring-1 focus:ring-[#1E3A2F] transition-colors"
@@ -180,6 +185,30 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </div>
       </div>
 
+      {/* Barrios y Sectores Destacados (Valle de Aburrá) */}
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1.5 text-xs bg-[#F8F7F2]/80 px-3 rounded-xl border border-[#E5E1D8]/70">
+        <span className="text-[11px] font-mono font-bold text-[#6B6A63] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+          📍 Barrios Medellín:
+        </span>
+        {POPULAR_BARRIOS_VALLE_ABURRA.map((b) => {
+          const isActive = filters.searchQuery.toLowerCase() === b.query.toLowerCase();
+          return (
+            <button
+              key={b.name}
+              type="button"
+              onClick={() => updateField('searchQuery', isActive ? '' : b.query)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 border cursor-pointer ${
+                isActive
+                  ? 'bg-[#1E3A2F] text-white border-[#1E3A2F] shadow-xs'
+                  : 'bg-white text-[#4A4944] border-[#E5E1D8] hover:border-[#1E3A2F] hover:bg-[#F8F7F2]'
+              }`}
+            >
+              {b.name}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Primary Filter Grid (Desktop View) */}
       <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-[#E5E1D8]">
         
@@ -216,6 +245,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             <option value="Bodega">Bodegas</option>
             <option value="Edificio">Edificios</option>
             <option value="Oficina">Oficinas</option>
+            <option value="Parqueadero">Parqueaderos / Garajes</option>
             <option value="Activo Especial">Activo Especial SAE</option>
           </select>
         </div>
@@ -229,6 +259,11 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2 text-[#242321] focus:outline-none focus:border-[#1E3A2F]"
           >
             <option value="">Todos los municipios</option>
+            <optgroup label="Valle de Aburrá">
+              {MUNICIPALITIES_VALLE_ABURRA.map((m) => (
+                <option key={`desktop-aburra-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
             <optgroup label="Bolívar (Cartagena)">
               {MUNICIPALITIES_BOLIVAR.map((m) => (
                 <option key={`desktop-bolivar-${m.name}`} value={m.name}>{m.label}</option>
@@ -410,6 +445,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   <option value="Bodega">Bodegas</option>
                   <option value="Edificio">Edificios</option>
                   <option value="Oficina">Oficinas</option>
+                  <option value="Parqueadero">Parqueaderos / Garajes</option>
                   <option value="Activo Especial">Activo Especial SAE</option>
                 </select>
               </div>
@@ -422,6 +458,11 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   className="w-full bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl px-3 py-2.5 text-[#242321]"
                 >
                   <option value="">Todos los municipios</option>
+                  <optgroup label="Valle de Aburrá">
+                    {MUNICIPALITIES_VALLE_ABURRA.map((m) => (
+                      <option key={`mobile-aburra-${m.name}`} value={m.name}>{m.label}</option>
+                    ))}
+                  </optgroup>
                   <optgroup label="Bolívar (Cartagena)">
                     {MUNICIPALITIES_BOLIVAR.map((m) => (
                       <option key={`mobile-bolivar-${m.name}`} value={m.name}>{m.label}</option>

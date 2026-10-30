@@ -143,7 +143,27 @@ export const MUNICIPALITIES_ATLANTICO: MunicipalityItem[] = [
   { name: 'Barranquilla', department: 'Atlántico', label: 'Barranquilla (Atlántico)', coords: { lat: 10.9685, lng: -74.7813 } },
 ];
 
+export const MUNICIPALITIES_VALLE_ABURRA: MunicipalityItem[] = [
+  { name: 'Medellín', department: 'Antioquia', label: 'Medellín (Valle de Aburrá)', coords: { lat: 6.2442, lng: -75.5812 } },
+  { name: 'Envigado', department: 'Antioquia', label: 'Envigado (Valle de Aburrá)', coords: { lat: 6.1695, lng: -75.5873 } },
+  { name: 'Sabaneta', department: 'Antioquia', label: 'Sabaneta (Valle de Aburrá)', coords: { lat: 6.1517, lng: -75.6163 } },
+];
+
+export const POPULAR_BARRIOS_VALLE_ABURRA = [
+  { name: 'El Poblado', query: 'Poblado', label: 'El Poblado' },
+  { name: 'Los Conquistadores', query: 'Conquistadores', label: 'Los Conquistadores' },
+  { name: 'Laureles', query: 'Laureles', label: 'Laureles' },
+  { name: 'Centro', query: 'Centro', label: 'Centro de Medellín' },
+  { name: 'Estadio', query: 'Estadio', label: 'Estadio / Floresta' },
+  { name: 'Patio Bonito', query: 'Patio Bonito', label: 'Patio Bonito (Poblado)' },
+  { name: 'Castropol', query: 'Castropol', label: 'Castropol (Poblado)' },
+  { name: 'Provenza', query: 'Provenza', label: 'Provenza (Poblado)' },
+  { name: 'Belén', query: 'Belen', label: 'Belén' },
+  { name: 'Robledo', query: 'Robledo', label: 'Robledo' },
+] as const;
+
 export const ALL_MUNICIPALITIES: MunicipalityItem[] = [
+  ...MUNICIPALITIES_VALLE_ABURRA,
   ...MUNICIPALITIES_VALLE,
   ...MUNICIPALITIES_LA_GUAJIRA,
   ...MUNICIPALITIES_ANTIOQUIA,
@@ -161,6 +181,15 @@ export function getCoordinatesForMunicipality(municipalityName: string): Locatio
   );
   if (found) return found.coords;
 
+  if (cleanName.includes('medellin')) {
+    return { lat: 6.2442, lng: -75.5812 };
+  }
+  if (cleanName.includes('envigado')) {
+    return { lat: 6.1695, lng: -75.5873 };
+  }
+  if (cleanName.includes('sabaneta')) {
+    return { lat: 6.1517, lng: -75.6163 };
+  }
   if (cleanName.includes('cartagena') || cleanName.includes('bolivar')) {
     return { lat: 10.3910, lng: -75.4794 };
   }

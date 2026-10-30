@@ -11,6 +11,7 @@ export type AssetType =
   | 'Edificio'
   | 'Local'
   | 'Oficina'
+  | 'Parqueadero'
   | 'Activo Especial';
 
 export type LegalStatus = 

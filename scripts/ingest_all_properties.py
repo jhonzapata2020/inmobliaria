@@ -138,7 +138,12 @@ STRATEGIC_WHITELIST_MAP = {
     'CARTAGENA': ('Cartagena de Indias', 'Bolívar'),
 
     # Atlántico Strategic Municipalities (Barranquilla)
-    'BARRANQUILLA': ('Barranquilla', 'Atlántico')
+    'BARRANQUILLA': ('Barranquilla', 'Atlántico'),
+
+    # Valle de Aburrá Strategic Municipalities
+    'MEDELLIN': ('Medellín', 'Antioquia'),
+    'ENVIGADO': ('Envigado', 'Antioquia'),
+    'SABANETA': ('Sabaneta', 'Antioquia')
 }
 
 MUNICIPALITY_COORDINATES = {
@@ -242,7 +247,10 @@ MUNICIPALITY_COORDINATES = {
     'La Jagua del Pilar': (10.5103, -73.0728),
     'Cartagena de Indias': (10.3910, -75.4794),
     'Cartagena': (10.3910, -75.4794),
-    'Barranquilla': (10.9685, -74.7813)
+    'Barranquilla': (10.9685, -74.7813),
+    'Medellín': (6.2442, -75.5812),
+    'Envigado': (6.1695, -75.5873),
+    'Sabaneta': (6.1517, -75.6163)
 }
 
 RUIN_TERMS = ['AMENAZA DE RUINA', 'MAL ESTADO', 'INHABITABLE', 'DEMOLICION', 'SOLO MEJORAS DETERIORADAS', 'RUINA', 'DETERIORADO']
@@ -296,6 +304,10 @@ IMAGE_POOLS = {
     "Oficina": [
         "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80",
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "Parqueadero": [
+        "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=1200&q=80"
     ]
 }
 
@@ -349,6 +361,8 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
     combined = f"{raw_upper} {dir_upper} {desc_upper}"
 
     # Priority 1: Check raw classification column
+    if "GARAJE" in raw_upper or "PARQUEADERO" in raw_upper:
+        return "Parqueadero"
     if "APARTAMENTO" in raw_upper:
         return "Apartamento"
     if "BODEGA" in raw_upper or "GALPON" in raw_upper or "NAVE" in raw_upper:
@@ -361,12 +375,14 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
         return "Oficina"
     if "CASA" in raw_upper or "VIVIENDA" in raw_upper or "HABITACION" in raw_upper or "CASA LOTE" in raw_upper or "CASA RECREO" in raw_upper:
         return "Casa"
-    if "LOTE" in raw_upper or "TERRENO" in raw_upper or "LOTE CON CONSTRUCCION" in raw_upper or "TERRAZA" in raw_upper or "GARAJE" in raw_upper:
+    if "LOTE" in raw_upper or "TERRENO" in raw_upper or "LOTE CON CONSTRUCCION" in raw_upper or "TERRAZA" in raw_upper:
         return "Lote"
     if "FINCA" in raw_upper or "HACIENDA" in raw_upper or "PARCELA" in raw_upper or "PREDIO RURAL" in raw_upper or "MEJORAS AGRICOLAS" in raw_upper:
         return "Finca"
 
     # Priority 2: Keyword search in Combined Text
+    if any(k in combined for k in ["PARQUEADERO", "GARAJE"]):
+        return "Parqueadero"
     if any(k in combined for k in ["LOCAL", "MALL", "COMERCIAL"]):
         return "Local"
     if any(k in combined for k in ["BODEGA", "ALMACEN"]):
@@ -385,7 +401,7 @@ def normalize_asset_type(raw_type, dir_val="", desc_val=""):
     return "Finca"
 
 def format_title(asset_type, dir_val, desc_val, id_act, muni_name):
-    is_urban = asset_type in ["Casa", "Apartamento", "Local", "Bodega", "Edificio", "Oficina", "Lote"]
+    is_urban = asset_type in ["Casa", "Apartamento", "Local", "Bodega", "Edificio", "Oficina", "Lote", "Parqueadero"]
     
     clean_dir = sanitize_text(dir_val)
     clean_desc = sanitize_text(desc_val)
@@ -921,10 +937,12 @@ def main():
             muni_norm = strip_accents(row[muni_col])
             dept_norm = strip_accents(row[dept_col]) if dept_col else ''
             
-            # Safeguard: Cartagena must be Bolivar, Barranquilla must be Atlantico
+            # Safeguard: Cartagena must be Bolivar, Barranquilla must be Atlantico, Valle de Aburra must be Antioquia
             if 'CARTAGENA' in muni_norm and 'BOLIVAR' not in dept_norm:
                 continue
             if 'BARRANQUILLA' in muni_norm and 'ATLANTICO' not in dept_norm:
+                continue
+            if muni_norm in ['MEDELLIN', 'ENVIGADO', 'SABANETA'] and 'ANTIOQUIA' not in dept_norm:
                 continue
 
             id_act = str(row[id_col]).strip()
@@ -1049,6 +1067,11 @@ def main():
                         if sale_price_cop:
                             sale_price_cop = 45000000
                 elif asset_type in ["Lote", "Terreno"]:
+                    if estimated_value_cop < 20000000:
+                        estimated_value_cop = 20000000
+                        if sale_price_cop:
+                            sale_price_cop = 20000000
+                elif asset_type in ["Parqueadero"]:
                     if estimated_value_cop < 20000000:
                         estimated_value_cop = 20000000
                         if sale_price_cop:

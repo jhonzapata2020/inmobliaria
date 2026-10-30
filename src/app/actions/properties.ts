@@ -71,6 +71,8 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       if (assetType && assetType.toLowerCase() !== 'all' && assetType.toLowerCase() !== 'todos') {
         if (assetType === 'Terreno' || assetType === 'Lote') {
           query = query.in('asset_type', ['Lote', 'Terreno']);
+        } else if (assetType === 'Parqueadero' || assetType === 'Garaje') {
+          query = query.in('asset_type', ['Parqueadero', 'Garaje']);
         } else {
           query = query.ilike('asset_type', `%${assetType}%`);
         }
@@ -138,7 +140,7 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         const safeSearch = searchQuery.replace(/[,.()%"'\\]/g, ' ').trim();
         if (safeSearch) {
           const q = `%${safeSearch}%`;
-          query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q}`);
+          query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q},address.ilike.${q},sector_vereda.ilike.${q},vereda.ilike.${q}`);
         }
       }
 

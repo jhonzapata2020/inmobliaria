@@ -73,6 +73,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     { label: 'Lotes / Terrenos', action: () => updateField('assetType', filters.assetType === 'Lote' ? '' : 'Lote'), isActive: filters.assetType === 'Lote' },
     { label: 'Parqueaderos', action: () => updateField('assetType', filters.assetType === 'Parqueadero' ? '' : 'Parqueadero'), isActive: filters.assetType === 'Parqueadero' },
     { label: 'El Poblado', action: () => updateField('searchQuery', filters.searchQuery === 'Poblado' ? '' : 'Poblado'), isActive: filters.searchQuery === 'Poblado' },
+    { label: 'Belén / La Mota', action: () => updateField('searchQuery', filters.searchQuery === 'Mota' ? '' : 'Mota'), isActive: filters.searchQuery === 'Mota' },
     { label: 'Conquistadores', action: () => updateField('searchQuery', filters.searchQuery === 'Conquistadores' ? '' : 'Conquistadores'), isActive: filters.searchQuery === 'Conquistadores' },
     { label: 'Bodegas', action: () => updateField('assetType', filters.assetType === 'Bodega' ? '' : 'Bodega'), isActive: filters.assetType === 'Bodega' },
     { label: 'Custodia SAE', action: () => updateField('modality', filters.modality === 'Custodia' ? '' : 'Custodia'), isActive: filters.modality === 'Custodia', isPurple: true },
@@ -186,28 +187,38 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
       </div>
 
       {/* Barrios y Sectores Destacados (Valle de Aburrá) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1.5 text-xs bg-[#F8F7F2]/80 px-3 rounded-xl border border-[#E5E1D8]/70">
-        <span className="text-[11px] font-mono font-bold text-[#6B6A63] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
-          📍 Barrios Medellín:
-        </span>
-        {POPULAR_BARRIOS_VALLE_ABURRA.map((b) => {
-          const isActive = filters.searchQuery.toLowerCase() === b.query.toLowerCase();
-          return (
-            <button
-              key={b.name}
-              type="button"
-              onClick={() => updateField('searchQuery', isActive ? '' : b.query)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 border cursor-pointer ${
-                isActive
-                  ? 'bg-[#1E3A2F] text-white border-[#1E3A2F] shadow-xs'
-                  : 'bg-white text-[#4A4944] border-[#E5E1D8] hover:border-[#1E3A2F] hover:bg-[#F8F7F2]'
-              }`}
-            >
-              {b.name}
-            </button>
-          );
-        })}
-      </div>
+      {(!filters.municipality || ['Medellín', 'Envigado', 'Sabaneta'].includes(filters.municipality)) && (
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1.5 text-xs bg-[#F8F7F2]/80 px-3 rounded-xl border border-[#E5E1D8]/70">
+          <span className="text-[11px] font-mono font-bold text-[#6B6A63] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            📍 Barrios Medellín:
+          </span>
+          {POPULAR_BARRIOS_VALLE_ABURRA.map((b) => {
+            const isActive = filters.searchQuery.toLowerCase() === b.query.toLowerCase();
+            return (
+              <button
+                key={b.name}
+                type="button"
+                onClick={() => {
+                  onFilterChange({
+                    ...filters,
+                    searchQuery: isActive ? '' : b.query,
+                    municipality: isActive 
+                      ? filters.municipality 
+                      : (['Medellín', 'Envigado', 'Sabaneta'].includes(filters.municipality) ? filters.municipality : 'Medellín')
+                  });
+                }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 border cursor-pointer ${
+                  isActive
+                    ? 'bg-[#1E3A2F] text-white border-[#1E3A2F] shadow-xs'
+                    : 'bg-white text-[#4A4944] border-[#E5E1D8] hover:border-[#1E3A2F] hover:bg-[#F8F7F2]'
+                }`}
+              >
+                {b.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Primary Filter Grid (Desktop View) */}
       <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-[#E5E1D8]">

@@ -150,15 +150,14 @@ export const MUNICIPALITIES_VALLE_ABURRA: MunicipalityItem[] = [
 ];
 
 export const POPULAR_BARRIOS_VALLE_ABURRA = [
+  { name: 'Belén', query: 'Belen', label: 'Belén' },
+  { name: 'Belén La Mota', query: 'Mota', label: 'Belén La Mota' },
+  { name: 'Los Bernal', query: 'Bernal', label: 'Loma de Los Bernal' },
   { name: 'El Poblado', query: 'Poblado', label: 'El Poblado' },
   { name: 'Los Conquistadores', query: 'Conquistadores', label: 'Los Conquistadores' },
   { name: 'Laureles', query: 'Laureles', label: 'Laureles' },
-  { name: 'Centro', query: 'Centro', label: 'Centro de Medellín' },
   { name: 'Estadio', query: 'Estadio', label: 'Estadio / Floresta' },
-  { name: 'Patio Bonito', query: 'Patio Bonito', label: 'Patio Bonito (Poblado)' },
-  { name: 'Castropol', query: 'Castropol', label: 'Castropol (Poblado)' },
-  { name: 'Provenza', query: 'Provenza', label: 'Provenza (Poblado)' },
-  { name: 'Belén', query: 'Belen', label: 'Belén' },
+  { name: 'Centro', query: 'Centro', label: 'Centro de Medellín' },
   { name: 'Robledo', query: 'Robledo', label: 'Robledo' },
 ] as const;
 

@@ -34,10 +34,12 @@ export const ExecutiveDossierModal: React.FC = () => {
   const handlePrint = (withLogo: boolean) => {
     setIncludeBranding(withLogo);
     setDownloading(true);
-    setTimeout(() => {
-      setDownloading(false);
-      window.print();
-    }, 400);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setDownloading(false);
+        window.print();
+      }, 300);
+    });
   };
 
   const handleSubmitRequest = (e: React.FormEvent) => {

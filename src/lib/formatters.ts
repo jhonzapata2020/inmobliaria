@@ -1,33 +1,37 @@
 import { LegalStatus, Modality } from '../types/property';
 
-export function formatCurrency(amount?: number): string {
-  if (amount === undefined || amount === null || amount === 0) return 'Bajo solicitud';
-  if (amount >= 1000000000) {
-    const millones = amount / 1000000;
+export function formatCurrency(amount?: number | string | null): string {
+  if (amount === undefined || amount === null) return 'Bajo solicitud';
+  const num = typeof amount === 'number' ? amount : Number(amount);
+  if (isNaN(num) || num <= 0) return 'Bajo solicitud';
+  if (num >= 1000000000) {
+    const millones = num / 1000000;
     return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} Millones COP`;
   }
-  if (amount >= 1000000) {
-    const millones = amount / 1000000;
+  if (num >= 1000000) {
+    const millones = num / 1000000;
     return `$${millones.toLocaleString('es-CO', { maximumFractionDigits: 1 })} Millones COP`;
   }
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
     maximumFractionDigits: 0
-  }).format(amount);
+  }).format(num);
 }
 
-export function formatArea(areaHa?: number, areaM2?: number): string {
-  if (areaHa && areaHa > 0) {
-    const m2 = areaM2 || areaHa * 10000;
-    return `${areaHa.toLocaleString('es-CO')} Ha (${m2.toLocaleString('es-CO')} m²)`;
+export function formatArea(areaHa?: number | string | null, areaM2?: number | string | null): string {
+  const ha = areaHa !== undefined && areaHa !== null ? Number(areaHa) : 0;
+  const m2 = areaM2 !== undefined && areaM2 !== null ? Number(areaM2) : 0;
+  if (!isNaN(ha) && ha > 0) {
+    const totalM2 = !isNaN(m2) && m2 > 0 ? m2 : ha * 10000;
+    return `${ha.toLocaleString('es-CO')} Ha (${totalM2.toLocaleString('es-CO')} m²)`;
   }
-  if (areaM2 && areaM2 > 0) {
-    if (areaM2 >= 10000) {
-      const ha = (areaM2 / 10000).toFixed(2);
-      return `${ha} Ha (${areaM2.toLocaleString('es-CO')} m²)`;
+  if (!isNaN(m2) && m2 > 0) {
+    if (m2 >= 10000) {
+      const computedHa = (m2 / 10000).toFixed(2);
+      return `${computedHa} Ha (${m2.toLocaleString('es-CO')} m²)`;
     }
-    return `${areaM2.toLocaleString('es-CO')} m²`;
+    return `${m2.toLocaleString('es-CO')} m²`;
   }
   return 'Sujeto a deslinde';
 }

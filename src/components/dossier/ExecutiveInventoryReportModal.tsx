@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   X, 
   Printer, 
@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   Clock, 
   AlertCircle,
-  MapPin
+  MapPin,
+  FileText
 } from 'lucide-react';
 import { Property, PropertyFilterState } from '../../types/property';
 import { formatCurrency, formatArea, isPriceToNegotiate } from '../../lib/formatters';
@@ -28,10 +29,15 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
   properties,
   filters
 }) => {
+  const [includeBranding, setIncludeBranding] = useState<boolean>(true);
+
   if (!isOpen) return null;
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = (withLogo: boolean) => {
+    setIncludeBranding(withLogo);
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   const currentDate = new Date().toLocaleDateString('es-CO', {
@@ -89,17 +95,41 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Toggle Preview Option */}
+            <label className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 bg-white text-xs font-medium text-[#242321] rounded-xl border border-[#E5E1D8] cursor-pointer hover:bg-slate-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={includeBranding}
+                onChange={(e) => setIncludeBranding(e.target.checked)}
+                className="rounded border-[#E5E1D8] text-[#1E3A2F] focus:ring-[#1E3A2F]"
+              />
+              <span>Mostrar membrete y logo</span>
+            </label>
+
+            {/* Print with Logo Button */}
             <button
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+              onClick={() => handlePrint(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+              title="Imprimir con membrete oficial y logo de Activos Darién"
             >
-              <Printer className="w-4 h-4" />
-              <span>Imprimir / Exportar PDF</span>
+              <Printer className="w-4 h-4 text-[#C6A15B]" />
+              <span>Imprimir con Logo</span>
             </button>
+
+            {/* Print without Logo Button */}
+            <button
+              onClick={() => handlePrint(false)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-emerald-50 text-[#1E3A2F] border-2 border-[#1E3A2F] text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+              title="Imprimir formato neutro (Listado de...) sin logo ni mención de Darién"
+            >
+              <FileText className="w-4 h-4 text-emerald-700" />
+              <span>Imprimir sin Logo</span>
+            </button>
+
             <button
               onClick={onClose}
-              className="p-2 text-[#6B6A63] hover:text-[#242321] hover:bg-[#E5E1D8] rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-[#6B6A63] hover:text-[#242321] hover:bg-[#E5E1D8] rounded-xl transition-colors cursor-pointer ml-1"
               title="Cerrar modal"
             >
               <X className="w-5 h-5" />
@@ -115,24 +145,37 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
           {/* Institutional Header */}
           <div className="border-b-2 border-[#1E3A2F] pb-5 space-y-3">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#1E3A2F] text-[#C6A15B] flex items-center justify-center font-serif font-bold text-sm">
-                    D
-                  </div>
-                  <div>
-                    <h1 className="font-serif text-lg sm:text-xl font-bold text-[#1E3A2F] tracking-tight">
-                      ACTIVOS & INVERSIONES DARIÉN S.A.S.
-                    </h1>
-                    <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider">
-                      División Tierras & Inversión • Nit: 901.789.452-1
-                    </p>
+              {includeBranding ? (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#1E3A2F] text-[#C6A15B] flex items-center justify-center font-serif font-bold text-sm">
+                      D
+                    </div>
+                    <div>
+                      <h1 className="font-serif text-lg sm:text-xl font-bold text-[#1E3A2F] tracking-tight">
+                        ACTIVOS & INVERSIONES DARIÉN S.A.S.
+                      </h1>
+                      <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider">
+                        División Tierras & Inversión • Nit: 901.789.452-1
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <h1 className="font-serif text-xl sm:text-2xl font-black text-[#1E3A2F] tracking-tight uppercase">
+                    Listado de Bienes e Inmuebles
+                  </h1>
+                  <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider font-semibold">
+                    Consolidado de Disponibilidad Predial y Referencia Comercial
+                  </p>
+                </div>
+              )}
 
               <div className="text-left sm:text-right font-mono text-xs text-[#6B6A63]">
-                <p className="font-bold text-[#1E3A2F]">INFORME CONSOLIDADO PREDIAL</p>
+                <p className="font-bold text-[#1E3A2F]">
+                  {includeBranding ? 'INFORME CONSOLIDADO PREDIAL' : 'DOCUMENTO DE INVENTARIO'}
+                </p>
                 <p className="capitalize text-[11px]">{currentDate}</p>
               </div>
             </div>
@@ -297,14 +340,22 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
           {/* Institutional Footer & Disclaimer */}
           <div className="pt-4 border-t border-[#E5E1D8] text-center text-[10px] font-mono text-[#6B6A63] space-y-1.5 print:border-gray-400 print:text-black">
-            <p className="font-bold text-[#1E3A2F] text-xs">
-              ACTIVOS & INVERSIONES DARIÉN S.A.S. • División de Gestión Predial & Proyectos Especiales
-            </p>
-            <p>
-              Urabá & Darién, Colombia | Correo: gerencia@activosdarien.com | Nit: 901.789.452-1
-            </p>
+            {includeBranding ? (
+              <>
+                <p className="font-bold text-[#1E3A2F] text-xs">
+                  ACTIVOS & INVERSIONES DARIÉN S.A.S. • División de Gestión Predial & Proyectos Especiales
+                </p>
+                <p>
+                  Urabá & Darién, Colombia | Correo: gerencia@activosdarien.com | Nit: 901.789.452-1
+                </p>
+              </>
+            ) : (
+              <p className="font-bold text-[#1E3A2F] text-xs uppercase tracking-wider">
+                DOCUMENTO CONSOLIDADO DE INVENTARIO Y DISPONIBILIDAD INMOBILIARIA
+              </p>
+            )}
             <p className="text-[9px] text-gray-500 italic max-w-4xl mx-auto pt-1">
-              * Documento ejecutivo oficial generado desde la plataforma de gestión territorial. Los valores comerciales de referencia y especificaciones técnicas están sujetos a confirmación en visita técnica de campo y estudio de títulos.
+              * Documento informativo y de consulta predial. Los valores comerciales de referencia y especificaciones técnicas están sujetos a confirmación en visita técnica de campo y estudio de títulos.
             </p>
           </div>
         </div>

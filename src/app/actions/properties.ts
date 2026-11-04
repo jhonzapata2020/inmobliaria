@@ -79,7 +79,18 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       }
 
       if (municipality && municipality.toLowerCase() !== 'all' && municipality.toLowerCase() !== 'todos') {
-        query = query.ilike('municipality', `%${municipality}%`);
+        if (municipality.includes(':')) {
+          const [muniPart, barrioPart] = municipality.split(':');
+          if (muniPart) {
+            query = query.ilike('municipality', `%${muniPart.trim()}%`);
+          }
+          if (barrioPart) {
+            const b = `%${barrioPart.trim()}%`;
+            query = query.or(`title.ilike.${b},description.ilike.${b},address.ilike.${b},sector_vereda.ilike.${b}`);
+          }
+        } else {
+          query = query.ilike('municipality', `%${municipality}%`);
+        }
       }
 
       if (department && department.toLowerCase() !== 'all' && department.toLowerCase() !== 'todos') {

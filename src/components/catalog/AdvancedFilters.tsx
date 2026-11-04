@@ -386,7 +386,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           )}
           {filters.municipality && (
             <span className="px-2.5 py-1 bg-[#F8F7F2] text-[#242321] rounded-lg border border-[#E5E1D8] flex items-center gap-1 font-medium">
-              Ubicación: {filters.municipality}
+              Ubicación: {filters.municipality.includes(':') ? filters.municipality.replace(':', ' - ') : filters.municipality}
               <X className="w-3 h-3 cursor-pointer hover:text-rose-600" onClick={() => updateField('municipality', '')} />
             </span>
           )}

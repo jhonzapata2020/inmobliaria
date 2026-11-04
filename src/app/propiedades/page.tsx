@@ -69,8 +69,10 @@ function PropiedadesCatalogContent() {
     loadProperties();
   }, [filters]);
 
-  // Sync active filters to URL for shareable links
+  // Sync active filters to URL for shareable links without triggering Next.js router re-render loops
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const params = new URLSearchParams();
     if (filters.searchQuery) params.set('searchQuery', filters.searchQuery);
     if (filters.modality) params.set('modality', filters.modality);
@@ -89,9 +91,14 @@ function PropiedadesCatalogContent() {
     if (showOnlyFavorites) params.set('favorites', 'true');
 
     const queryString = params.toString();
-    const newPath = queryString ? `/propiedades?${queryString}` : '/propiedades';
-    router.replace(newPath, { scroll: false });
-  }, [filters, showOnlyFavorites, router]);
+    const currentQuery = window.location.search.replace(/^\?/, '');
+
+    // Only update browser URL if the query string actually changed
+    if (queryString !== currentQuery) {
+      const newPath = queryString ? `/propiedades?${queryString}` : '/propiedades';
+      window.history.replaceState(null, '', newPath);
+    }
+  }, [filters, showOnlyFavorites]);
 
   const handleResetFilters = () => {
     setFilters({

@@ -251,12 +251,14 @@ function PropiedadesCatalogContent() {
       </div>
 
       {/* Executive Inventory Tabular Report Modal */}
-      <ExecutiveInventoryReportModal
-        isOpen={isInventoryReportOpen}
-        onClose={() => setIsInventoryReportOpen(false)}
-        properties={filteredProperties}
-        filters={filters}
-      />
+      {isInventoryReportOpen && (
+        <ExecutiveInventoryReportModal
+          isOpen={isInventoryReportOpen}
+          onClose={() => setIsInventoryReportOpen(false)}
+          properties={filteredProperties}
+          filters={filters}
+        />
+      )}
     </>
   );
 }

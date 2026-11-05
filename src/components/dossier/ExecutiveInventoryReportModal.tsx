@@ -34,8 +34,6 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
     setCurrentPage(1);
   }, [properties.length, filters.municipality, filters.assetType, filters.searchQuery]);
 
-  if (!isOpen) return null;
-
   const totalPages = Math.ceil(properties.length / pageSize) || 1;
   const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
   const startIndex = (safeCurrentPage - 1) * pageSize;
@@ -44,6 +42,23 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
   const displayedProperties = useMemo(() => {
     return properties.slice(startIndex, endIndex);
   }, [properties, startIndex, endIndex]);
+
+  const activeFiltersSummary = useMemo(() => {
+    const parts: string[] = [];
+    if (filters.searchQuery) parts.push(`Búsqueda: "${filters.searchQuery}"`);
+    if (filters.municipality) parts.push(`Municipio: ${filters.municipality}`);
+    if (filters.department) parts.push(`Depto: ${filters.department}`);
+    if (filters.assetType) parts.push(`Tipo: ${filters.assetType}`);
+    if (filters.modality) parts.push(`Modalidad: ${filters.modality}`);
+    if (filters.legalStatus) parts.push(`Estado Jurídico: ${filters.legalStatus}`);
+    if (filters.isInvestmentOpportunity) parts.push(`Alta Valorización`);
+    if (filters.minAreaHa || filters.maxAreaHa) {
+      parts.push(`Área: ${filters.minAreaHa || 0} - ${filters.maxAreaHa || '∞'} Ha`);
+    }
+    return parts.length > 0 ? parts.join(' • ') : 'Portafolio Completo (Sin Filtros)';
+  }, [filters]);
+
+  if (!isOpen) return null;
 
   const handlePrint = () => {
     requestAnimationFrame(() => {
@@ -129,21 +144,6 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
     month: 'long',
     day: 'numeric'
   });
-
-  const activeFiltersSummary = useMemo(() => {
-    const parts: string[] = [];
-    if (filters.searchQuery) parts.push(`Búsqueda: "${filters.searchQuery}"`);
-    if (filters.municipality) parts.push(`Municipio: ${filters.municipality}`);
-    if (filters.department) parts.push(`Depto: ${filters.department}`);
-    if (filters.assetType) parts.push(`Tipo: ${filters.assetType}`);
-    if (filters.modality) parts.push(`Modalidad: ${filters.modality}`);
-    if (filters.legalStatus) parts.push(`Estado Jurídico: ${filters.legalStatus}`);
-    if (filters.isInvestmentOpportunity) parts.push(`Alta Valorización`);
-    if (filters.minAreaHa || filters.maxAreaHa) {
-      parts.push(`Área: ${filters.minAreaHa || 0} - ${filters.maxAreaHa || '∞'} Ha`);
-    }
-    return parts.length > 0 ? parts.join(' • ') : 'Portafolio Completo (Sin Filtros)';
-  }, [filters]);
 
   const getOccupancyBadge = (status?: string) => {
     switch (status) {

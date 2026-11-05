@@ -193,7 +193,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             📍 Barrios Medellín:
           </span>
           {POPULAR_BARRIOS_VALLE_ABURRA.map((b) => {
-            const isActive = filters.searchQuery.toLowerCase() === b.query.toLowerCase();
+            const isActive = (filters.searchQuery || '').toLowerCase() === b.query.toLowerCase();
             return (
               <button
                 key={b.name}
@@ -204,7 +204,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                     searchQuery: isActive ? '' : b.query,
                     municipality: isActive 
                       ? filters.municipality 
-                      : (['Medellín', 'Envigado', 'Sabaneta'].includes(filters.municipality) ? filters.municipality : 'Medellín')
+                      : (['Medellín', 'Envigado', 'Sabaneta', 'Bello'].includes(filters.municipality) ? filters.municipality : 'Medellín')
                   });
                 }}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 border cursor-pointer ${
@@ -386,7 +386,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           )}
           {filters.municipality && (
             <span className="px-2.5 py-1 bg-[#F8F7F2] text-[#242321] rounded-lg border border-[#E5E1D8] flex items-center gap-1 font-medium">
-              Ubicación: {filters.municipality.includes(':') ? filters.municipality.replace(':', ' - ') : filters.municipality}
+              Ubicación: {filters.municipality}
               <X className="w-3 h-3 cursor-pointer hover:text-rose-600" onClick={() => updateField('municipality', '')} />
             </span>
           )}

@@ -61,30 +61,18 @@ export const ExecutiveDossierModal: React.FC = () => {
         <div className="p-4 bg-[#F8F7F2] border-b border-[#E5E1D8] flex flex-wrap items-center justify-between gap-3 no-print print:hidden">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[#1E3A2F] bg-[#EEF4EF] border border-[#E5E1D8] px-2.5 py-1 rounded-md font-bold">
-              {includeBranding ? 'DOSSIER OFICIAL • ACTIVOS DARIÉN' : 'DOSSIER EJECUTIVO • FORMATO NEUTRO'}
+              REPORTE DE PROPIEDADES • DOSSIER
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Print with Logo Button */}
-            <button
-              onClick={() => handlePrint(true)}
-              disabled={downloading}
-              className="px-3.5 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
-              title="Imprimir con membrete oficial y logo de Activos Darién"
-            >
-              <Printer className="w-4 h-4 text-[#C6A15B]" />
-              <span>Imprimir con Logo</span>
-            </button>
-
-            {/* Print without Logo Button */}
             <button
               onClick={() => handlePrint(false)}
               disabled={downloading}
-              className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-[#1E3A2F] border-2 border-[#1E3A2F] rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
-              title="Imprimir formato neutro (Listado de...) sin logo ni mención de Darién"
+              className="px-4 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+              title="Imprimir dossier en PDF"
             >
-              <FileText className="w-4 h-4 text-emerald-700" />
-              <span>Imprimir sin Logo</span>
+              <Printer className="w-4 h-4 text-[#C6A15B]" />
+              <span>Imprimir Dossier (PDF)</span>
             </button>
 
             <button
@@ -101,30 +89,14 @@ export const ExecutiveDossierModal: React.FC = () => {
           
           {/* Header Letterhead */}
           <div className="border-b-2 border-[#1E3A2F] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            {includeBranding ? (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#1E3A2F] text-white flex items-center justify-center shadow-md">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#242321] tracking-tight">
-                    ACTIVOS & INVERSIONES DARIÉN S.A.S.
-                  </h1>
-                  <p className="text-xs text-[#1E3A2F] font-mono font-semibold">
-                    NIT 901.884.210-4 • DOSSIER EJECUTIVO DE ACTIVOS INMOBILIARIOS
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#242321] tracking-tight uppercase">
-                  Listado de Bienes e Inmuebles
-                </h1>
-                <p className="text-xs text-[#1E3A2F] font-mono font-semibold">
-                  DOSSIER CONSOLIDADO DE ACTIVOS INMOBILIARIOS
-                </p>
-              </div>
-            )}
+            <div>
+              <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#242321] tracking-tight uppercase">
+                Reporte de Propiedades
+              </h1>
+              <p className="text-xs text-[#1E3A2F] font-mono font-semibold uppercase tracking-wider">
+                Dossier Ejecutivo de Activos Inmobiliarios
+              </p>
+            </div>
             <div className="text-left sm:text-right font-mono text-xs text-[#6B6A63] space-y-1">
               <p><strong className="text-[#242321]">Ref:</strong> DOS-{Math.floor(100000 + Math.random() * 900000)}</p>
               <p><strong className="text-[#242321]">Fecha de Emisión:</strong> {currentDate}</p>
@@ -393,29 +365,20 @@ export const ExecutiveDossierModal: React.FC = () => {
               Aviso Legal & Términos de Verificación Comercial
             </div>
             <p>
-              Este documento tiene carácter estrictamente informativo y comercial emitido por ACTIVOS & INVERSIONES DARIÉN S.A.S. La información, linderos, matrículas inmobiliarias y cifras están sujetas a validación técnica, jurídica, catastral, ambiental y comercial previa a cualquier firma de promesa, negociación, contrato o transacción oficial.
+              Este documento tiene carácter estrictamente informativo y de consulta predial. La información técnica, linderos y valores comerciales están sujetos a verificación en campo y estudio de títulos previo a cualquier compromiso o negociación formal.
             </p>
           </div>
 
-          {/* Corporate Footer & Signature */}
+          {/* Neutral Footer */}
           <div className="pt-6 border-t border-[#E5E1D8] flex flex-col sm:flex-row justify-between items-center text-xs text-[#6B6A63] gap-4">
-            {includeBranding ? (
-              <>
-                <div>
-                  <p className="font-semibold text-[#242321]">ACTIVOS & INVERSIONES DARIÉN S.A.S.</p>
-                  <p>Departamento de Gestión Comercial & Custodia Patrimonial</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#1E3A2F]" />
-                  <span className="font-mono text-[#1E3A2F] font-bold">www.activosdarien.com.co</span>
-                </div>
-              </>
-            ) : (
-              <div>
-                <p className="font-semibold text-[#242321]">DOCUMENTO DE GESTIÓN Y CONSULTA INMOBILIARIA</p>
-                <p>Consolidado de Activos y Referencia Predial</p>
-              </div>
-            )}
+            <div>
+              <p className="font-semibold text-[#242321]">DOCUMENTO DE GESTIÓN Y CONSULTA INMOBILIARIA</p>
+              <p>Consolidado de Activos y Referencia Predial</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#1E3A2F]" />
+              <span className="font-mono text-[#1E3A2F] font-bold">Documento Verificado</span>
+            </div>
           </div>
         </div>
 

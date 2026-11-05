@@ -144,17 +144,10 @@ export const MUNICIPALITIES_ATLANTICO: MunicipalityItem[] = [
 ];
 
 export const MUNICIPALITIES_VALLE_ABURRA: MunicipalityItem[] = [
-  { name: 'Medellín', department: 'Antioquia', label: 'Medellín (Todo el municipio)', coords: { lat: 6.2442, lng: -75.5812 } },
-  { name: 'Medellín:Belen', department: 'Antioquia', label: '📍 Medellín - Belén (General)', coords: { lat: 6.2312, lng: -75.5985 } },
-  { name: 'Medellín:Mota', department: 'Antioquia', label: '📍 Medellín - Belén La Mota / Vaso de Leche', coords: { lat: 6.2205, lng: -75.6015 } },
-  { name: 'Medellín:Bernal', department: 'Antioquia', label: '📍 Medellín - Loma de Los Bernal', coords: { lat: 6.2160, lng: -75.6070 } },
-  { name: 'Medellín:Poblado', department: 'Antioquia', label: '📍 Medellín - El Poblado', coords: { lat: 6.2085, lng: -75.5685 } },
-  { name: 'Medellín:Conquistadores', department: 'Antioquia', label: '📍 Medellín - Los Conquistadores', coords: { lat: 6.2415, lng: -75.5865 } },
-  { name: 'Medellín:Laureles', department: 'Antioquia', label: '📍 Medellín - Laureles', coords: { lat: 6.2455, lng: -75.5945 } },
-  { name: 'Medellín:Estadio', department: 'Antioquia', label: '📍 Medellín - Estadio / Floresta', coords: { lat: 6.2575, lng: -75.5905 } },
-  { name: 'Medellín:Centro', department: 'Antioquia', label: '📍 Medellín - Centro', coords: { lat: 6.2518, lng: -75.5636 } },
+  { name: 'Medellín', department: 'Antioquia', label: 'Medellín (Valle de Aburrá)', coords: { lat: 6.2442, lng: -75.5812 } },
   { name: 'Envigado', department: 'Antioquia', label: 'Envigado (Valle de Aburrá)', coords: { lat: 6.1695, lng: -75.5873 } },
   { name: 'Sabaneta', department: 'Antioquia', label: 'Sabaneta (Valle de Aburrá)', coords: { lat: 6.1517, lng: -75.6163 } },
+  { name: 'Bello', department: 'Antioquia', label: 'Bello (Valle de Aburrá)', coords: { lat: 6.3373, lng: -75.5579 } },
 ];
 
 export const POPULAR_BARRIOS_VALLE_ABURRA = [

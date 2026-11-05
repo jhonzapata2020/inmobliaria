@@ -4,15 +4,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { 
   X, 
   Printer, 
-  Building2, 
   FileSpreadsheet, 
   MapPin,
-  FileText,
   ChevronLeft,
   ChevronRight,
-  Download,
-  Layers,
-  AlertCircle
+  Download
 } from 'lucide-react';
 import { Property, PropertyFilterState } from '../../types/property';
 import { formatCurrency, formatArea, isPriceToNegotiate } from '../../lib/formatters';
@@ -30,14 +26,13 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
   properties,
   filters
 }) => {
-  const [includeBranding, setIncludeBranding] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(50);
 
   // Reset to first page whenever properties array or filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [properties.length, filters]);
+  }, [properties.length, filters.municipality, filters.assetType, filters.searchQuery]);
 
   if (!isOpen) return null;
 
@@ -50,13 +45,11 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
     return properties.slice(startIndex, endIndex);
   }, [properties, startIndex, endIndex]);
 
-  const handlePrint = (withLogo: boolean) => {
-    setIncludeBranding(withLogo);
-    // Allow React state update and DOM repaint before invoking native print dialog
+  const handlePrint = () => {
     requestAnimationFrame(() => {
       setTimeout(() => {
         window.print();
-      }, 200);
+      }, 150);
     });
   };
 
@@ -123,7 +116,7 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
     const link = document.createElement('a');
     link.href = url;
     const now = new Date().toISOString().slice(0, 10);
-    link.setAttribute('download', `Inventario_Predial_Darien_${now}.csv`);
+    link.setAttribute('download', `Reporte_Propiedades_${now}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -178,14 +171,14 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                  Sábana de Inventario Predial
+                  Listado de Inventario
                 </span>
                 <span className="text-[11px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded font-semibold">
-                  {properties.length.toLocaleString('es-CO')} Activos
+                  {properties.length.toLocaleString('es-CO')} Predios
                 </span>
               </div>
               <h2 className="text-base font-bold text-[#242321] font-serif mt-0.5">
-                Informe Ejecutivo Tabular
+                Reporte de Propiedades
               </h2>
             </div>
           </div>
@@ -195,41 +188,20 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
             <button
               onClick={handleExportCSV}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-[#1E3A2F] border border-[#E5E1D8] text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
-              title="Descargar todos los predios filtrados en formato CSV para Microsoft Excel"
+              title="Descargar todos los predios en formato CSV para Microsoft Excel"
             >
               <Download className="w-4 h-4 text-emerald-700" />
               <span>Exportar Excel (CSV)</span>
             </button>
 
-            {/* Toggle Preview Option */}
-            <label className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 bg-white text-xs font-medium text-[#242321] rounded-xl border border-[#E5E1D8] cursor-pointer hover:bg-slate-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={includeBranding}
-                onChange={(e) => setIncludeBranding(e.target.checked)}
-                className="rounded border-[#E5E1D8] text-[#1E3A2F] focus:ring-[#1E3A2F]"
-              />
-              <span>Membrete y logo</span>
-            </label>
-
-            {/* Print with Logo Button */}
+            {/* Print Button (Neutral, Clean) */}
             <button
-              onClick={() => handlePrint(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
-              title="Imprimir con membrete oficial y logo de Activos Darién"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1E3A2F] hover:bg-[#152921] text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+              title="Imprimir reporte en PDF"
             >
               <Printer className="w-4 h-4 text-[#C6A15B]" />
-              <span>Imprimir con Logo</span>
-            </button>
-
-            {/* Print without Logo Button */}
-            <button
-              onClick={() => handlePrint(false)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-emerald-50 text-[#1E3A2F] border-2 border-[#1E3A2F] text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
-              title="Imprimir formato neutro (Listado de...) sin logo ni mención de Darién"
-            >
-              <FileText className="w-4 h-4 text-emerald-700" />
-              <span>Imprimir sin Logo</span>
+              <span>Imprimir Reporte (PDF)</span>
             </button>
 
             <button
@@ -251,8 +223,8 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
                 Mostrando <strong className="text-[#242321]">{startIndex + 1} - {endIndex}</strong> de <strong className="text-[#242321]">{properties.length.toLocaleString('es-CO')}</strong> predios
               </span>
               {properties.length > pageSize && (
-                <span className="hidden md:inline text-[11px] bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded">
-                  Imprime {displayedProperties.length} predios por tanda para evitar saturar el navegador.
+                <span className="hidden md:inline text-[11px] bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5 rounded">
+                  Mostrando {displayedProperties.length} predios por tanda para impresión ágil.
                 </span>
               )}
             </div>
@@ -308,39 +280,21 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
           id="reporte-tabular-imprimible" 
           className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 print:p-0 print:overflow-visible print:bg-white"
         >
-          {/* Institutional Header */}
+          {/* Neutral Clean Header */}
           <div className="border-b-2 border-[#1E3A2F] pb-5 space-y-3">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              {includeBranding ? (
-                <div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-[#1E3A2F] text-[#C6A15B] flex items-center justify-center font-serif font-bold text-sm">
-                      D
-                    </div>
-                    <div>
-                      <h1 className="font-serif text-lg sm:text-xl font-bold text-[#1E3A2F] tracking-tight">
-                        ACTIVOS & INVERSIONES DARIÉN S.A.S.
-                      </h1>
-                      <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider">
-                        División Tierras & Inversión • Nit: 901.789.452-1
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <h1 className="font-serif text-xl sm:text-2xl font-black text-[#1E3A2F] tracking-tight uppercase">
-                    Listado de Bienes e Inmuebles
-                  </h1>
-                  <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider font-semibold">
-                    Consolidado de Disponibilidad Predial y Referencia Comercial
-                  </p>
-                </div>
-              )}
+              <div>
+                <h1 className="font-serif text-xl sm:text-2xl font-black text-[#1E3A2F] tracking-tight uppercase">
+                  Reporte de Propiedades
+                </h1>
+                <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider font-semibold">
+                  Consolidado de Disponibilidad Predial e Inventario Inmobiliario
+                </p>
+              </div>
 
               <div className="text-left sm:text-right font-mono text-xs text-[#6B6A63]">
                 <p className="font-bold text-[#1E3A2F]">
-                  {includeBranding ? 'INFORME CONSOLIDADO PREDIAL' : 'DOCUMENTO DE INVENTARIO'}
+                  DOCUMENTO DE INVENTARIO
                 </p>
                 <p className="capitalize text-[11px]">{currentDate}</p>
                 {totalPages > 1 && (
@@ -515,20 +469,9 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
           {/* Institutional Footer & Disclaimer */}
           <div className="pt-4 border-t border-[#E5E1D8] text-center text-[10px] font-mono text-[#6B6A63] space-y-1.5 print:border-gray-400 print:text-black">
-            {includeBranding ? (
-              <>
-                <p className="font-bold text-[#1E3A2F] text-xs">
-                  ACTIVOS & INVERSIONES DARIÉN S.A.S. • División de Gestión Predial & Proyectos Especiales
-                </p>
-                <p>
-                  Urabá & Darién, Colombia | Correo: gerencia@activosdarien.com | Nit: 901.789.452-1
-                </p>
-              </>
-            ) : (
-              <p className="font-bold text-[#1E3A2F] text-xs uppercase tracking-wider">
-                DOCUMENTO CONSOLIDADO DE INVENTARIO Y DISPONIBILIDAD INMOBILIARIA
-              </p>
-            )}
+            <p className="font-bold text-[#1E3A2F] text-xs uppercase tracking-wider">
+              DOCUMENTO CONSOLIDADO DE INVENTARIO Y DISPONIBILIDAD INMOBILIARIA
+            </p>
             <p className="text-[9px] text-gray-500 italic max-w-4xl mx-auto pt-1">
               * Documento informativo y de consulta predial. Los valores comerciales de referencia y especificaciones técnicas están sujetos a confirmación en visita técnica de campo y estudio de títulos.
             </p>

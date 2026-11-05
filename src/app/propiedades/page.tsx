@@ -20,24 +20,28 @@ function PropiedadesCatalogContent() {
   const [error, setError] = useState<string | null>(null);
   const [isInventoryReportOpen, setIsInventoryReportOpen] = useState(false);
 
-  // Initial filters from query params
-  const [filters, setFilters] = useState<PropertyFilterState>({
-    searchQuery: searchParams.get('searchQuery') || '',
-    modality: searchParams.get('modality') || '',
-    assetType: searchParams.get('assetType') || '',
-    department: searchParams.get('department') || '',
-    municipality: searchParams.get('municipality') || '',
-    minPrice: searchParams.get('minPrice') || '',
-    maxPrice: searchParams.get('maxPrice') || '',
-    minArea: searchParams.get('minArea') || '',
-    maxArea: searchParams.get('maxArea') || '',
-    minAreaHa: searchParams.get('minAreaHa') || '',
-    maxAreaHa: searchParams.get('maxAreaHa') || '',
-    legalStatus: searchParams.get('legalStatus') || '',
-    potentialUse: searchParams.get('potentialUse') || '',
-    availability: '',
-    isInvestmentOpportunity: searchParams.get('isInvestmentOpportunity') === 'true',
-    sortBy: searchParams.get('sortBy') || 'recent'
+  // Initial filters from query params (safe lazy init)
+  const [filters, setFilters] = useState<PropertyFilterState>(() => {
+    const rawMuni = searchParams.get('municipality') || '';
+    const cleanMuni = rawMuni.split(':')[0].trim();
+    return {
+      searchQuery: searchParams.get('searchQuery') || '',
+      modality: searchParams.get('modality') || '',
+      assetType: searchParams.get('assetType') || '',
+      department: searchParams.get('department') || '',
+      municipality: cleanMuni,
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      minArea: searchParams.get('minArea') || '',
+      maxArea: searchParams.get('maxArea') || '',
+      minAreaHa: searchParams.get('minAreaHa') || '',
+      maxAreaHa: searchParams.get('maxAreaHa') || '',
+      legalStatus: searchParams.get('legalStatus') || '',
+      potentialUse: searchParams.get('potentialUse') || '',
+      availability: '',
+      isInvestmentOpportunity: searchParams.get('isInvestmentOpportunity') === 'true',
+      sortBy: searchParams.get('sortBy') || 'recent'
+    };
   });
 
   const showOnlyFavorites = searchParams.get('favorites') === 'true';
@@ -69,36 +73,6 @@ function PropiedadesCatalogContent() {
     loadProperties();
   }, [filters]);
 
-  // Sync active filters to URL for shareable links without triggering Next.js router re-render loops
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const params = new URLSearchParams();
-    if (filters.searchQuery) params.set('searchQuery', filters.searchQuery);
-    if (filters.modality) params.set('modality', filters.modality);
-    if (filters.assetType) params.set('assetType', filters.assetType);
-    if (filters.municipality) params.set('municipality', filters.municipality);
-    if (filters.department) params.set('department', filters.department);
-    if (filters.minPrice) params.set('minPrice', String(filters.minPrice));
-    if (filters.maxPrice) params.set('maxPrice', String(filters.maxPrice));
-    if (filters.minArea) params.set('minArea', String(filters.minArea));
-    if (filters.maxArea) params.set('maxArea', String(filters.maxArea));
-    if (filters.minAreaHa) params.set('minAreaHa', String(filters.minAreaHa));
-    if (filters.maxAreaHa) params.set('maxAreaHa', String(filters.maxAreaHa));
-    if (filters.legalStatus) params.set('legalStatus', filters.legalStatus);
-    if (filters.isInvestmentOpportunity) params.set('isInvestmentOpportunity', 'true');
-    if (filters.sortBy && filters.sortBy !== 'recent') params.set('sortBy', filters.sortBy);
-    if (showOnlyFavorites) params.set('favorites', 'true');
-
-    const queryString = params.toString();
-    const currentQuery = window.location.search.replace(/^\?/, '');
-
-    // Only update browser URL if the query string actually changed
-    if (queryString !== currentQuery) {
-      const newPath = queryString ? `/propiedades?${queryString}` : '/propiedades';
-      window.history.replaceState(null, '', newPath);
-    }
-  }, [filters, showOnlyFavorites]);
 
   const handleResetFilters = () => {
     setFilters({

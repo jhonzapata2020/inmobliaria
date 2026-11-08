@@ -62,7 +62,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       {/* Photo Container */}
       <div className="relative h-56 w-full bg-[#F1EFE8] overflow-hidden">
         <img
-          src={property.featuredImage || property.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
+          src={property.images?.[currentImageIndex] || property.featuredImage || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
           alt={property.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />

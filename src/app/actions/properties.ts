@@ -56,6 +56,13 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       .neq('availability', 'Archivado');
 
     if (filters) {
+      const portfolio = filters.portfolio || 'territorial';
+      if (portfolio === 'nacional') {
+        query = query.ilike('code', 'NAC-%');
+      } else if (portfolio === 'territorial') {
+        query = query.not('code', 'ilike', 'NAC-%');
+      }
+
       const modality = sanitizeParam(filters.modality);
       const assetType = sanitizeParam(filters.assetType);
       const municipality = sanitizeParam(filters.municipality);
@@ -157,7 +164,7 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         query = query.order('created_at', { ascending: false });
       }
     } else {
-      query = query.order('created_at', { ascending: false });
+      query = query.not('code', 'ilike', 'NAC-%').order('created_at', { ascending: false });
     }
 
     const { data, error } = await query.limit(1000);

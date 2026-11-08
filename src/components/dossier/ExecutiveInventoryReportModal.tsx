@@ -45,6 +45,13 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
   const activeFiltersSummary = useMemo(() => {
     const parts: string[] = [];
+    if (filters.portfolio === 'nacional') {
+      parts.push('Portafolio: Nacional (SAE)');
+    } else if (filters.portfolio === 'all') {
+      parts.push('Portafolio: Consolidado Total');
+    } else {
+      parts.push('Portafolio: Territorial (Urabá)');
+    }
     if (filters.searchQuery) parts.push(`Búsqueda: "${filters.searchQuery}"`);
     if (filters.municipality) parts.push(`Municipio: ${filters.municipality}`);
     if (filters.department) parts.push(`Depto: ${filters.department}`);
@@ -288,7 +295,7 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
                   Reporte de Propiedades
                 </h1>
                 <p className="text-[11px] font-mono text-[#6B6A63] uppercase tracking-wider font-semibold">
-                  Consolidado de Disponibilidad Predial e Inventario Inmobiliario
+                  Consolidado de Disponibilidad Predial e Inventario Inmobiliario • {filters.portfolio === 'nacional' ? 'Portafolio Nacional (SAE)' : filters.portfolio === 'all' ? 'Portafolio Consolidado' : 'Portafolio Territorial (Urabá)'}
                 </p>
               </div>
 

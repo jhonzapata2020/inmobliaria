@@ -109,6 +109,7 @@ export interface Property {
 
   // Partner & Origin Metadata
   createdBy?: string;
+  portfolio?: 'territorial' | 'nacional';
   commissionAgreement?: 'split_50_50' | 'net_price_group_commission' | 'fixed_fee' | 'direct_owner' | 'custom' | string;
   netPriceOwnerCop?: number;
   groupCommissionCop?: number;
@@ -145,6 +146,7 @@ export type PotentialUse =
   | string;
 
 export interface PropertyFilterState {
+  portfolio?: 'territorial' | 'nacional' | 'all';
   searchQuery: string;
   modality: string;
   assetType: string;

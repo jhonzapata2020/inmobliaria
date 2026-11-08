@@ -24,7 +24,10 @@ function PropiedadesCatalogContent() {
   const [filters, setFilters] = useState<PropertyFilterState>(() => {
     const rawMuni = searchParams.get('municipality') || '';
     const cleanMuni = rawMuni.split(':')[0].trim();
+    const rawPortfolio = searchParams.get('portfolio');
+    const validPortfolio = (rawPortfolio === 'nacional' || rawPortfolio === 'all') ? rawPortfolio : 'territorial';
     return {
+      portfolio: validPortfolio,
       searchQuery: searchParams.get('searchQuery') || '',
       modality: searchParams.get('modality') || '',
       assetType: searchParams.get('assetType') || '',
@@ -75,7 +78,8 @@ function PropiedadesCatalogContent() {
 
 
   const handleResetFilters = () => {
-    setFilters({
+    setFilters((prev) => ({
+      portfolio: prev.portfolio || 'territorial',
       searchQuery: '',
       modality: '',
       assetType: '',
@@ -92,7 +96,7 @@ function PropiedadesCatalogContent() {
       availability: '',
       isInvestmentOpportunity: false,
       sortBy: 'recent'
-    });
+    }));
   };
 
   const filteredProperties = useMemo(() => {
@@ -109,10 +113,14 @@ function PropiedadesCatalogContent() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold tracking-wider">
-                Marketplace Inmobiliario Premium
+                {filters.portfolio === 'nacional' ? 'Portafolio Nacional SAE' : 'Portafolio Territorial Especializado'}
               </span>
               <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#242321] mt-1">
-                {showOnlyFavorites ? 'Mis Propiedades Favoritas' : 'Catálogo Visual de Propiedades'}
+                {showOnlyFavorites
+                  ? 'Mis Propiedades Favoritas'
+                  : filters.portfolio === 'nacional'
+                  ? 'Inventario Nacional de Propiedades'
+                  : 'Catálogo Territorial de Propiedades'}
               </h1>
               <p className="text-xs text-[#6B6A63] font-mono mt-1">
                 {loading ? (
@@ -121,7 +129,7 @@ function PropiedadesCatalogContent() {
                   <span className="text-rose-700 font-bold">Error de conexión al inventario</span>
                 ) : (
                   <span>
-                    Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el portafolio
+                    Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el {filters.portfolio === 'nacional' ? 'portafolio nacional' : 'portafolio territorial'}
                   </span>
                 )}
               </p>

@@ -1,5 +1,6 @@
 import { Property, Modality, AssetType, EditorialStatus, AvailabilityStatus } from '../../types/property';
 import { Lead, CRMStage, LeadPriority, LeadNote, LeadActivity } from '../../types/crm';
+import { getAppropriatePropertyImages, isGenericPlaceholder } from '../utils/propertyImages';
 
 export function mapDbToProperty(row: Record<string, unknown>): Property {
   const parseNum = (v: unknown): number | undefined => {
@@ -23,6 +24,20 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
 
   const landAreaM2 = parseNum(row.land_area_m2);
   const landAreaHa = parseNum(row.land_area_ha) ?? (landAreaM2 ? landAreaM2 / 10000 : undefined);
+
+  const rawImages = parseArray(row.images);
+  const rawFeatured = row.featured_image ? String(row.featured_image) : undefined;
+  const finalImages = getAppropriatePropertyImages({
+    id: String(row.id || ''),
+    code: String(row.code || ''),
+    title: String(row.title || ''),
+    description: String(row.description || ''),
+    assetType: String(row.asset_type || ''),
+    municipality: String(row.municipality || ''),
+    department: String(row.department || ''),
+    images: rawImages,
+    featuredImage: rawFeatured,
+  });
 
   return {
     id: String(row.id || ''),
@@ -78,8 +93,8 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
     editorialStatus: (row.editorial_status as EditorialStatus) || 'published',
     isDemoData: Boolean(row.is_demo_data),
 
-    images: parseArray(row.images),
-    featuredImage: row.featured_image ? String(row.featured_image) : undefined,
+    images: finalImages,
+    featuredImage: isGenericPlaceholder(rawFeatured) ? finalImages[0] : (rawFeatured || finalImages[0]),
     videoUrl: row.video_url ? String(row.video_url) : undefined,
     virtualTourUrl: row.virtual_tour_url ? String(row.virtual_tour_url) : undefined,
     documentsAvailable: parseJson(row.documents_available, []),
@@ -91,6 +106,9 @@ export function mapDbToProperty(row: Record<string, unknown>): Property {
     updatedDate: row.updated_at ? new Date(String(row.updated_at)).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
 
     createdBy: row.created_by ? String(row.created_by) : undefined,
+    portfolio: String(row.document_status || '').toLowerCase() === 'nacional' || String(row.code || '').startsWith('NAC-')
+      ? 'nacional'
+      : 'territorial',
     commissionAgreement: row.commission_agreement ? String(row.commission_agreement) : 'split_50_50',
     netPriceOwnerCop: parseNum(row.net_price_owner_cop),
     groupCommissionCop: parseNum(row.group_commission_cop),

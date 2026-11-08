@@ -8,7 +8,9 @@ import {
   X, 
   Sparkles,
   Check,
-  FileSpreadsheet
+  FileSpreadsheet,
+  MapPin,
+  Globe
 } from 'lucide-react';
 import { PropertyFilterState } from '../../types/property';
 import { 
@@ -80,9 +82,67 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     { label: 'Alta Valorización', action: () => updateField('isInvestmentOpportunity', !filters.isInvestmentOpportunity), isActive: filters.isInvestmentOpportunity, isGold: true },
   ];
 
+  const currentPortfolio = filters.portfolio || 'territorial';
+
   return (
     <div className="bg-white border border-[#E5E1D8] rounded-2xl p-5 shadow-sm space-y-4">
       
+      {/* Portfolio Selector Header */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 bg-[#F8F7F2] border border-[#E5E1D8] rounded-xl">
+        <div className="flex items-center gap-1.5 p-1 bg-white border border-[#E5E1D8] rounded-lg shadow-xs">
+          <button
+            type="button"
+            onClick={() => {
+              onFilterChange({
+                ...filters,
+                portfolio: 'territorial',
+                municipality: '',
+                department: '',
+                searchQuery: '',
+              });
+            }}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              currentPortfolio === 'territorial'
+                ? 'bg-[#1E3A2F] text-white shadow-sm'
+                : 'text-[#6B6A63] hover:text-[#242321] hover:bg-[#F8F7F2]'
+            }`}
+          >
+            <MapPin className="w-3.5 h-3.5 text-[#C6A15B]" />
+            <span>Portafolio Territorial (Urabá)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onFilterChange({
+                ...filters,
+                portfolio: 'nacional',
+                municipality: '',
+                department: '',
+                searchQuery: '',
+              });
+            }}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              currentPortfolio === 'nacional'
+                ? 'bg-[#1E3A2F] text-[#C6A15B] shadow-sm font-black'
+                : 'text-[#6B6A63] hover:text-[#242321] hover:bg-[#F8F7F2]'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>Portafolio Nacional (SAE)</span>
+          </button>
+        </div>
+
+        <div className="text-[11px] font-mono text-[#6B6A63] px-2 flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+          <span>
+            {currentPortfolio === 'nacional'
+              ? 'Portafolio Nacional SAE Activo'
+              : 'Portafolio Territorial Especializado'}
+          </span>
+        </div>
+      </div>
+
       {/* Horizontally Scrollable Quick Chips Bar */}
       <div className="flex items-center gap-2 pb-3 border-b border-[#E5E1D8] overflow-x-auto scrollbar-none py-1">
         <span className="text-xs font-mono font-bold text-[#6B6A63] uppercase tracking-wider shrink-0 mr-1">Filtros Rápidos:</span>
@@ -426,6 +486,52 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             </div>
 
             <div className="space-y-3 text-xs">
+              {/* Mobile Portfolio Selector */}
+              <div>
+                <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Portafolio</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFilterChange({
+                        ...filters,
+                        portfolio: 'territorial',
+                        municipality: '',
+                        department: '',
+                        searchQuery: '',
+                      });
+                    }}
+                    className={`p-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 ${
+                      currentPortfolio === 'territorial'
+                        ? 'bg-[#1E3A2F] text-white border-[#1E3A2F]'
+                        : 'bg-[#F8F7F2] text-[#242321] border-[#E5E1D8]'
+                    }`}
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-[#C6A15B]" />
+                    <span>Territorial</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFilterChange({
+                        ...filters,
+                        portfolio: 'nacional',
+                        municipality: '',
+                        department: '',
+                        searchQuery: '',
+                      });
+                    }}
+                    className={`p-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 ${
+                      currentPortfolio === 'nacional'
+                        ? 'bg-[#1E3A2F] text-[#C6A15B] border-[#1E3A2F]'
+                        : 'bg-[#F8F7F2] text-[#242321] border-[#E5E1D8]'
+                    }`}
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Nacional</span>
+                  </button>
+                </div>
+              </div>
               <div>
                 <label className="block text-[#6B6A63] mb-1 font-mono font-medium">Modalidad</label>
                 <select

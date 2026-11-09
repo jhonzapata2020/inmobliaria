@@ -16,6 +16,7 @@ import { PropertyFilterState } from '../../types/property';
 import { 
   MUNICIPALITIES_VALLE_ABURRA,
   POPULAR_BARRIOS_VALLE_ABURRA,
+  MUNICIPALITIES_META,
   MUNICIPALITIES_VALLE,
   MUNICIPALITIES_LA_GUAJIRA,
   MUNICIPALITIES_ANTIOQUIA,
@@ -345,6 +346,11 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 <option key={`desktop-atlantico-${m.name}`} value={m.name}>{m.label}</option>
               ))}
             </optgroup>
+            <optgroup label="Meta (Llanos Orientales)">
+              {MUNICIPALITIES_META.map((m) => (
+                <option key={`desktop-meta-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
             <optgroup label="Valle del Cauca">
               {MUNICIPALITIES_VALLE.map((m) => (
                 <option key={`desktop-valle-${m.name}`} value={m.name}>{m.label}</option>
@@ -590,7 +596,12 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                       <option key={`mobile-atlantico-${m.name}`} value={m.name}>{m.label}</option>
                     ))}
                   </optgroup>
-                  <optgroup label="Valle del Cauca">
+                  <optgroup label="Meta (Llanos Orientales)">
+              {MUNICIPALITIES_META.map((m) => (
+                <option key={`desktop-meta-${m.name}`} value={m.name}>{m.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Valle del Cauca">
                     {MUNICIPALITIES_VALLE.map((m) => (
                       <option key={`mobile-valle-${m.name}`} value={m.name}>{m.label}</option>
                     ))}

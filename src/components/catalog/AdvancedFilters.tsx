@@ -229,9 +229,13 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
               } else {
                 onFilterChange({
                   ...filters,
-                  portfolio: 'nacional',
+                  portfolio: 'all',
                   municipality: '',
                   department: '',
+                  modality: '',
+                  assetType: '',
+                  legalStatus: '',
+                  isInvestmentOpportunity: false,
                   searchQuery: 'Cúpica',
                 });
               }

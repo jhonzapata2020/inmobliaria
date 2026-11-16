@@ -35,6 +35,42 @@ function stripAccents(str: string): string {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+const ACCENT_RESTORE_MAP: Record<string, string> = {
+  'cupica': 'Cúpica',
+  'choco': 'Chocó',
+  'bahia': 'Bahía',
+  'quibdo': 'Quibdó',
+  'acandi': 'Acandí',
+  'acacias': 'Acacías',
+  'tado': 'Tadó',
+  'novita': 'Nóvita',
+  'bagado': 'Bagadó',
+  'puerto lopez': 'Puerto López',
+  'san martin': 'San Martín',
+  'puerto gaitan': 'Puerto Gaitán',
+  'medellin': 'Medellín',
+  'apartado': 'Apartadó',
+  'necocli': 'Necoclí',
+  'chigorodo': 'Chigorodó',
+  'monteria': 'Montería',
+  'cordoba': 'Córdoba',
+  'bogota': 'Bogotá',
+};
+
+function getSearchVariants(str: string): string[] {
+  const clean = str.trim();
+  if (!clean) return [];
+  const unaccented = stripAccents(clean);
+  const variants = new Set<string>([clean, unaccented]);
+  const lowerUnaccented = unaccented.toLowerCase();
+  for (const [plain, accented] of Object.entries(ACCENT_RESTORE_MAP)) {
+    if (lowerUnaccented.includes(plain)) {
+      variants.add(lowerUnaccented.replace(plain, accented));
+    }
+  }
+  return Array.from(variants);
+}
+
 function sanitizePublicProperty(prop: Property): Property {
   if (prop.isConfidentialCoords) {
     return {
@@ -76,7 +112,7 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         'choco', 'bahia solano', 'quibdo', 'istmina', 'tado', 'condoto', 'novita', 'cupica'
       ].some(m => rawLocation.includes(m));
 
-      const portfolio = isExplicitNationalLocation ? 'nacional' : (filters.portfolio || 'territorial');
+      const portfolio = isExplicitNationalLocation ? 'all' : (filters.portfolio || 'territorial');
       if (portfolio === 'nacional') {
         query = query.ilike('code', 'NAC-%');
       } else if (portfolio === 'territorial') {
@@ -100,18 +136,18 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
 
       if (municipality && municipality.toLowerCase() !== 'all' && municipality.toLowerCase() !== 'todos') {
         const cleanMuni = municipality.split(':')[0].trim();
-        const unaccented = stripAccents(cleanMuni);
-        if (unaccented.toLowerCase() !== cleanMuni.toLowerCase()) {
-          query = query.or(`municipality.ilike.%${cleanMuni}%,municipality.ilike.%${unaccented}%`);
+        const variants = getSearchVariants(cleanMuni);
+        if (variants.length > 1) {
+          query = query.or(variants.map(v => `municipality.ilike.%${v}%`).join(','));
         } else {
           query = query.ilike('municipality', `%${cleanMuni}%`);
         }
       }
 
       if (department && department.toLowerCase() !== 'all' && department.toLowerCase() !== 'todos') {
-        const unaccented = stripAccents(department);
-        if (unaccented.toLowerCase() !== department.toLowerCase()) {
-          query = query.or(`department.ilike.%${department}%,department.ilike.%${unaccented}%`);
+        const variants = getSearchVariants(department);
+        if (variants.length > 1) {
+          query = query.or(variants.map(v => `department.ilike.%${v}%`).join(','));
         } else {
           query = query.ilike('department', `%${department}%`);
         }
@@ -170,16 +206,20 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       if (searchQuery) {
         const safeSearch = searchQuery.replace(/[,.()%"'\\]/g, ' ').trim();
         if (safeSearch) {
-          const q = `%${safeSearch}%`;
-          const unaccentedSearch = stripAccents(safeSearch);
-          if (unaccentedSearch.toLowerCase() !== safeSearch.toLowerCase()) {
-            const qu = `%${unaccentedSearch}%`;
-            query = query.or(
-              `title.ilike.${q},title.ilike.${qu},description.ilike.${q},description.ilike.${qu},municipality.ilike.${q},municipality.ilike.${qu},code.ilike.${q},address.ilike.${q},address.ilike.${qu},sector_vereda.ilike.${q},sector_vereda.ilike.${qu},vereda.ilike.${q},vereda.ilike.${qu}`
-            );
-          } else {
-            query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q},address.ilike.${q},sector_vereda.ilike.${q},vereda.ilike.${q}`);
-          }
+          const variants = getSearchVariants(safeSearch);
+          const clauses = variants.flatMap(v => {
+            const q = `%${v}%`;
+            return [
+              `title.ilike.${q}`,
+              `description.ilike.${q}`,
+              `municipality.ilike.${q}`,
+              `code.ilike.${q}`,
+              `address.ilike.${q}`,
+              `sector_vereda.ilike.${q}`,
+              `vereda.ilike.${q}`
+            ];
+          });
+          query = query.or(clauses.join(','));
         }
       }
 

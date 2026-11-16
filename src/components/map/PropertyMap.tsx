@@ -41,10 +41,34 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   }
 
   const L = leafletRef.current;
-  const defaultCenter: [number, number] = [7.9351, -76.7289];
+  const validProps = properties.filter((p) => Boolean(p.latitude && p.longitude));
+  const firstProp = validProps[0];
+  const defaultCenter: [number, number] = firstProp
+    ? [firstProp.latitude, firstProp.longitude]
+    : [7.9351, -76.7289];
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-[#E5E1D8] shadow-md" style={{ height }}>
+      {/* Coordinate / Region Pill */}
+      {firstProp && (
+        <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#E5E1D8] rounded-xl px-3 py-1.5 shadow-md text-[11px] font-mono text-[#242321] flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+          {validProps.length === 1 ? (
+            <span>
+              <strong className="text-[#1E3A2F]">{firstProp.municipality}, {firstProp.department}</strong>
+              {' · '}
+              {firstProp.latitude.toFixed(4)}° N, {Math.abs(firstProp.longitude).toFixed(4)}° W
+            </span>
+          ) : (
+            <span>
+              <strong className="text-[#1E3A2F]">{validProps.length} activos georreferenciados</strong>
+              {' · '}
+              Centro aprox. {firstProp.latitude.toFixed(2)}°, {firstProp.longitude.toFixed(2)}°
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Map Control Tile Switcher */}
       <div className="absolute top-4 right-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#E5E1D8] rounded-xl p-1 flex gap-1 shadow-md text-xs font-mono text-[#242321]">
         <button
@@ -89,6 +113,7 @@ const LeafletMapInner: React.FC<{
 }> = ({ L, properties, defaultCenter, mapTile, onSelectProperty }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const lastBoundsKeyRef = useRef<string>('');
 
   useEffect(() => {
     if (!containerRef.current || !L) return;
@@ -97,7 +122,7 @@ const LeafletMapInner: React.FC<{
     if (!mapInstanceRef.current) {
       const map = L.map(containerRef.current, {
         center: defaultCenter,
-        zoom: 9,
+        zoom: properties.length === 1 ? 13 : 9,
         zoomControl: true
       });
 
@@ -113,10 +138,10 @@ const LeafletMapInner: React.FC<{
       }
     });
 
-    // Add Tile Layer
+    // Add Tile Layer (100% free, no API key required)
     if (mapTile === 'streets') {
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> & OpenStreetMap',
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19
       }).addTo(map);
     } else {
@@ -133,22 +158,25 @@ const LeafletMapInner: React.FC<{
       }
     });
 
-    // Custom Icon Generator with Price Pill Pins
+    // Custom Icon Generator with Price Pill Pins (inline styles so Tailwind purge never strips them)
     const createCustomIcon = (code: string, modality: string) => {
-      let bg = 'bg-white text-[#1E3A2F] border-[#1E3A2F]';
-      if (modality === 'Arriendo') bg = 'bg-white text-[#0F766E] border-[#0F766E]';
-      if (modality === 'Custodia SAE') bg = 'bg-[#6D4C7D] text-white border-[#6D4C7D]';
+      const isCustody = modality === 'Custodia SAE';
+      const isRent = modality === 'Arriendo';
+      const bgColor = isCustody ? '#6D4C7D' : '#FFFFFF';
+      const textColor = isCustody ? '#FFFFFF' : isRent ? '#0F766E' : '#1E3A2F';
+      const borderColor = isCustody ? '#6D4C7D' : isRent ? '#0F766E' : '#1E3A2F';
+      const dotColor = isCustody ? '#FFFFFF' : '#10B981';
 
       return L.divIcon({
         className: 'custom-map-pin',
         html: `
-          <div className="${bg} font-mono font-bold text-[10px] px-2 py-1 rounded-full shadow-md border flex items-center gap-1 hover:scale-110 transition-transform">
-            <span className="w-1.5 h-1.5 rounded-full ${modality === 'Custodia SAE' ? 'bg-white' : 'bg-[#1E3A2F]'} animate-pulse"></span>
-            ${code}
+          <div style="background:${bgColor};color:${textColor};border:1.5px solid ${borderColor};font-family:monospace;font-weight:700;font-size:10px;padding:3px 8px;border-radius:9999px;box-shadow:0 3px 8px rgba(0,0,0,0.22);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">
+            <span style="width:7px;height:7px;border-radius:9999px;background:${dotColor};display:inline-block;flex-shrink:0;"></span>
+            <span>${code}</span>
           </div>
         `,
-        iconSize: [85, 24],
-        iconAnchor: [42, 12]
+        iconSize: [110, 24],
+        iconAnchor: [55, 12]
       });
     };
 
@@ -193,6 +221,22 @@ const LeafletMapInner: React.FC<{
         });
       }
     });
+
+    // Auto-center / fitBounds whenever the active set of properties changes
+    const validCoords = properties
+      .filter((p) => Boolean(p.latitude && p.longitude))
+      .map((p) => [p.latitude, p.longitude] as [number, number]);
+    const boundsKey = properties.map((p) => `${p.id}:${p.latitude}:${p.longitude}`).join('|');
+
+    if (validCoords.length > 0 && boundsKey !== lastBoundsKeyRef.current) {
+      lastBoundsKeyRef.current = boundsKey;
+      if (validCoords.length === 1) {
+        map.setView(validCoords[0], 13, { animate: true });
+      } else {
+        const bounds = L.latLngBounds(validCoords);
+        map.fitBounds(bounds, { padding: [45, 45], maxZoom: 13 });
+      }
+    }
 
   }, [L, properties, defaultCenter, mapTile, onSelectProperty]);
 

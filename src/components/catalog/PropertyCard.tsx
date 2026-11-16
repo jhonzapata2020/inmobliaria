@@ -12,7 +12,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   ShieldCheck,
-  Building
+  Building,
+  ArrowUpRight
 } from 'lucide-react';
 import { Property } from '../../types/property';
 import { formatCurrency, formatArea, getLegalStatusBadge, getModalityBadge, formatPropertyValuation } from '../../lib/formatters';
@@ -61,14 +62,16 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       
       {/* Photo Container */}
       <div className="relative h-56 w-full bg-[#F1EFE8] overflow-hidden">
-        <img
-          src={property.images?.[currentImageIndex] || property.featuredImage || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
-          alt={property.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+        <Link href={detailHref} className="block w-full h-full" aria-label={`Ver detalles de ${property.title}`}>
+          <img
+            src={property.images?.[currentImageIndex] || property.featuredImage || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef'}
+            alt={property.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+        </Link>
 
         {/* Top Badges & Actions */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start gap-2 z-10">
@@ -93,23 +96,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           </div>
 
           <div className="flex items-center gap-1.5">
-            {/* Quick Dossier Button Floating on Photo */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                inDossier ? removeFromDossier(property.id) : addToDossier(property);
-              }}
-              className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
-                inDossier 
-                  ? 'bg-[#23866D] text-white font-bold' 
-                  : 'bg-white/90 text-[#1E3A2F] hover:text-[#152921] hover:bg-white'
-              }`}
-              title={inDossier ? 'Quitar del dossier' : '+ Agregar al dossier'}
-            >
-              {inDossier ? <Check className="w-4 h-4 stroke-[3]" /> : <FileSpreadsheet className="w-4 h-4" />}
-            </button>
-
             {/* Favorite Button */}
             <button
               onClick={(e) => {
@@ -117,7 +103,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 e.stopPropagation();
                 toggleFavorite(property.id);
               }}
-              className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm ${
+              className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-sm cursor-pointer ${
                 favorite 
                   ? 'bg-rose-600 text-white' 
                   : 'bg-white/90 text-[#6B6A63] hover:text-[#242321] hover:bg-white'
@@ -246,41 +232,52 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             );
           })()}
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {/* Compare Toggle */}
-            <button
-              onClick={() => (inCompare ? removeFromCompare(property.id) : addToCompare(property))}
-              className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                inCompare
-                  ? 'bg-[#C6A15B]/20 text-[#C6A15B] border border-[#C6A15B]/50'
-                  : 'bg-[#F1EFE8] text-[#242321] hover:bg-[#E5E1D8]'
-              }`}
+          <div className="space-y-2 pt-1">
+            <Link
+              href={detailHref}
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 bg-[#1E3A2F] hover:bg-[#152921] text-white transition-all shadow-sm"
             >
-              <Layers className="w-3.5 h-3.5 text-[#6B6A63]" />
-              <span>{inCompare ? 'Comparando' : 'Comparar'}</span>
-            </button>
+              <span>Ver Detalles</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
 
-            {/* Dossier Toggle */}
-            <button
-              onClick={() => (inDossier ? removeFromDossier(property.id) : addToDossier(property))}
-              className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm ${
-                inDossier
-                  ? 'bg-[#23866D] text-white font-bold'
-                  : 'bg-[#1E3A2F] hover:bg-[#152921] text-white'
-              }`}
-            >
-              {inDossier ? (
-                <>
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>En Dossier</span>
-                </>
-              ) : (
-                <>
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>+ Dossier</span>
-                </>
-              )}
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Compare Toggle */}
+              <button
+                onClick={() => (inCompare ? removeFromCompare(property.id) : addToCompare(property))}
+                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  inCompare
+                    ? 'bg-[#C6A15B]/20 text-[#C6A15B] border border-[#C6A15B]/50'
+                    : 'bg-[#F1EFE8] text-[#242321] hover:bg-[#E5E1D8]'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5 text-[#6B6A63]" />
+                <span>{inCompare ? 'Comparando' : 'Comparar'}</span>
+              </button>
+
+              {/* Dossier Toggle */}
+              <button
+                onClick={() => (inDossier ? removeFromDossier(property.id) : addToDossier(property))}
+                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  inDossier
+                    ? 'bg-[#23866D] text-white font-bold shadow-sm'
+                    : 'bg-[#F8F7F2] hover:bg-[#E5E1D8] text-[#1E3A2F] border border-[#E5E1D8]'
+                }`}
+                title={inDossier ? 'Quitar de Mi Dossier' : 'Agregar a Mi Dossier para cotización'}
+              >
+                {inDossier ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    <span>En Dossier</span>
+                  </>
+                ) : (
+                  <>
+                    <FileSpreadsheet className="w-3.5 h-3.5" />
+                    <span>+ Dossier</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 

@@ -69,7 +69,6 @@ export const DossierProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return [...prev, property];
     });
     setLastAddedTitle(property.title);
-    setIsDrawerOpen(true);
 
     setTimeout(() => {
       setLastAddedTitle(null);

@@ -113,11 +113,17 @@ function PropiedadesCatalogContent() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <span className="text-xs font-mono uppercase text-[#1E3A2F] font-bold tracking-wider">
-                {filters.portfolio === 'nacional' ? 'Portafolio Nacional SAE' : 'Portafolio Territorial Especializado'}
+                {filters.portfolio === 'all'
+                  ? 'Portafolio Completo (Territorial + Nacional SAE)'
+                  : filters.portfolio === 'nacional'
+                  ? 'Portafolio Nacional SAE'
+                  : 'Portafolio Territorial Especializado'}
               </span>
               <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#242321] mt-1">
                 {showOnlyFavorites
                   ? 'Mis Propiedades Favoritas'
+                  : filters.portfolio === 'all'
+                  ? 'Catálogo Unificado de Propiedades'
                   : filters.portfolio === 'nacional'
                   ? 'Inventario Nacional de Propiedades'
                   : 'Catálogo Territorial de Propiedades'}
@@ -129,7 +135,7 @@ function PropiedadesCatalogContent() {
                   <span className="text-rose-700 font-bold">Error de conexión al inventario</span>
                 ) : (
                   <span>
-                    Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el {filters.portfolio === 'nacional' ? 'portafolio nacional' : 'portafolio territorial'}
+                    Se encontraron <strong className="text-[#1E3A2F] font-bold">{filteredProperties.length}</strong> activos validados en el {filters.portfolio === 'all' ? 'portafolio completo' : filters.portfolio === 'nacional' ? 'portafolio nacional' : 'portafolio territorial'}
                   </span>
                 )}
               </p>

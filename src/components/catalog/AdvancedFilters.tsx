@@ -10,7 +10,8 @@ import {
   Check,
   FileSpreadsheet,
   MapPin,
-  Globe
+  Globe,
+  Anchor
 } from 'lucide-react';
 import { PropertyFilterState } from '../../types/property';
 import { 
@@ -44,8 +45,17 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const updateField = (field: keyof PropertyFilterState, value: any) => {
+    let nextPortfolio = filters.portfolio;
+    if (field === 'municipality' && value) {
+      const cleanMuni = String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const nationalMunis = ['villavicencio', 'acacias', 'puerto lopez', 'restrepo', 'san martin', 'granada', 'fuente de oro', 'puerto lleras', 'vistahermosa', 'puerto rico', 'guamal', 'cumaral', 'puerto gaitan', 'cali', 'palmira', 'bogota', 'soacha', 'chia', 'bahia solano', 'quibdo', 'istmina', 'tado', 'condoto', 'novita'];
+      if (nationalMunis.some(m => cleanMuni.includes(m))) {
+        nextPortfolio = 'nacional';
+      }
+    }
     onFilterChange({
       ...filters,
+      portfolio: nextPortfolio,
       [field]: value
     });
   };
@@ -205,6 +215,37 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
               <span>Informe Ejecutivo PDF</span>
             </button>
           )}
+
+          {/* Cúpica / Puerto Pacífico Dedicated Button */}
+          <button
+            type="button"
+            onClick={() => {
+              const isCupicaActive = filters.searchQuery.toLowerCase().includes('cúpica') || filters.searchQuery.toLowerCase().includes('cupica');
+              if (isCupicaActive) {
+                onFilterChange({
+                  ...filters,
+                  searchQuery: '',
+                });
+              } else {
+                onFilterChange({
+                  ...filters,
+                  portfolio: 'nacional',
+                  municipality: '',
+                  department: '',
+                  searchQuery: 'Cúpica',
+                });
+              }
+            }}
+            className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer shrink-0 ${
+              filters.searchQuery.toLowerCase().includes('cúpica') || filters.searchQuery.toLowerCase().includes('cupica')
+                ? 'bg-[#0F4C5C] text-white border-[#0F4C5C] shadow-sm'
+                : 'bg-[#F0F9FF] border-[#BAE6FD] text-[#0369A1] hover:bg-[#E0F2FE]'
+            }`}
+            title="Ver activos estratégicos en Bahía de Cúpica (Corredor Puerto Interoceánico Pacífico-Atlántico)"
+          >
+            <Anchor className="w-3.5 h-3.5 shrink-0" />
+            <span>Cúpica / Puerto Pacífico</span>
+          </button>
 
           {/* Investment Opportunity Toggle */}
           <button

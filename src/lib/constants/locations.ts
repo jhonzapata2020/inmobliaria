@@ -129,10 +129,14 @@ export const MUNICIPALITIES_CORDOBA: MunicipalityItem[] = [
 ];
 
 export const MUNICIPALITIES_CHOCO: MunicipalityItem[] = [
+  { name: 'Quibdó', department: 'Chocó', label: 'Quibdó (Chocó)', coords: { lat: 5.6947, lng: -76.6611 } },
+  { name: 'Bahía Solano', department: 'Chocó', label: 'Bahía Solano (Chocó)', coords: { lat: 6.2239, lng: -77.4039 } },
   { name: 'Acandí', department: 'Chocó', label: 'Acandí (Chocó)', coords: { lat: 8.5083, lng: -77.2778 } },
+  { name: 'Istmina', department: 'Chocó', label: 'Istmina (Chocó)', coords: { lat: 5.1600, lng: -76.6853 } },
+  { name: 'Tadó', department: 'Chocó', label: 'Tadó (Chocó)', coords: { lat: 5.2678, lng: -76.5583 } },
   { name: 'Unguía', department: 'Chocó', label: 'Unguía (Chocó)', coords: { lat: 8.0439, lng: -77.0939 } },
   { name: 'Riosucio', department: 'Chocó', label: 'Riosucio (Chocó)', coords: { lat: 7.4394, lng: -77.1189 } },
-  { name: 'Bahía Solano', department: 'Chocó', label: 'Bahía Solano (Chocó)', coords: { lat: 6.2239, lng: -77.4039 } },
+  { name: 'Condoto', department: 'Chocó', label: 'Condoto (Chocó)', coords: { lat: 5.0944, lng: -76.6506 } },
 ];
 
 export const MUNICIPALITIES_BOLIVAR: MunicipalityItem[] = [
@@ -146,10 +150,10 @@ export const MUNICIPALITIES_ATLANTICO: MunicipalityItem[] = [
 
 export const MUNICIPALITIES_META: MunicipalityItem[] = [
   { name: 'Villavicencio', department: 'Meta', label: 'Villavicencio (Meta)', coords: { lat: 4.1420, lng: -73.6266 } },
-  { name: 'Acacías', department: 'Meta', label: 'Acacías (Meta)', coords: { lat: 3.9869, lng: -73.7628 } },
-  { name: 'Puerto López', department: 'Meta', label: 'Puerto López (Meta)', coords: { lat: 4.0847, lng: -72.9558 } },
+  { name: 'Acacias', department: 'Meta', label: 'Acacías (Meta)', coords: { lat: 3.9869, lng: -73.7628 } },
+  { name: 'Puerto Lopez', department: 'Meta', label: 'Puerto López (Meta)', coords: { lat: 4.0847, lng: -72.9558 } },
   { name: 'Restrepo', department: 'Meta', label: 'Restrepo (Meta)', coords: { lat: 4.2508, lng: -73.5658 } },
-  { name: 'San Martín', department: 'Meta', label: 'San Martín (Meta)', coords: { lat: 3.6961, lng: -73.6989 } },
+  { name: 'San Martin', department: 'Meta', label: 'San Martín (Meta)', coords: { lat: 3.6961, lng: -73.6989 } },
   { name: 'Granada', department: 'Meta', label: 'Granada (Meta)', coords: { lat: 3.5461, lng: -73.7067 } },
   { name: 'Fuente de Oro', department: 'Meta', label: 'Fuente de Oro (Meta)', coords: { lat: 3.4619, lng: -73.6214 } },
   { name: 'Puerto Lleras', department: 'Meta', label: 'Puerto Lleras (Meta)', coords: { lat: 3.2758, lng: -73.3742 } },
@@ -158,7 +162,7 @@ export const MUNICIPALITIES_META: MunicipalityItem[] = [
   { name: 'San Carlos de Guaroa', department: 'Meta', label: 'San Carlos de Guaroa (Meta)', coords: { lat: 3.7119, lng: -73.2458 } },
   { name: 'Guamal', department: 'Meta', label: 'Guamal (Meta)', coords: { lat: 3.8808, lng: -73.7658 } },
   { name: 'Cumaral', department: 'Meta', label: 'Cumaral (Meta)', coords: { lat: 4.2711, lng: -73.4869 } },
-  { name: 'Puerto Gaitán', department: 'Meta', label: 'Puerto Gaitán (Meta)', coords: { lat: 4.3139, lng: -72.0817 } },
+  { name: 'Puerto Gaitan', department: 'Meta', label: 'Puerto Gaitán (Meta)', coords: { lat: 4.3139, lng: -72.0817 } },
 ];
 
 export const MUNICIPALITIES_VALLE_ABURRA: MunicipalityItem[] = [

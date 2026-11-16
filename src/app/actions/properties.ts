@@ -31,6 +31,10 @@ function sanitizeParam(val?: string): string {
   return decoded.trim();
 }
 
+function stripAccents(str: string): string {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function sanitizePublicProperty(prop: Property): Property {
   if (prop.isConfidentialCoords) {
     return {
@@ -56,19 +60,28 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
       .neq('availability', 'Archivado');
 
     if (filters) {
-      const portfolio = filters.portfolio || 'territorial';
-      if (portfolio === 'nacional') {
-        query = query.ilike('code', 'NAC-%');
-      } else if (portfolio === 'territorial') {
-        query = query.not('code', 'ilike', 'NAC-%');
-      }
-
       const modality = sanitizeParam(filters.modality);
       const assetType = sanitizeParam(filters.assetType);
       const municipality = sanitizeParam(filters.municipality);
       const department = sanitizeParam(filters.department);
       const legalStatus = sanitizeParam(filters.legalStatus);
       const searchQuery = sanitizeParam(filters.searchQuery);
+
+      // Check if location specifically belongs to Meta, Chocó or another national region
+      const rawLocation = stripAccents(`${municipality} ${department} ${searchQuery}`).toLowerCase();
+      const isExplicitNationalLocation = [
+        'meta', 'villavicencio', 'acacias', 'puerto lopez', 'restrepo', 'san martin',
+        'granada', 'fuente de oro', 'puerto lleras', 'vistahermosa', 'puerto rico',
+        'guamal', 'cumaral', 'puerto gaitan', 'cali', 'palmira', 'bogota', 'soacha', 'chia',
+        'choco', 'bahia solano', 'quibdo', 'istmina', 'tado', 'condoto', 'novita', 'cupica'
+      ].some(m => rawLocation.includes(m));
+
+      const portfolio = isExplicitNationalLocation ? 'nacional' : (filters.portfolio || 'territorial');
+      if (portfolio === 'nacional') {
+        query = query.ilike('code', 'NAC-%');
+      } else if (portfolio === 'territorial') {
+        query = query.not('code', 'ilike', 'NAC-%');
+      }
 
       if (modality && modality.toLowerCase() !== 'all' && modality.toLowerCase() !== 'todas') {
         const modalityVal = modality === 'Custodia' ? 'Custodia SAE' : modality;
@@ -87,11 +100,21 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
 
       if (municipality && municipality.toLowerCase() !== 'all' && municipality.toLowerCase() !== 'todos') {
         const cleanMuni = municipality.split(':')[0].trim();
-        query = query.ilike('municipality', `%${cleanMuni}%`);
+        const unaccented = stripAccents(cleanMuni);
+        if (unaccented.toLowerCase() !== cleanMuni.toLowerCase()) {
+          query = query.or(`municipality.ilike.%${cleanMuni}%,municipality.ilike.%${unaccented}%`);
+        } else {
+          query = query.ilike('municipality', `%${cleanMuni}%`);
+        }
       }
 
       if (department && department.toLowerCase() !== 'all' && department.toLowerCase() !== 'todos') {
-        query = query.ilike('department', `%${department}%`);
+        const unaccented = stripAccents(department);
+        if (unaccented.toLowerCase() !== department.toLowerCase()) {
+          query = query.or(`department.ilike.%${department}%,department.ilike.%${unaccented}%`);
+        } else {
+          query = query.ilike('department', `%${department}%`);
+        }
       }
 
       if (filters.minPrice) {
@@ -148,7 +171,15 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         const safeSearch = searchQuery.replace(/[,.()%"'\\]/g, ' ').trim();
         if (safeSearch) {
           const q = `%${safeSearch}%`;
-          query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q},address.ilike.${q},sector_vereda.ilike.${q},vereda.ilike.${q}`);
+          const unaccentedSearch = stripAccents(safeSearch);
+          if (unaccentedSearch.toLowerCase() !== safeSearch.toLowerCase()) {
+            const qu = `%${unaccentedSearch}%`;
+            query = query.or(
+              `title.ilike.${q},title.ilike.${qu},description.ilike.${q},description.ilike.${qu},municipality.ilike.${q},municipality.ilike.${qu},code.ilike.${q},address.ilike.${q},address.ilike.${qu},sector_vereda.ilike.${q},sector_vereda.ilike.${qu},vereda.ilike.${q},vereda.ilike.${qu}`
+            );
+          } else {
+            query = query.or(`title.ilike.${q},description.ilike.${q},municipality.ilike.${q},code.ilike.${q},address.ilike.${q},sector_vereda.ilike.${q},vereda.ilike.${q}`);
+          }
         }
       }
 

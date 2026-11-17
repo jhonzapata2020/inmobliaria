@@ -327,6 +327,38 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
                 )}
               </div>
             </div>
+
+            {/* Executive KPIs Summary */}
+            {properties.length > 0 && (() => {
+              const totalHa = properties.reduce((sum, p) => sum + (Number(p.landAreaHa) || 0), 0);
+              const desocupados = properties.filter((p) => (p.occupancyStatus || '').toUpperCase() === 'DESOCUPADO').length;
+              const extintos = properties.filter((p) => (p.legalStatus || '').toUpperCase().includes('EXTINTO')).length;
+              const arrendados = properties.filter((p) => (p.occupancyStatus || '').toUpperCase() === 'ARRENDADO').length;
+              return (
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center font-mono">
+                  <div className="bg-white border border-[#E5E1D8] rounded-xl p-2.5">
+                    <span className="text-[10px] uppercase text-[#6B6A63] block">Total Predios</span>
+                    <span className="text-sm font-black text-[#1E3A2F]">{properties.length.toLocaleString('es-CO')}</span>
+                  </div>
+                  <div className="bg-white border border-[#E5E1D8] rounded-xl p-2.5">
+                    <span className="text-[10px] uppercase text-[#6B6A63] block">Área Consolidada</span>
+                    <span className="text-sm font-black text-[#1E3A2F]">{totalHa.toLocaleString('es-CO', { maximumFractionDigits: 2 })} Ha</span>
+                  </div>
+                  <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-2.5">
+                    <span className="text-[10px] uppercase text-emerald-800 block">Desocupados</span>
+                    <span className="text-sm font-black text-emerald-800">{desocupados}</span>
+                  </div>
+                  <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-2.5">
+                    <span className="text-[10px] uppercase text-emerald-800 block">Extinto 100%</span>
+                    <span className="text-sm font-black text-emerald-800">{extintos}</span>
+                  </div>
+                  <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-2.5 col-span-2 sm:col-span-1">
+                    <span className="text-[10px] uppercase text-teal-800 block">Arrendados</span>
+                    <span className="text-sm font-black text-teal-800">{arrendados}</span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Tabular Inventory Grid (1 Property per Row) */}
@@ -334,12 +366,12 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
             <table className="w-full text-left border-collapse text-xs font-sans border border-[#E5E1D8] print:border-gray-400">
               <thead>
                 <tr className="bg-[#1E3A2F] text-white text-[11px] font-mono uppercase tracking-wider print:bg-emerald-950 print:text-white">
-                  <th className="p-2.5 border border-[#1E3A2F] w-24 text-center">Código</th>
+                  <th className="p-2.5 border border-[#1E3A2F] w-28 text-center">Matrícula / SAE</th>
                   <th className="p-2.5 border border-[#1E3A2F]">Nombre del Predio & Ubicación</th>
                   <th className="p-2.5 border border-[#1E3A2F] w-32">Tipo / Modalidad</th>
                   <th className="p-2.5 border border-[#1E3A2F] w-28 text-right">Extensión</th>
                   <th className="p-2.5 border border-[#1E3A2F] w-28 text-center">Tenencia</th>
-                  <th className="p-2.5 border border-[#1E3A2F] w-44 text-right">Valor Referencia / Renta</th>
+                  <th className="p-2.5 border border-[#1E3A2F] w-44 text-right">Avalúo / Renta Est.</th>
                   <th className="p-2.5 border border-[#1E3A2F] w-36">Estado Jurídico</th>
                 </tr>
               </thead>
@@ -433,7 +465,19 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
 
                         {/* Col 6: Valuation / Rent */}
                         <td className="p-2.5 border border-[#E5E1D8] text-right align-top font-mono print:border-gray-300">
-                          {isPriceToNegotiate(prop) ? (
+                          {prop.estimatedValueCop && prop.estimatedValueCop > 0 ? (
+                            <div>
+                              <span className="font-bold text-[#1E3A2F] block text-xs">
+                                {formatCurrency(prop.estimatedValueCop)}
+                              </span>
+                              <span className="text-[9px] text-[#6B6A63] block">Avalúo Catastral</span>
+                              {rentDisplay && rentDisplay > 0 && (
+                                <span className="text-[10px] font-semibold text-blue-800 block mt-0.5">
+                                  Renta est: {formatCurrency(rentDisplay)}/mes
+                                </span>
+                              )}
+                            </div>
+                          ) : isPriceToNegotiate(prop) ? (
                             <div>
                               <span className="font-semibold text-stone-700 block text-xs font-sans">
                                 A convenir

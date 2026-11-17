@@ -136,6 +136,7 @@ export const MUNICIPALITIES_CHOCO: MunicipalityItem[] = [
   { name: 'Tadó', department: 'Chocó', label: 'Tadó (Chocó)', coords: { lat: 5.2678, lng: -76.5583 } },
   { name: 'Unguía', department: 'Chocó', label: 'Unguía (Chocó)', coords: { lat: 8.0439, lng: -77.0939 } },
   { name: 'Riosucio', department: 'Chocó', label: 'Riosucio (Chocó)', coords: { lat: 7.4394, lng: -77.1189 } },
+  { name: 'Belén de Bajirá', department: 'Chocó', label: 'Belén de Bajirá (Urabá / Chocó)', coords: { lat: 7.4167, lng: -76.7167 } },
   { name: 'Condoto', department: 'Chocó', label: 'Condoto (Chocó)', coords: { lat: 5.0944, lng: -76.6506 } },
 ];
 

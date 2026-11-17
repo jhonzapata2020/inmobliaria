@@ -55,6 +55,8 @@ const ACCENT_RESTORE_MAP: Record<string, string> = {
   'monteria': 'Montería',
   'cordoba': 'Córdoba',
   'bogota': 'Bogotá',
+  'bajira': 'Bajirá',
+  'mutata': 'Mutatá',
 };
 
 function getSearchVariants(str: string): string[] {
@@ -109,7 +111,8 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
         'meta', 'villavicencio', 'acacias', 'puerto lopez', 'restrepo', 'san martin',
         'granada', 'fuente de oro', 'puerto lleras', 'vistahermosa', 'puerto rico',
         'guamal', 'cumaral', 'puerto gaitan', 'cali', 'palmira', 'bogota', 'soacha', 'chia',
-        'choco', 'bahia solano', 'quibdo', 'istmina', 'tado', 'condoto', 'novita', 'cupica'
+        'choco', 'bahia solano', 'quibdo', 'istmina', 'tado', 'condoto', 'novita', 'cupica',
+        'riosucio', 'bajira', 'mutata', 'chigorodo'
       ].some(m => rawLocation.includes(m));
 
       const portfolio = isExplicitNationalLocation ? 'all' : (filters.portfolio || 'territorial');
@@ -136,11 +139,16 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
 
       if (municipality && municipality.toLowerCase() !== 'all' && municipality.toLowerCase() !== 'todos') {
         const cleanMuni = municipality.split(':')[0].trim();
-        const variants = getSearchVariants(cleanMuni);
-        if (variants.length > 1) {
-          query = query.or(variants.map(v => `municipality.ilike.%${v}%`).join(','));
+        const normMuni = stripAccents(cleanMuni).toLowerCase();
+        if (normMuni.includes('bajir')) {
+          query = query.or('municipality.ilike.%Bajir%,vereda.ilike.%Bajir%,sector_vereda.ilike.%Bajir%,address.ilike.%Bajir%,title.ilike.%Bajir%');
         } else {
-          query = query.ilike('municipality', `%${cleanMuni}%`);
+          const variants = getSearchVariants(cleanMuni);
+          if (variants.length > 1) {
+            query = query.or(variants.map(v => `municipality.ilike.%${v}%`).join(','));
+          } else {
+            query = query.ilike('municipality', `%${cleanMuni}%`);
+          }
         }
       }
 

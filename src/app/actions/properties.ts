@@ -222,6 +222,9 @@ export async function getPublishedProperties(filters?: PropertyFilterState): Pro
               `description.ilike.${q}`,
               `municipality.ilike.${q}`,
               `code.ilike.${q}`,
+              `sae_id_activo.ilike.${q}`,
+              `folio_matricula.ilike.${q}`,
+              `matricula_inmobiliaria.ilike.${q}`,
               `address.ilike.${q}`,
               `sector_vereda.ilike.${q}`,
               `vereda.ilike.${q}`

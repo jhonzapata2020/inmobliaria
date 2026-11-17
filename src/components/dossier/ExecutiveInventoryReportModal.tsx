@@ -97,7 +97,8 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
       'Canon Renta (COP)',
       'Avalúo Comercial (COP)',
       'Activo SAE',
-      'ID SAE'
+      'ID SAE',
+      'Folio Matrícula'
     ];
 
     const escapeCsv = (val: any) => {
@@ -125,7 +126,8 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
       escapeCsv(p.monthlyRentCop || p.monthlyRentEstimateCop),
       escapeCsv(p.commercialAppraisalCop || p.estimatedValueCop),
       escapeCsv(p.isSae ? 'SÍ' : 'NO'),
-      escapeCsv(p.saeIdActivo)
+      escapeCsv(p.saeIdActivo),
+      escapeCsv(p.folioMatricula || p.matriculaInmobiliaria)
     ]);
 
     const csvContent = '\uFEFF' + [
@@ -367,9 +369,14 @@ export const ExecutiveInventoryReportModal: React.FC<ExecutiveInventoryReportMod
                         key={prop.id || prop.code || `prop-row-${idx}`} 
                         className={`break-inside-avoid ${isEven ? 'bg-white' : 'bg-[#F9F8F3]'} hover:bg-emerald-50/40 transition-colors print:bg-white`}
                       >
-                        {/* Col 1: Code */}
+                        {/* Col 1: Code & Folio */}
                         <td className="p-2.5 border border-[#E5E1D8] font-mono font-bold text-[#1E3A2F] text-center align-top print:border-gray-300">
-                          {prop.code}
+                          {(prop.folioMatricula || prop.matriculaInmobiliaria) && (prop.folioMatricula || prop.matriculaInmobiliaria) !== 'Bajo solicitud' && (
+                            <span className="block text-[11px] font-mono font-extrabold text-[#1E3A2F] bg-emerald-50 rounded px-1.5 py-0.5 mb-1 border border-emerald-200">
+                              Mat: {prop.folioMatricula || prop.matriculaInmobiliaria}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-[#6B6A63] block">{prop.code}</span>
                           {prop.isSae && (
                             <span className="block text-[9px] font-sans text-purple-700 bg-purple-50 rounded px-1 mt-0.5 border border-purple-200">
                               SAE #{prop.saeIdActivo || 'SAE'}

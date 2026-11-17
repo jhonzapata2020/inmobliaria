@@ -147,10 +147,15 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           </div>
         )}
 
-        {/* Code Badge */}
-        <div className="absolute bottom-3 left-3 z-10">
+        {/* Code & Folio Badge */}
+        <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-1.5">
+          {(property.folioMatricula || property.matriculaInmobiliaria) && (property.folioMatricula || property.matriculaInmobiliaria) !== 'Bajo solicitud' && (
+            <span className="text-[10px] font-mono font-bold text-white bg-[#1E3A2F]/90 backdrop-blur-md px-2 py-0.5 rounded border border-emerald-400/40">
+              Mat: {property.folioMatricula || property.matriculaInmobiliaria}
+            </span>
+          )}
           <span className="text-[10px] font-mono font-bold text-white bg-black/70 backdrop-blur-md px-2 py-0.5 rounded border border-white/20">
-            {property.code}
+            {property.saeIdActivo ? `SAE ${property.saeIdActivo}` : property.code}
           </span>
         </div>
       </div>
